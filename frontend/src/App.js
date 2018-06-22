@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import { injectGlobal } from 'styled-components';
 import NavBar from './Components/Navbar';
 
+import PennLogo from './images/penn-logo.png'
+
 const AppWrapper = styled.div`
   /* sticky footer */
   display: flex;
@@ -33,7 +35,7 @@ class App extends Component {
   render() {
     return (
       <AppWrapper>
-        <NavBar brandname="TUPLE" />
+        <NavBar brandname="Events at Penn" />
 
         <Container>
         Content goes here!
