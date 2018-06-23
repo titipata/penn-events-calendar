@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import styled from 'styled-components';
-import { injectGlobal } from 'styled-components';
+import styled, { injectGlobal } from 'styled-components';
+import Fetcher from './Components/Fetcher';
 import NavBar from './Components/Navbar';
-
-import PennLogo from './images/penn-logo.png'
 
 const AppWrapper = styled.div`
   /* sticky footer */
@@ -38,7 +36,10 @@ class App extends Component {
         <NavBar brandname="Events at Penn" />
 
         <Container>
-        Content goes here!
+          Content goes here!
+          
+          <Fetcher />
+
         </Container>
 
         <NavBar brandname="this is footer" />
