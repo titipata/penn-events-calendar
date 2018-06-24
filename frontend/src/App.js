@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import styled, { injectGlobal } from 'styled-components';
 import Fetcher from './Components/Fetcher';
 import NavBar from './Components/Navbar';
+import { Container } from './Components/BaseComponents';
 
 // add fa font to use
 library.add(
@@ -20,9 +21,9 @@ const AppWrapper = styled.div`
   flex-direction: column;
 `;
 
-const Container = styled.div`
-  flex: 1;
-`;
+// const Container = styled.div`
+//   flex: 1;
+// `;
 
 class App extends Component {
   componentDidMount() {
@@ -47,7 +48,6 @@ class App extends Component {
         <NavBar brandname="Events at Penn" />
 
         <Container>
-          Content goes here!
 
           <Fetcher />
 

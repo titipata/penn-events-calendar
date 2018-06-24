@@ -7,13 +7,14 @@ import { Category } from '../../Data';
 import { Datetime as dtutil, Events as evutil } from '../../Utils';
 
 const StyledListItem = styled.li`
-  margin-bottom: 10px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #eee;
+  margin-bottom: 5px;
+  padding: 10px 0;
+  border: 1px solid #eee;
+  border-left: 5px solid ${props => props.color};
+  border-radius: 5px;
 `;
 
 const StyledContentWrapper = styled.div`
-  border-left: 3px solid ${props => props.color};
   display: inline-flex;
   flex-direction: row;
 `;
@@ -26,6 +27,10 @@ const DatetimeWrapper = styled.div`
   padding: 0 20px;
   display: flex;
   flex-direction: column;
+`;
+
+const DetailWrapper = styled.div`
+  padding: 0 15px;
 `;
 
 const StyledDate = styled.div`
@@ -70,8 +75,8 @@ const StyledCat = styled.div`
 `;
 
 const EventItem = ({ ev }) => (
-  <StyledListItem>
-    <StyledContentWrapper color={Category.getColor(evutil.getText(ev).category)}>
+  <StyledListItem color={Category.getColor(evutil.getText(ev).category)}>
+    <StyledContentWrapper>
       <DatetimeWrapper>
         <StyledDate>
           {dtutil.getMonthDay(evutil.getText(ev).date)}
@@ -85,7 +90,7 @@ const EventItem = ({ ev }) => (
           {dtutil.getTime(evutil.getText(ev).endtime)}
         </StyledTime>
       </DatetimeWrapper>
-      <div>
+      <DetailWrapper>
         <StyledTitle>
           {renderHTML(evutil.getText(ev).title)}
         </StyledTitle>
@@ -97,7 +102,7 @@ const EventItem = ({ ev }) => (
             {evutil.getText(ev).category}
           </StyledCat>
         </CatContainer>
-      </div>
+      </DetailWrapper>
     </StyledContentWrapper>
   </StyledListItem>
 );
