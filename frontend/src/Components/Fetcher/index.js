@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import XMLParser from 'xml-js';
 import { Key } from '../../Utils';
+import EventsList from '../EventsList';
+import EventItem from '../EventItem';
 
 // define xml2json function
 const xml2json = xml => JSON.parse(XMLParser.xml2json(xml, { compact: true, spaces: 2 }));
@@ -34,23 +36,14 @@ class Fetcher extends Component {
 
   render() {
     return (
-      <ul>
+      <EventsList>
         {this.state.xmlContent ?
           this.state.xmlContent.event.map(ev =>
             (
-              <li key={Key.getShortKey()}>
-                <div style={{ paddingBottom: '10px' }}>
-                  School: {ev.school._text} <br/>
-                  Title: {ev.title._text} <br/>
-                  Datetime: {ev.date._text}: {ev.starttime._text}-{ev.endtime._text} <br/>
-                  Location: Room {ev.room._text}, {ev.location._text} <br/>
-                  Owner: {ev.owner._text} <br/>
-                  URL: <a href={ev.url._text}>{ev.url._text}</a>
-                </div>
-              </li>
+              <EventItem key={Key.getShortKey()} ev={ev} />
             )) :
           <p>Loading XML data...</p>}
-      </ul>
+      </EventsList>
     );
   }
 }
