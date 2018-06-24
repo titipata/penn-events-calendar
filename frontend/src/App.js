@@ -1,7 +1,16 @@
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faCalendarAlt, faMapMarkerAlt, faClock, faFileAlt, faExternalLinkAlt, faUserTie, faSchool, faUniversity, faBookmark } from '@fortawesome/free-solid-svg-icons';
 import React, { Component } from 'react';
 import styled, { injectGlobal } from 'styled-components';
 import Fetcher from './Components/Fetcher';
 import NavBar from './Components/Navbar';
+
+// add fa font to use
+library.add(
+  faCalendarAlt, faMapMarkerAlt, faClock, faFileAlt,
+  faExternalLinkAlt, faUserTie, faSchool, faUniversity,
+  faBookmark,
+);
 
 const AppWrapper = styled.div`
   /* sticky footer */
@@ -18,6 +27,8 @@ const Container = styled.div`
 class App extends Component {
   componentDidMount() {
     this.globals = injectGlobal`
+      @import url('https://fonts.googleapis.com/css?family=Source+Code+Pro');
+
       body {
         margin: 0;
         padding: 0;
@@ -37,7 +48,7 @@ class App extends Component {
 
         <Container>
           Content goes here!
-          
+
           <Fetcher />
 
         </Container>
