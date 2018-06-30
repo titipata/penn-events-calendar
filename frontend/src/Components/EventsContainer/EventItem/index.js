@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import renderHTML from 'react-render-html';
 import styled from 'styled-components';
-import { Category } from '../../Data';
-import { Datetime as dtutil, Events as evutil } from '../../Utils';
+import { Category } from '../../../Data';
+import { Datetime as dtutil, Events as evutil } from '../../../Utils';
 
 const StyledListItem = styled.li`
   margin-bottom: 5px;

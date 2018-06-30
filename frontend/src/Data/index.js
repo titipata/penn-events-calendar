@@ -1,22 +1,17 @@
-import { fetchEventsBegin, fetchEventsSuccess, fetchEventsError } from '../Actions';
-import { XML } from '../Utils';
+const endPoint = {
+  baseURL: 'http://www.upenn.edu/calendar-export',
+  dayEndpoint: '/?showndays=',
+};
 
+const definedDays = {
+  maximumDays: 90,
+  defaultDays: 14,
+  dayPerWeek: 7,
+  dayPerMonth: 30,
+};
 class API {
-  constructor() {
-    this.endPoint = {
-      baseURL: 'http://www.upenn.edu/calendar-export',
-      dayEndpoint: '/?showndays=',
-    };
-    this.default = {
-      maximumDays: 90,
-      defaultDays: 14,
-      dayPerWeek: 7,
-      dayPerMonth: 30,
-    };
-  }
-
-  getDaysLink(days = this.default.defaultDays) {
-    return `${this.endPoint.baseURL}${this.endPoint.dayEndpoint}${days}`;
+  static getDaysLink(days = definedDays.defaultDays) {
+    return `${endPoint.baseURL}${endPoint.dayEndpoint}${days}`;
   }
 
   // Handle HTTP errors since fetch won't.
@@ -25,22 +20,6 @@ class API {
       throw Error(response.statusText);
     }
     return response;
-  }
-
-  static fetchEvents() {
-    return (dispatch) => {
-      dispatch(fetchEventsBegin());
-      return fetch(this.getDaysLink())
-        .then(API.handleErrors)
-        .then(res => res.text())
-        .then((xmlText) => {
-          const xmlJson = XML.xml2json(xmlText).calendar;
-
-          dispatch(fetchEventsSuccess(xmlJson));
-          return xmlJson;
-        })
-        .catch(error => dispatch(fetchEventsError(error)));
-    };
   }
 }
 
