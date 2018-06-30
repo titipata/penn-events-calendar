@@ -1,5 +1,17 @@
 import shortid from 'shortid';
 import moment from 'moment';
+import XMLParser from 'xml-js';
+
+class XML {
+  // define xml2json function
+  static xml2json(xml) {
+    return JSON.parse(XMLParser
+      .xml2json(
+        xml,
+        { compact: true, spaces: 2 },
+      ));
+  }
+}
 
 class Key {
   static getShortKey() {
@@ -26,6 +38,10 @@ class Events {
       link: eventItem.link._text,
     };
   }
+
+  static getId(eventItem) {
+    return eventItem.link._attributes.id;
+  }
 }
 
 class Datetime {
@@ -39,4 +55,4 @@ class Datetime {
   }
 }
 
-export { Datetime, Events, Key };
+export { Datetime, Events, Key, XML };

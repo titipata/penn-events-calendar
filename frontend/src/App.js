@@ -1,7 +1,9 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCalendarAlt, faMapMarkerAlt, faClock, faFileAlt, faExternalLinkAlt, faUserTie, faSchool, faUniversity, faBookmark } from '@fortawesome/free-solid-svg-icons';
+import { faBookmark, faCalendarAlt, faClock, faExternalLinkAlt, faFileAlt, faMapMarkerAlt, faSchool, faUniversity, faUserTie } from '@fortawesome/free-solid-svg-icons';
 import React, { Component } from 'react';
 import styled, { injectGlobal } from 'styled-components';
+import { Container } from './Components/BaseComponents';
+import EventsContainer from './Components/EventsContainer';
 import Fetcher from './Components/Fetcher';
 import NavBar from './Components/Navbar';
 
@@ -18,10 +20,6 @@ const AppWrapper = styled.div`
   height: 100%;
   min-height: 100vh;
   flex-direction: column;
-`;
-
-const Container = styled.div`
-  flex: 1;
 `;
 
 class App extends Component {
@@ -46,11 +44,10 @@ class App extends Component {
       <AppWrapper>
         <NavBar brandname="Events at Penn" />
 
+        <Fetcher />
+
         <Container>
-          Content goes here!
-
-          <Fetcher />
-
+          <EventsContainer />
         </Container>
 
         <NavBar brandname="this is footer" />
