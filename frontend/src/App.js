@@ -6,6 +6,7 @@ import { Container } from './Components/BaseComponents';
 import EventsContainer from './Components/EventsContainer';
 import Fetcher from './Components/Fetcher';
 import NavBar from './Components/Navbar';
+import Footer from './Components/Footer';
 
 // add fa font to use
 library.add(
@@ -26,6 +27,7 @@ class App extends Component {
   componentDidMount() {
     this.globals = injectGlobal`
       @import url('https://fonts.googleapis.com/css?family=Source+Code+Pro');
+      @import url('https://fonts.googleapis.com/css?family=Open+Sans');
 
       body {
         margin: 0;
@@ -42,7 +44,7 @@ class App extends Component {
   render() {
     return (
       <AppWrapper>
-        <NavBar brandname="Events at Penn" />
+        <NavBar brandname="Upcoming Events" />
 
         <Fetcher />
 
@@ -50,7 +52,7 @@ class App extends Component {
           <EventsContainer />
         </Container>
 
-        <NavBar brandname="this is footer" />
+        <Footer />
       </AppWrapper>
     );
   }
