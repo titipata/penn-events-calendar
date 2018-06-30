@@ -26,19 +26,19 @@ class API {
 class Category {
   static getColor(catStr) {
     const colorCode = {
-      Exhibitions: '#49a9a6',
-      'Career/Prof': '#a3e8dc',
-      Academic: '#f64242',
-      Other: '#ffb51c',
-      'Perf Arts': '#ba2644',
-      Literary: '#ff6b6b',
-      Community: '#ff83bd',
-      Film: '#aaaaaa',
-      Social: '#61c0bf',
-      Health: '#bbded6',
+      Exhibitions: '#ca8b65',
+      'Career/Prof': '#ff7562',
+      Academic: '#ffb51c',
+      Other: '#2d174d',
+      'Perf Arts': '#7c98b3',
+      Literary: '#ff83bd',
+      Community: '#fde583',
+      Film: '#27567b',
+      Social: '#8fc0e7',
+      Health: '#3a8ba2',
       International: '#fae3d9',
-      Religion: '#ffb6b9',
-      Meetings: '#7af0b7',
+      Religion: '#fbf1f1',
+      Meetings: '#aaaaaa',
     };
 
     return colorCode[catStr];

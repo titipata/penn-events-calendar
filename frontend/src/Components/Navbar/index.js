@@ -5,16 +5,20 @@ import { Container } from '../BaseComponents';
 
 const pennLogo = require('../../images/penn-logo.png');
 
-const navHeight = '4.75rem';
+const navHeight = '3.75rem';
 
 const StyledNavBar = styled.div`
-  height: ${navHeight};
+  font-family: 'Open Sans';
+  height: auto;
   color: white;
   /* background-color: #1E303C; */
   background-color: white;
 
   display: flex;
   align-items: center;
+
+  padding-top: 15px;
+  padding-bottom: 5px;
 `;
 
 const NavContainer = Container.extend`
@@ -22,16 +26,18 @@ const NavContainer = Container.extend`
   flex-basis: auto; /* default value */
   flex-grow: 0;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  /* justify-content: space-between; */
 `;
 
 const StyledBrandText = styled.div`
   align-items: center;
   color: #1E303C;
-  display: flex;
-  font-size: 1.5rem;
+  /* display: flex; */
+  font-size: 1.05rem;
   font-weight: bold;
-  padding: 15px;
+  padding-top: 5px;
+  text-align: center;
 `;
 
 const LogoWrapper = styled.div`
@@ -49,12 +55,12 @@ const StyledLogo = styled.img`
 const NavBar = ({ brandname }) => (
   <StyledNavBar>
     <NavContainer>
-      <StyledBrandText>
-        { brandname }
-      </StyledBrandText>
       <LogoWrapper>
         <StyledLogo src={pennLogo} alt="Logo" />
       </LogoWrapper>
+      <StyledBrandText>
+        { brandname }
+      </StyledBrandText>
     </NavContainer>
   </StyledNavBar>
 );
