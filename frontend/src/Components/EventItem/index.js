@@ -75,7 +75,7 @@ const StyledCat = styled.div`
 `;
 
 const EventItem = ({ ev }) => (
-  <StyledListItem color={Category.getColor(evutil.getText(ev).category)}>
+  <StyledListItem onClick={()=>console.log(evutil.getId(ev), ': is clicked!')} color={Category.getColor(evutil.getText(ev).category)}>
     <StyledContentWrapper>
       <DatetimeWrapper>
         <StyledDate>

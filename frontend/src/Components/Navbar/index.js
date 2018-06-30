@@ -11,7 +11,7 @@ const StyledNavBar = styled.div`
   height: ${navHeight};
   color: white;
   /* background-color: #1E303C; */
-  background-color: #1E303C1A;
+  background-color: white;
 
   display: flex;
   align-items: center;
