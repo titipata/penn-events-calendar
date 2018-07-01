@@ -42,6 +42,22 @@ class Events {
   static getId(eventItem) {
     return eventItem.link._attributes.id;
   }
+
+  static groupByDate(eventArr) {
+    // get all dates from events
+    const allDates = eventArr.map(ev => Events.getText(ev).date);
+    // get only unique dates
+    const uniqueDates = [...new Set(allDates)];
+    // groupby date with reduce
+    const groupbyDate = uniqueDates.reduce((acc, cur) =>
+      ({
+        ...acc,
+        [cur]: eventArr.filter(ev =>
+          Events.getText(ev).date === cur),
+      }), {});
+
+    return groupbyDate;
+  }
 }
 
 class Datetime {
