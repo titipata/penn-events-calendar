@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import os
 import requests
 import json
@@ -5,6 +6,10 @@ from unidecode import unidecode
 from datetime import datetime
 from dateutil import parser
 from lxml import etree, html
+from bs4 import BeautifulSoup
+
+import time
+import schedule
 
 DAYS = [
     "Mon", "Tue",
@@ -12,6 +17,20 @@ DAYS = [
     "Fri", "Sat",
     "Sun"
 ]
+PATH_JSON = 'events.json'
+
+
+def read_json(file_path):
+    """
+    Read collected file from path
+    """
+    if not os.path.exists(file_path):
+        events = []
+        return events
+    else:
+        with open(file_path, 'r') as fp:
+            events = [json.loads(line) for line in fp]
+        return events
 
 
 def save_json(ls, file_path):
@@ -55,7 +74,7 @@ def convert_event_to_dict(event):
     return event_dict
 
 
-if __name__ == '__main__':
+def fetch_events():
     """
     Saving Penn events to JSON format
     """
@@ -63,11 +82,31 @@ if __name__ == '__main__':
     page = requests.get(URL)
     tree = html.fromstring(page.content)
     events = tree.findall('event')
-    event_list = []
+
+    # read JSON file is exist
+    if os.path.isfile(PATH_JSON):
+        events_list = read_json(PATH_JSON)
+    else:
+        events_list = []
+
     for event in events:
         try:
             event_dict = convert_event_to_dict(event)
-            event_list.append(event_dict)
+            if len(events_list) > 0:
+                event_ids = [e_['event_id'] for e_ in events_list]
+            else:
+                event_ids = []
+            if event_dict['event_id'] not in event_ids:
+                events_list.append(event_dict)
         except:
             pass
-    save_json(event_list, 'events.json')
+    save_json(events_list, PATH_JSON)
+    print('Events Downloaded!')
+
+
+if __name__ == '__main__':
+    # schedule.every().day.at("00:00").do(fetch_events)
+    schedule.every(1).minutes.do(fetch_events) # test run every minute
+    while 1:
+        schedule.run_pending()
+        time.sleep(30)
