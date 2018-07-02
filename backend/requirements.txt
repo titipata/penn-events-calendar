@@ -1,4 +1,4 @@
 flask
 flask-restful
 unidecode
-schedule
+python-crontab

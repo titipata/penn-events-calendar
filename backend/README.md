@@ -1,9 +1,10 @@
 # Flask back-end for Penn event
 
-You can run `fetch_events.py` to constantly fetch Penn events
+We use `cron` to constantly fetch Penn events. Change `username` in `cron_fetch_events`
+then run cron job by using the following script
 
 ```sh
-python fetch_events.py
+python cron_fetch_events.py
 ```
 
 

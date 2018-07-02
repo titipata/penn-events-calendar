@@ -2,14 +2,12 @@
 import os
 import requests
 import json
+import time
 from unidecode import unidecode
 from datetime import datetime
 from dateutil import parser
 from lxml import etree, html
 from bs4 import BeautifulSoup
-
-import time
-import schedule
 
 DAYS = [
     "Mon", "Tue",
@@ -105,8 +103,4 @@ def fetch_events():
 
 
 if __name__ == '__main__':
-    # schedule.every().day.at("00:00").do(fetch_events)
-    schedule.every(1).minutes.do(fetch_events) # test run every minute
-    while 1:
-        schedule.run_pending()
-        time.sleep(30)
+    fetch_events()
