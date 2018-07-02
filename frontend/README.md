@@ -1,4 +1,4 @@
-# Automatic Citation React App
+# React front-end for Penn event
 
 Run this project by:
 
