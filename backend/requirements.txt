@@ -2,3 +2,5 @@ flask
 flask-restful
 unidecode
 python-crontab
+bs4
+flask-cors

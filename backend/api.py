@@ -6,9 +6,11 @@ from fetch_events import read_json, save_json
 
 from flask import Flask
 from flask_restful import Resource, Api
+from flask_cors import CORS
 
 
 app = Flask(__name__)
+CORS(app)
 api = Api(app, catch_all_404s=True)
 events = read_json('events.json') # read saved events
 
@@ -37,7 +39,7 @@ class ShowEventDetails(Resource):
         return event
 
 
-api.add_resource(ShowEvent, '/showndays/<int:showndays>')
+api.add_resource(ShowEvent, '/getevents/<int:showndays>')
 api.add_resource(ShowEventDetails, '/event_id/<int:event_id>')
 
 

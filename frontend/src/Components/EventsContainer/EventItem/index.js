@@ -75,31 +75,31 @@ const StyledCat = styled.div`
 `;
 
 const EventItem = ({ ev }) => (
-  <StyledListItem onClick={()=>console.log(evutil.getId(ev), ': is clicked!')} color={Category.getColor(evutil.getText(ev).category)}>
+  <StyledListItem onClick={()=>console.log(ev.event_id, ': is clicked!')} color={Category.getColor(ev.category)}>
     <StyledContentWrapper>
       <DatetimeWrapper>
         <StyledDate>
-          {dtutil.getMonthDay(evutil.getText(ev).date)}
+          {dtutil.getMonthDay(ev.date)}
         </StyledDate>
         <StyledTime>
           <StyledTimeIcon>
             <Fa icon="clock" />
           </StyledTimeIcon>
-          {dtutil.getTime(evutil.getText(ev).starttime)}
+          {dtutil.getTime(ev.starttime)}
           <br />
-          {dtutil.getTime(evutil.getText(ev).endtime)}
+          {dtutil.getTime(ev.endtime)}
         </StyledTime>
       </DatetimeWrapper>
       <DetailWrapper>
         <StyledTitle>
-          {renderHTML(evutil.getText(ev).title)}
+          {renderHTML(ev.title)}
         </StyledTitle>
         <StyledLocation>
-          <Fa icon="map-marker-alt" /> {evutil.getText(ev).location}
+          <Fa icon="map-marker-alt" /> {ev.location}
         </StyledLocation>
         <CatContainer>
-          <StyledCat color={Category.getColor(evutil.getText(ev).category)}>
-            {evutil.getText(ev).category}
+          <StyledCat color={Category.getColor(ev.category)}>
+            {ev.category}
           </StyledCat>
         </CatContainer>
       </DetailWrapper>

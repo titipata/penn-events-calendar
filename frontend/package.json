@@ -21,9 +21,12 @@
     "xml-js": "^1.6.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "concurrently -n 'python,react' -c 'bgBlue,bgMagenta' 'cd ../backend && python api.py' 'react-scripts start'",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
+  },
+  "devDependencies": {
+    "concurrently": "^3.6.0"
   }
 }

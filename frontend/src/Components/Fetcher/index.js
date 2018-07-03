@@ -20,12 +20,8 @@ class Fetcher extends Component {
 
     fetch(API.getDaysLink())
       .then(API.handleErrors)
-      .then(res => res.text())
-      .then((xmlText) => {
-        const fetchedEvents = XML.xml2json(xmlText).calendar.event;
-
-        this.props.fetchEventsSuccess(fetchedEvents);
-      })
+      .then(res => res.json())
+      .then(events => this.props.fetchEventsSuccess(events))
       .catch(err => this.props.fetchEventsError(err));
   }
 
