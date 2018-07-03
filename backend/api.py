@@ -1,12 +1,28 @@
+"""
+A backend service for Penn event calendar
+Run the app:
+
+    $ python api.py
+
+This will serve on localhost:5000.
+
+Example queries:
+    - http://localhost:5000/api/v1/getevent?days=7 # return events happenning in next 7 day_args
+    - http://localhost:5000/api/v1/getevent # return all events
+
+"""
 import os
 import json
+import dateutil.parser
 from datetime import datetime, timedelta
-from dateutil import parser
 from fetch_events import read_json, save_json
 
 from flask import Flask
 from flask_restful import Resource, Api
 from flask_cors import CORS
+
+from webargs import fields, validate
+from webargs.flaskparser import use_args, use_kwargs, parser, abort
 
 
 app = Flask(__name__)
@@ -19,10 +35,23 @@ class ShowEvent(Resource):
     """
     Return events base on days ahead
     """
-    def get(self, showndays=7):
+    day_args = {
+        'days': fields.Int(missing=None, required=False)
+    }
+
+    @use_args(day_args)
+    def get(self, args):
+        """Retrieve events from saved JSON"""
+        date_retrieve = datetime.today()
+        if args['days'] is None:
+            events_to_show = events
+            return events_to_show
+        else:
+            date_retrieve += timedelta(days=args['days'])
+
         events_to_show = []
         for event in events:
-            if parser.parse(event['date']) <= datetime.today() + timedelta(days=showndays):
+            if dateutil.parser.parse(event['date']) <= date_retrieve:
                 events_to_show.append(event)
         return events_to_show
 
@@ -39,9 +68,7 @@ class ShowEventDetails(Resource):
         return event
 
 
-api.add_resource(ShowEvent, '/getevents/<int:showndays>')
-api.add_resource(ShowEventDetails, '/event_id/<int:event_id>')
-
-
 if __name__ == '__main__':
+    api.add_resource(ShowEvent, '/api/v1/getevent')
+    api.add_resource(ShowEventDetails, '/event_id/<int:event_id>')
     app.run(debug=True)
