@@ -2,30 +2,23 @@ import os
 import json
 from datetime import datetime, timedelta
 from dateutil import parser
+from fetch_events import read_json, save_json
 
 from flask import Flask
 from flask_restful import Resource, Api
+from flask_cors import CORS
 
 
 app = Flask(__name__)
-api = Api(app)
-
-
-def read_json(file_path):
-    """
-    Read collected file from path
-    """
-    if not os.path.exists(file_path):
-        events = []
-        return events
-    else:
-        with open(file_path, 'r') as fp:
-            events = [json.loads(line) for line in fp]
-        return events
-events = read_json('events.json')
+CORS(app)
+api = Api(app, catch_all_404s=True)
+events = read_json('events.json') # read saved events
 
 
 class ShowEvent(Resource):
+    """
+    Return events base on days ahead
+    """
     def get(self, showndays=7):
         events_to_show = []
         for event in events:
@@ -34,7 +27,21 @@ class ShowEvent(Resource):
         return events_to_show
 
 
-api.add_resource(ShowEvent, '/showndays/<int:showndays>')
+class ShowEventDetails(Resource):
+    """
+    Return an event base on event ID
+    """
+    def get(self, event_id=None):
+        event = {}
+        for event in events:
+            if int(event['event_id']) == event_id:
+                return event
+        return event
+
+
+api.add_resource(ShowEvent, '/getevents/<int:showndays>')
+api.add_resource(ShowEventDetails, '/event_id/<int:event_id>')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

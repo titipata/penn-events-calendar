@@ -1,6 +1,6 @@
 const endPoint = {
-  baseURL: 'http://www.upenn.edu/calendar-export',
-  dayEndpoint: '/?showndays=',
+  baseURL: 'http://localhost:5000',
+  dayEndpoint: '/getevents/',
 };
 
 const definedDays = {

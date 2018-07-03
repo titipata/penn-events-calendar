@@ -1,10 +1,12 @@
-# React back-end for Penn event
+# Flask back-end for Penn event
 
-You can run cronjob to constantly fetch Penn events using
+We use `cron` to constantly fetch Penn events. Change `username` in `cron_fetch_events`
+then run cron job by using the following script
 
-```bash
-python fetch_events.py
+```sh
+python cron_fetch_events.py
 ```
+
 
 Start API by running
 
