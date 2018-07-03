@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-import { Key, Events as evUtil } from '../../Utils';
+import { Key } from '../../Utils';
 import EventItem from './EventItem';
 import EventsList from './EventsList';
 
