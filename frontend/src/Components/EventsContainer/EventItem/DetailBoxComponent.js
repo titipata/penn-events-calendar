@@ -1,10 +1,9 @@
 import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
-import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { Category } from '../../../Data';
-import CategoryLabel from './CategoryLabelComponent';
-import renderHTML from 'react-render-html';
 import React from 'react';
+import renderHTML from 'react-render-html';
+import styled from 'styled-components';
+import CategoryLabel from './CategoryLabelComponent';
 
 const DetailWrapper = styled.div`
   padding: 0 15px;

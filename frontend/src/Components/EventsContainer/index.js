@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
-import { Key } from '../../Utils';
+import { Key, Events as evUtil } from '../../Utils';
 import EventItem from './EventItem';
 import EventsList from './EventsList';
 
 const EvenstContainer = ({ events, loading, error }) => {
   // group by date usage
-  // console.log('gbd:', evUtil.groupByDate(events));
+  console.log('gbd:', evUtil.groupByDate(events));
 
   if (error) {
     return (
