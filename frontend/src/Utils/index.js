@@ -65,11 +65,14 @@ class Events {
     const uniqueDates = [...new Set(allDates)];
     // groupby date with reduce
     const groupbyDate = uniqueDates.reduce((acc, cur) =>
-      ({
+      ([
         ...acc,
-        [Datetime.getDayMonthDate(cur)]: eventArr.filter(ev =>
-          ev.date === cur),
-      }), {});
+        {
+          dateFormatted: Datetime.getDayMonthDate(cur),
+          events: eventArr.filter(ev =>
+            ev.date === cur),
+        },
+      ]), []);
 
     return groupbyDate;
   }
