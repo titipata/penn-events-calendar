@@ -1,9 +1,18 @@
+import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Key, Events as evUtil } from '../../Utils';
-import EventItem from './EventItem';
 import EventsList from './EventsList';
+import styled from 'styled-components';
+
+const StyledSectionText = styled.div`
+  font-family: 'Source Code Pro';
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: #222;
+  /* text-align: center; */
+`;
 
 const EvenstContainer = ({ events, loading, error }) => {
   // group by date usage
@@ -16,14 +25,21 @@ const EvenstContainer = ({ events, loading, error }) => {
   }
 
   return (
-    <EventsList>
+    <React.Fragment>
       {!loading ?
-        events.map(ev =>
+        evUtil.groupByDate(events).map(grp =>
           (
-            <EventItem key={Key.getShortKey()} ev={ev} />
+            <React.Fragment key={Key.getShortKey()}>
+              <StyledSectionText>
+                <Fa icon="calendar-alt" />
+                &nbsp;
+                {grp.dateFormatted}
+              </StyledSectionText>
+              <EventsList events={grp.events} />
+            </React.Fragment>
           )) :
         <p>Loading XML data...</p>}
-    </EventsList>
+    </React.Fragment>
   );
 };
 

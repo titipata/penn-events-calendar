@@ -3,7 +3,6 @@ import { Component } from 'react';
 import { connect } from 'react-redux';
 import { fetchEventsBegin, fetchEventsError, fetchEventsSuccess } from '../../Actions';
 import { API } from '../../Data';
-import { XML } from '../../Utils';
 
 // This component is used to fetch data only
 

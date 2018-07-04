@@ -1,6 +1,7 @@
 const endPoint = {
   baseURL: 'http://localhost:5001',
-  dayEndpoint: '/api/v1/getevent?days=',
+  eventEndpoint: '/api/v1/getevent',
+  eventDays: '?days=',
 };
 
 const definedDays = {
@@ -11,7 +12,7 @@ const definedDays = {
 };
 class API {
   static getDaysLink(days = definedDays.defaultDays) {
-    return `${endPoint.baseURL}${endPoint.dayEndpoint}${days}`;
+    return `${endPoint.baseURL}${endPoint.eventEndpoint}${endPoint.eventDays}${days}`;
   }
 
   // Handle HTTP errors since fetch won't.

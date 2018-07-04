@@ -19,6 +19,21 @@ class Key {
   }
 }
 
+class Datetime {
+  static getMonthDay(dtStr) {
+    return moment(dtStr).format('MM.DD').toString();
+  }
+
+  static getTime(timeStr) {
+    // console.log(moment(timeStr, 'HH:mm:ss').format('LT'));
+    return moment(timeStr, 'HH:mm:ss').format('HH:MM A');
+  }
+
+  static getDayMonthDate(timeStr) {
+    return moment(timeStr).format('ddd, MMM DD');
+  }
+}
+
 class Events {
   static getText(eventItem) {
     return {
@@ -45,29 +60,21 @@ class Events {
 
   static groupByDate(eventArr) {
     // get all dates from events
-    const allDates = eventArr.map(ev => Events.getText(ev).date);
+    const allDates = eventArr.map(ev => ev.date);
     // get only unique dates
     const uniqueDates = [...new Set(allDates)];
     // groupby date with reduce
     const groupbyDate = uniqueDates.reduce((acc, cur) =>
-      ({
+      ([
         ...acc,
-        [cur]: eventArr.filter(ev =>
-          Events.getText(ev).date === cur),
-      }), {});
+        {
+          dateFormatted: Datetime.getDayMonthDate(cur),
+          events: eventArr.filter(ev =>
+            ev.date === cur),
+        },
+      ]), []);
 
     return groupbyDate;
-  }
-}
-
-class Datetime {
-  static getMonthDay(dtStr) {
-    return moment(dtStr).format('MM.DD').toString();
-  }
-
-  static getTime(timeStr) {
-    // console.log(moment(timeStr, 'HH:mm:ss').format('LT'));
-    return moment(timeStr, 'HH:mm:ss').format('HH:MM A');
   }
 }
 
