@@ -6,6 +6,7 @@ import EventItem from '../EventItem';
 
 const StyledEventsList = styled.ul`
   list-style-type: none;
+  margin: 0.5rem 0;
   padding: 0;
 `;
 

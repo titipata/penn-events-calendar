@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { Category } from '../../../Data';
 import DetailBox from './DetailBoxComponent';
 import TimeBox from './TimeBoxComponent';
+import DescriptionBox from './DescriptionBoxComponent';
 
 const StyledListItem = styled.li`
   margin-bottom: 5px;
@@ -14,7 +15,7 @@ const StyledListItem = styled.li`
 `;
 
 const StyledContentWrapper = styled.div`
-  display: inline-flex;
+  display: flex;
   flex-direction: row;
 `;
 
@@ -47,16 +48,12 @@ class EventItem extends Component {
             eventTitle={this.props.ev.title}
             eventLocation={this.props.ev.location}
             eventCategory={this.props.ev.category}
+            eventDescription={this.props.ev.description}
           />
         </StyledContentWrapper>
         {
-          this.props.ev.description ?
-            <div>click to toggle description</div> :
-            <div>no description</div>
-        }
-        {
-          this.state.descriptionVisible ?
-            <div>{this.props.ev.description}</div> :
+          this.state.descriptionVisible && this.props.ev.description ?
+            <DescriptionBox eventDescription={this.props.ev.description} /> :
             null
         }
       </StyledListItem>
