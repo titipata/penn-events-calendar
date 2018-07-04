@@ -9,14 +9,9 @@ from dateutil import parser
 from lxml import etree, html
 from bs4 import BeautifulSoup
 
-DAYS = [
-    "Mon", "Tue",
-    "Wed", "Thu",
-    "Fri", "Sat",
-    "Sun"
-]
-PATH_JSON = 'events.json'
 
+PATH_JSON = 'events.json'
+URL = 'http://www.upenn.edu/calendar-export/?showndays=50'
 
 def read_json(file_path):
     """
@@ -57,10 +52,6 @@ def convert_event_to_dict(event):
             value = BeautifulSoup(value, 'html.parser').text # description
         elif key in ('starttime', 'endtime'):
             value = datetime.strptime(value, "%H:%M:%S").strftime("%I:%M %p")
-        elif key == 'date':
-            event_dict[key] = value
-            dow = parser.parse(value).weekday()
-            event_dict['day_of_week'] = DAYS[dow]
         elif key == 'url':
             if len(value) > 0:
                 event_dict['event_id'] = int(value.rsplit('/')[-1])
@@ -76,7 +67,6 @@ def fetch_events():
     """
     Saving Penn events to JSON format
     """
-    URL = 'http://www.upenn.edu/calendar-export/?showndays=50'
     page = requests.get(URL)
     tree = html.fromstring(page.content)
     events = tree.findall('event')
