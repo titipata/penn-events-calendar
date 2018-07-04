@@ -5,3 +5,4 @@ python-crontab
 beautifulsoup4
 flask-cors
 webargs
+gevent
