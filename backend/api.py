@@ -20,7 +20,6 @@ from fetch_events import read_json, save_json
 from flask import Flask
 from flask_restful import Resource, Api
 from flask_cors import CORS
-from gevent.wsgi import WSGIServer
 
 from webargs import fields, validate
 from webargs.flaskparser import use_args, use_kwargs, parser, abort
@@ -74,8 +73,8 @@ class ShowEventDetails(Resource):
         return event
 
 
+api.add_resource(ShowEvent, '/api/v1/getevent')
+api.add_resource(ShowEventDetails, '/api/v1/event/<int:event_id>')
+
 if __name__ == '__main__':
-    api.add_resource(ShowEvent, '/api/v1/getevent')
-    api.add_resource(ShowEventDetails, '/api/v1/event/<int:event_id>')
-    http_server = WSGIServer(('0.0.0.0', 5001), app)
-    http_server.serve_forever()
+    app.run(host='0.0.0.0')

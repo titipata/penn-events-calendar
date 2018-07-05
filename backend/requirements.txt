@@ -7,3 +7,4 @@ flask-cors
 webargs
 gevent
 lxml
+requests

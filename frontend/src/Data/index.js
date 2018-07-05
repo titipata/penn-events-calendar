@@ -1,5 +1,5 @@
 const endPoint = {
-  baseURL: 'http://localhost:5001',
+  baseURL: '',
   eventEndpoint: '/api/v1/getevent',
   eventDays: '?days=',
 };
