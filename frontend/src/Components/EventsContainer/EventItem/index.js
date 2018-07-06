@@ -1,9 +1,10 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { Component } from 'react';
 import styled from 'styled-components';
 import { Category } from '../../../Data';
 import DetailBox from './DetailBoxComponent';
 import TimeBox from './TimeBoxComponent';
+import DescriptionBox from './DescriptionBoxComponent';
 
 const StyledListItem = styled.li`
   margin-bottom: 5px;
@@ -14,26 +15,51 @@ const StyledListItem = styled.li`
 `;
 
 const StyledContentWrapper = styled.div`
-  display: inline-flex;
+  display: flex;
   flex-direction: row;
 `;
 
-const EventItem = ({ ev }) => (
-  <StyledListItem onClick={()=>console.log(ev.event_id, ': is clicked!')} color={Category.getColor(ev.category)}>
-    <StyledContentWrapper>
-      <TimeBox
-        eventDate={ev.date}
-        eventStartTime={ev.starttime}
-        eventEndTime={ev.endtime}
-      />
-      <DetailBox
-        eventTitle={ev.title}
-        eventLocation={ev.location}
-        eventCategory={ev.category}
-      />
-    </StyledContentWrapper>
-  </StyledListItem>
-);
+class EventItem extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      descriptionVisible: false,
+    };
+
+    this._handleClick = this._handleClick.bind(this);
+  }
+
+  _handleClick() {
+    this.setState({
+      descriptionVisible: !this.state.descriptionVisible,
+    });
+  }
+
+  render() {
+    return (
+      <StyledListItem onClick={this._handleClick} color={Category.getColor(this.props.ev.category)}>
+        <StyledContentWrapper>
+          <TimeBox
+            eventDate={this.props.ev.date}
+            eventStartTime={this.props.ev.starttime}
+            eventEndTime={this.props.ev.endtime}
+          />
+          <DetailBox
+            eventTitle={this.props.ev.title}
+            eventLocation={this.props.ev.location}
+            eventCategory={this.props.ev.category}
+            eventDescription={this.props.ev.description}
+          />
+        </StyledContentWrapper>
+        {
+          this.state.descriptionVisible && this.props.ev.description ?
+            <DescriptionBox eventDescription={this.props.ev.description} /> :
+            null
+        }
+      </StyledListItem>
+    );
+  }
+}
 
 EventItem.propTypes = {
   ev: PropTypes.shape({

@@ -7,6 +7,7 @@ import CategoryLabel from './CategoryLabelComponent';
 
 const DetailWrapper = styled.div`
   padding: 0 15px;
+  flex: 1;
 `;
 
 const StyledTitle = styled.div`
@@ -19,11 +20,7 @@ const StyledLocation = styled.div`
   padding-top: 5px;
 `;
 
-const CatContainer = styled.div`
-  display: inline-block;
-`;
-
-const DetailBox = ({ eventTitle, eventLocation, eventCategory }) => (
+const DetailBox = ({ eventTitle, eventLocation, eventCategory, eventDescription }) => (
   <DetailWrapper>
     <StyledTitle>
       {renderHTML(eventTitle)}
@@ -31,9 +28,7 @@ const DetailBox = ({ eventTitle, eventLocation, eventCategory }) => (
     <StyledLocation>
       <Fa icon="map-marker-alt" /> {eventLocation}
     </StyledLocation>
-    <CatContainer>
-      <CategoryLabel eventCategory={eventCategory} />
-    </CatContainer>
+    <CategoryLabel eventCategory={eventCategory} eventDescription={eventDescription} />
   </DetailWrapper>
 );
 
