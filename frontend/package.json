@@ -22,7 +22,9 @@
   },
   "scripts": {
     "start": "concurrently -n 'python,react' -c 'bgBlue,bgMagenta' 'cd ../backend && python api.py' 'react-scripts start'",
+    "prebuild": "./production pre",
     "build": "react-scripts build",
+    "postbuild": "./production post",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },

@@ -1,0 +1,77 @@
+#!/bin/bash
+
+# ---------------------------
+#      variables
+# ---------------------------
+
+declare -r dataPath='./src/Data/index.js'
+declare -r endpoint='http://localhost:5001'
+
+# ---------------------------
+#      functions
+# ---------------------------
+
+## display help
+displayHelp(){
+    echo "Usage: $0 [pre|post]"
+    echo
+    echo "  Options:"
+    echo "    pre        remove endpoint from Data variables"
+    echo "    post       insert endpoint to Data variables"
+    echo
+
+    exit 1
+}
+
+# ## one-liner
+# removeEndpoint() {
+#   sed -in "s|$endpoint||" $dataPath
+# }
+
+# insertEndpoint() {
+#   sed -Ein "s|(baseURL.*').*(')|\1$endpoint\2|" $dataPath
+# }
+
+## multi-lines
+removeEndpoint() {
+  sed -i '' "
+  /baseURL:/ {
+    s|$endpoint||
+  }" $dataPath
+}
+
+insertEndpoint() {
+  sed -i '' "
+  /baseURL:/ {
+    s|''|'$endpoint'|
+  }" $dataPath
+}
+
+# ---------------------------
+#      main
+# ---------------------------
+
+main() {
+
+  case $1 in
+    'pre' )
+      removeEndpoint
+      exit
+    ;;
+    'post' )
+      insertEndpoint
+      exit
+    ;;
+    '-t' )
+      # testMultiRemove
+      # testMultiInsert
+      displayHelp
+      exit
+    ;;
+    * )
+      displayHelp
+    ;;
+  esac
+}
+
+main $@
