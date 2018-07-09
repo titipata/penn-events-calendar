@@ -23,25 +23,32 @@ displayHelp(){
     exit 1
 }
 
-# ## one-liner
-# removeEndpoint() {
-#   sed -in "s|$endpoint||" $dataPath
-# }
-
-# insertEndpoint() {
-#   sed -Ein "s|(baseURL.*').*(')|\1$endpoint\2|" $dataPath
-# }
-
 ## multi-lines
-removeEndpoint() {
+# Mac
+rmend_mac() {
   sed -i '' "
   /baseURL:/ {
     s|$endpoint||
   }" $dataPath
 }
 
-insertEndpoint() {
+insend_mac() {
   sed -i '' "
+  /baseURL:/ {
+    s|''|'$endpoint'|
+  }" $dataPath
+}
+
+# Linux
+rmend_li() {
+  sed -i "
+  /baseURL:/ {
+    s|$endpoint||
+  }" $dataPath
+}
+
+insend_li() {
+  sed -i "
   /baseURL:/ {
     s|''|'$endpoint'|
   }" $dataPath
@@ -52,14 +59,23 @@ insertEndpoint() {
 # ---------------------------
 
 main() {
+  # declare local os suffix
+  local ossuf
+
+  # set os suffix
+  if [ "$(uname)" = "Darwin" ]; then
+    ossuf=mac
+  else
+    ossuf=li
+  fi
 
   case $1 in
     'pre' )
-      removeEndpoint
+      rmend_$ossuf
       exit
     ;;
     'post' )
-      insertEndpoint
+      insend_$ossuf
       exit
     ;;
     '-t' )
