@@ -9,6 +9,7 @@ This will serve on localhost:5001.
 Example queries:
     - http://localhost:5001/api/v1/getevent?days=7 # return events happenning in next 7 days
     - http://localhost:5001/api/v1/getevent?days=7&school=medicine-health-system # return events in next 7 days from "Medicine/Health System"
+    - http://localhost:5001/api/v1/getevent?days=14&category=academic # return events in academic category
     - http://localhost:5001/api/v1/getevent # return all events
 
 """
@@ -38,7 +39,8 @@ class ShowEvent(Resource):
     """
     input_args = {
         'days': fields.Int(missing=None, required=False),
-        'school': fields.String(missing=None, required=False)
+        'school': fields.String(missing=None, required=False),
+        'category': fields.String(missing=None, required=False)
     }
 
     @use_args(input_args)
@@ -66,6 +68,11 @@ class ShowEvent(Resource):
             events_query = list(filter(lambda x: x['date_dt'] >= datetime.today() and x['date_dt'] <= date_retrieve, 
                                 events_query))
 
+        # filter category
+        if args['category'] is not None:
+            events_query = list(filter(lambda x: x['category'].lower() == args['category'], 
+                                events_query))
+
         # remove generated keys
         for event in events_query:
             event.pop('date_dt', None)
@@ -74,20 +81,6 @@ class ShowEvent(Resource):
         return events_query
 
 
-class ShowEventDetails(Resource):
-    """
-    Return an event's details base on given event ID
-    """
-    def get(self, event_id=None):
-        events = read_json('events.json')
-        event = {}
-        for event in events:
-            if event['event_id'] == event_id:
-                return event
-        return event
-
-
 if __name__ == '__main__':
     api.add_resource(ShowEvent, '/api/v1/getevent')
-    api.add_resource(ShowEventDetails, '/api/v1/event/<int:event_id>')
     app.run(port=5001, debug=True)
