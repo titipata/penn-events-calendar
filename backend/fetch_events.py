@@ -214,7 +214,7 @@ def fetch_events_english_dept():
 
     for (month, day, location, starttime, endtime, title, description, url) in zip(event_months, event_days, event_locations, starttimes, endtimes, titles, descriptions, urls):
         try:
-            date = day + ' ' + month
+            date = '{} {}'.format(day, month)
             event_dict = {
                 "date": dateutil.parser.parse(re.sub('to \d+', '', date)).strftime("%Y-%m-%d"),
                 "starttime": starttime,
