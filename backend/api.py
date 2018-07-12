@@ -47,28 +47,31 @@ class ShowEvent(Resource):
         Retrieve events from saved JSON
         """
         events = read_json('events.json')
-        date_retrieve = datetime.today()
-        if args['days'] is None:
-            events_to_show = events
-            return events_to_show
-        else:
-            date_retrieve += timedelta(days=args['days'])
 
-        # filter school
-        events_school_query = []
+        # add school query, parse datetime
+        events_query = []
         for event in events:
             event['school_query'] = '-'.join(event['school'].lower().replace('/', ' ').split())
-            events_school_query.append(event)
+            event['date_dt'] = dateutil.parser.parse(event['date'])
+            events_query.append(event)
 
+        # filter school name
         if args['school'] is not None:
-            events = [event for event in events_school_query if event['school_query'] == args['school']]
+            events_query = list(filter(lambda x: x['school_query'] == args['school'], 
+                                events_query))
 
-        events_to_show = []
-        for event in events:
-            event_date = dateutil.parser.parse(event['date'])
-            if event_date <= date_retrieve and event_date >= datetime.today():
-                events_to_show.append(event)
-        return events_to_show
+        # filter date
+        if args['days'] is not None:
+            date_retrieve = datetime.today() + timedelta(days=args['days'])
+            events_query = list(filter(lambda x: x['date_dt'] >= datetime.today() and x['date_dt'] <= date_retrieve, 
+                                events_query))
+
+        # remove generated keys
+        for event in events_query:
+            event.pop('date_dt', None)
+            event.pop('school_query', None)
+
+        return events_query
 
 
 class ShowEventDetails(Resource):
