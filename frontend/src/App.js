@@ -1,5 +1,5 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faBookmark, faCalendarAlt, faClock, faExternalLinkAlt, faFileAlt, faMapMarkerAlt, faSchool, faUniversity, faUserTie, faChevronCircleDown } from '@fortawesome/free-solid-svg-icons';
+import { faBookmark, faCalendarAlt, faClock, faExternalLinkAlt, faFileAlt, faMapMarkerAlt, faSchool, faUniversity, faUserTie, faChevronCircleDown, faChevronCircleUp } from '@fortawesome/free-solid-svg-icons';
 import React, { Component } from 'react';
 import styled, { injectGlobal } from 'styled-components';
 import { Container } from './Components/BaseComponents';
@@ -12,7 +12,7 @@ import Footer from './Components/Footer';
 library.add(
   faCalendarAlt, faMapMarkerAlt, faClock, faFileAlt,
   faExternalLinkAlt, faUserTie, faSchool, faUniversity,
-  faBookmark, faChevronCircleDown,
+  faBookmark, faChevronCircleDown, faChevronCircleUp,
 );
 
 const AppWrapper = styled.div`

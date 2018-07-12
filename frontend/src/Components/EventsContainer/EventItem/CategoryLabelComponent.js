@@ -21,14 +21,28 @@ const StyledCat = styled.div`
   width: fit-content;
 `;
 
-const CategoryLabel = ({ eventCategory, eventDescription }) => (
+const CollapseSpan = styled.span`
+  cursor: ${props => (props.cursorPointer ? 'pointer' : 'default')};
+`;
+
+const CategoryLabel = ({ eventCategory, eventDescription, onCollapseClick, isDescriptionExpanded }) => (
   <CatContainer>
     <StyledCat color={Category.getColor(eventCategory)}>
       {eventCategory}
     </StyledCat>
     {
-      eventDescription ?
+      eventDescription && !isDescriptionExpanded ?
         <span>See Details <Fa icon="chevron-circle-down" /></span> :
+        null
+    }
+    {
+      eventDescription && isDescriptionExpanded ?
+        <CollapseSpan
+          cursorPointer={isDescriptionExpanded}
+          onClick={onCollapseClick}
+        >
+          Collapse <Fa icon="chevron-circle-up" />
+        </CollapseSpan> :
         null
     }
   </CatContainer>
@@ -36,6 +50,8 @@ const CategoryLabel = ({ eventCategory, eventDescription }) => (
 
 CategoryLabel.propTypes = {
   eventCategory: PropTypes.string.isRequired,
+  onCollapseClick: PropTypes.func.isRequired,
+  isDescriptionExpanded: PropTypes.bool.isRequired,
 };
 
 export default CategoryLabel;

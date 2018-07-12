@@ -20,7 +20,7 @@ const StyledLocation = styled.div`
   padding-top: 5px;
 `;
 
-const DetailBox = ({ eventTitle, eventLocation, eventCategory, eventDescription }) => (
+const DetailBox = ({ eventTitle, eventLocation, eventCategory, eventDescription, isDescriptionExpanded, onCollapseClick }) => (
   <DetailWrapper>
     <StyledTitle>
       {renderHTML(eventTitle)}
@@ -28,7 +28,12 @@ const DetailBox = ({ eventTitle, eventLocation, eventCategory, eventDescription 
     <StyledLocation>
       <Fa icon="map-marker-alt" /> {eventLocation}
     </StyledLocation>
-    <CategoryLabel eventCategory={eventCategory} eventDescription={eventDescription} />
+    <CategoryLabel
+      eventCategory={eventCategory}
+      eventDescription={eventDescription}
+      isDescriptionExpanded={isDescriptionExpanded}
+      onCollapseClick={onCollapseClick}
+    />
   </DetailWrapper>
 );
 

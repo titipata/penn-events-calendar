@@ -12,6 +12,7 @@ const StyledListItem = styled.li`
   border: 1px solid #eee;
   border-left: 5px solid ${props => props.color};
   border-radius: 5px;
+  cursor: ${props => (props.cursorPointer ? 'pointer' : 'default')};
 `;
 
 const StyledContentWrapper = styled.div`
@@ -26,18 +27,30 @@ class EventItem extends Component {
       descriptionVisible: false,
     };
 
-    this._handleClick = this._handleClick.bind(this);
+    this._handleCardClick = this._handleCardClick.bind(this);
+    this._handleCollapseClick = this._handleCollapseClick.bind(this);
   }
 
-  _handleClick() {
+  _handleCardClick() {
     this.setState({
-      descriptionVisible: !this.state.descriptionVisible,
+      descriptionVisible: true,
+    });
+  }
+
+  _handleCollapseClick() {
+    console.log('+++++ collapse is clicked!');
+    this.setState({
+      descriptionVisible: false,
     });
   }
 
   render() {
     return (
-      <StyledListItem onClick={this._handleClick} color={Category.getColor(this.props.ev.category)}>
+      <StyledListItem
+        onClick={this._handleCardClick}
+        color={Category.getColor(this.props.ev.category)}
+        cursorPointer={this.props.ev.description && !this.state.descriptionVisible}
+      >
         <StyledContentWrapper>
           <TimeBox
             eventDate={this.props.ev.date}
@@ -49,6 +62,8 @@ class EventItem extends Component {
             eventLocation={this.props.ev.location}
             eventCategory={this.props.ev.category}
             eventDescription={this.props.ev.description}
+            isDescriptionExpanded={this.state.descriptionVisible}
+            onCollapseClick={this._handleCollapseClick}
           />
         </StyledContentWrapper>
         {
