@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import os
+import re
 import requests
 import json
 import time
@@ -174,6 +175,77 @@ def fetch_events_cni():
     print('CNI Events Downloaded!')
 
 
+def fetch_events_english_dept():
+    """
+    Saving English Department events to JSON format
+    """
+
+    # read JSON file is exist
+    if os.path.isfile(PATH_JSON):
+        events_list = read_json(PATH_JSON)
+    else:
+        events_list = []
+
+    base_url = 'https://www.english.upenn.edu/events/calendar-export/'
+    page = requests.get(base_url)
+    site = html.fromstring(page.text)
+    events = site.xpath('//ul[@class="unstyled"]//li//span[@class="field-content"]')
+    events = events[0]
+    event_months = [stringify_children(e).strip() for e in events.xpath('//div[@class="month-date"]')]
+    event_days = [stringify_children(e).strip() for e in events.xpath('//div[@class="day-date"]')]
+    event_locations = events.xpath('//p[@class="location"]/text()')
+
+    starttimes = []
+    endtimes = []
+    for div in events.xpath('//div[@class="date-time"]'):
+        event_time = div.find('span[@class="date-display-single"]')
+        if event_time is not None and event_time.find('span[@class="date-display-start"]') is not None:
+            starttimes.append(event_time.find('span[@class="date-display-start"]').text)
+            endtimes.append(event_time.find('span[@class="date-display-end"]').text)
+        else:
+            starttimes.append(event_time.text or '')
+            endtimes.append(event_time.text or '')
+
+    titles = [span.find('a').text for span in events.xpath('//span[@class="field-content"]') 
+            if span.find('a') is not None]
+    urls = [span.find('a').attrib.get('href') for span in events.xpath('//span[@class="field-content"]') 
+            if span.find('a') is not None]
+    descriptions = [stringify_children(e).strip() for e in events.xpath('//div[@class="span10"]')]
+
+    for (month, day, location, starttime, endtime, title, description, url) in zip(event_months, event_days, event_locations, starttimes, endtimes, titles, descriptions, urls):
+        try:
+            date = day + ' ' + month
+            event_dict = {
+                "date": dateutil.parser.parse(re.sub('to \d+', '', date)).strftime("%Y-%m-%d"),
+                "starttime": starttime,
+                "endtime": "",
+                "title": title,
+                "description": description,
+                "location": location,
+                "room": "",
+                "event_id": url + date, # using url and date, probably change later
+                "url": urljoin(base_url, url),
+                "student": "0",
+                "privacy": "0",
+                "category": "English Dept",
+                "school": "English Department",
+                "owner": "English Department",
+                "link": ""
+            }
+            # get current event ids
+            if len(events_list) > 0:
+                event_ids = [e_['event_id'] for e_ in events_list]
+            else:
+                event_ids = []
+            if event_dict['event_id'] not in event_ids:
+                events_list.append(event_dict)
+        except:
+            pass
+    save_json(events_list, PATH_JSON)
+    print('English Department events Downloaded!')
+
+
 if __name__ == '__main__':
     fetch_events()
     fetch_events_cni()
+    fetch_events_english_dept()
