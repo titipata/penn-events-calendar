@@ -7,7 +7,8 @@ Run the app:
 This will serve on localhost:5001.
 
 Example queries:
-    - http://localhost:5001/api/v1/getevent?days=7 # return events happenning in next 7 day_args
+    - http://localhost:5001/api/v1/getevent?days=7 # return events happenning in next 7 days
+    - http://localhost:5001/api/v1/getevent?days=7&school=Medicine/Health%20System # return events in next 7 days from "Medicine/Health System"
     - http://localhost:5001/api/v1/getevent # return all events
 
 """
@@ -20,7 +21,6 @@ from fetch_events import read_json, save_json
 from flask import Flask
 from flask_restful import Resource, Api
 from flask_cors import CORS
-from gevent.wsgi import WSGIServer
 
 from webargs import fields, validate
 from webargs.flaskparser import use_args, use_kwargs, parser, abort
@@ -36,11 +36,12 @@ class ShowEvent(Resource):
     """
     Return events base on days ahead
     """
-    day_args = {
-        'days': fields.Int(missing=None, required=False)
+    input_args = {
+        'days': fields.Int(missing=None, required=False),
+        'school': fields.String(missing=None, required=False)
     }
 
-    @use_args(day_args)
+    @use_args(input_args)
     def get(self, args):
         """
         Retrieve events from saved JSON
@@ -52,6 +53,11 @@ class ShowEvent(Resource):
             return events_to_show
         else:
             date_retrieve += timedelta(days=args['days'])
+
+        # filter school
+        print(args['school'])
+        if args['school'] is not None:
+            events = [event for event in events if event['school'] == args['school']]
 
         events_to_show = []
         for event in events:
@@ -77,5 +83,4 @@ class ShowEventDetails(Resource):
 if __name__ == '__main__':
     api.add_resource(ShowEvent, '/api/v1/getevent')
     api.add_resource(ShowEventDetails, '/api/v1/event/<int:event_id>')
-    http_server = WSGIServer(('0.0.0.0', 5001), app)
-    http_server.serve_forever()
+    app.run(port=5001, debug=True)
