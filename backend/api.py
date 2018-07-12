@@ -8,7 +8,7 @@ This will serve on localhost:5001.
 
 Example queries:
     - http://localhost:5001/api/v1/getevent?days=7 # return events happenning in next 7 days
-    - http://localhost:5001/api/v1/getevent?days=7&school=Medicine/Health%20System # return events in next 7 days from "Medicine/Health System"
+    - http://localhost:5001/api/v1/getevent?days=7&school=medicine-health-system # return events in next 7 days from "Medicine/Health System"
     - http://localhost:5001/api/v1/getevent # return all events
 
 """
@@ -55,9 +55,13 @@ class ShowEvent(Resource):
             date_retrieve += timedelta(days=args['days'])
 
         # filter school
-        print(args['school'])
+        events_school_query = []
+        for event in events:
+            event['school_query'] = '-'.join(event['school'].lower().replace('/', ' ').split())
+            events_school_query.append(event)
+
         if args['school'] is not None:
-            events = [event for event in events if event['school'] == args['school']]
+            events = [event for event in events_school_query if event['school_query'] == args['school']]
 
         events_to_show = []
         for event in events:
