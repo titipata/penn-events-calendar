@@ -14,7 +14,6 @@ from urllib.parse import urljoin
 
 
 PATH_JSON = 'events.json'
-URL = 'http://www.upenn.edu/calendar-export/?showndays=50'
 
 
 def read_json(file_path):
@@ -71,7 +70,8 @@ def fetch_events():
     """
     Saving Penn events to JSON format
     """
-    page = requests.get(URL)
+    base_url = 'http://www.upenn.edu/calendar-export/?showndays=50'
+    page = requests.get(base_url)
     tree = html.fromstring(page.content)
     events = tree.findall('event')
 
