@@ -40,10 +40,27 @@ class Category {
       International: '#fae3d9',
       Religion: '#fbf1f1',
       Meetings: '#aaaaaa',
+      CNI: '#49a9a6', 
+      'English Dept': '#a3e8dc': 
     };
 
     return colorCode[catStr];
   }
 }
+
+
+class School {
+  static getColor(catStr) {
+    const colorCode = {
+      'Medicine/Health System': '#f64242',
+      'School of Engineering and Applied Science': '#ffb51c',
+      'Computational Neuroscience Initiative': '#49a9a6', 
+      'English Department': '#a3e8dc',
+    };
+
+    return colorCode[catStr];
+  }  
+}
+
 
 export { API, Category };
