@@ -20,7 +20,14 @@ const StyledLocation = styled.div`
   padding-top: 5px;
 `;
 
-const DetailBox = ({ eventTitle, eventLocation, eventCategory, eventDescription, isDescriptionExpanded, onCollapseClick }) => (
+const DetailBox = ({
+  eventCategory,
+  eventDescription,
+  eventLocation,
+  eventTitle,
+  isDescriptionExpanded,
+  onCollapseClick,
+}) => (
   <DetailWrapper>
     <StyledTitle>
       {renderHTML(eventTitle)}
@@ -38,9 +45,12 @@ const DetailBox = ({ eventTitle, eventLocation, eventCategory, eventDescription,
 );
 
 DetailBox.propTypes = {
-  eventTitle: PropTypes.string.isRequired,
-  eventLocation: PropTypes.string.isRequired,
   eventCategory: PropTypes.string.isRequired,
+  eventDescription: PropTypes.string.isRequired,
+  eventLocation: PropTypes.string.isRequired,
+  eventTitle: PropTypes.string.isRequired,
+  isDescriptionExpanded: PropTypes.bool.isRequired,
+  onCollapseClick: PropTypes.func.isRequired,
 };
 
 export default DetailBox;

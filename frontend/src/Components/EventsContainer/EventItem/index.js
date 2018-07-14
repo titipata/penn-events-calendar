@@ -32,13 +32,14 @@ class EventItem extends Component {
   }
 
   _handleCardClick() {
-    this.setState({
-      descriptionVisible: true,
-    });
+    if (!this.state.descriptionVisible) {
+      this.setState({
+        descriptionVisible: true,
+      });
+    }
   }
 
   _handleCollapseClick() {
-    console.log('+++++ collapse is clicked!');
     this.setState({
       descriptionVisible: false,
     });
@@ -58,10 +59,10 @@ class EventItem extends Component {
             eventEndTime={this.props.ev.endtime}
           />
           <DetailBox
-            eventTitle={this.props.ev.title}
-            eventLocation={this.props.ev.location}
             eventCategory={this.props.ev.category}
             eventDescription={this.props.ev.description}
+            eventLocation={this.props.ev.location}
+            eventTitle={this.props.ev.title}
             isDescriptionExpanded={this.state.descriptionVisible}
             onCollapseClick={this._handleCollapseClick}
           />

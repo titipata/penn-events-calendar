@@ -2,7 +2,7 @@ import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
-import { Category } from '../../../Data';
+import { Category } from '../../../../Data';
 
 const CatContainer = styled.div`
   display: flex;
@@ -21,28 +21,38 @@ const StyledCat = styled.div`
   width: fit-content;
 `;
 
-const CollapseSpan = styled.span`
-  cursor: ${props => (props.cursorPointer ? 'pointer' : 'default')};
+const StyledSpan = styled.span`
+  cursor: pointer;
+  color: ${props => `${props.color}A6`};
 `;
 
-const CategoryLabel = ({ eventCategory, eventDescription, onCollapseClick, isDescriptionExpanded }) => (
+const CategoryLabel = ({
+  eventCategory,
+  eventDescription,
+  isDescriptionExpanded,
+  onCollapseClick,
+}) => (
   <CatContainer>
     <StyledCat color={Category.getColor(eventCategory)}>
       {eventCategory}
     </StyledCat>
     {
       eventDescription && !isDescriptionExpanded ?
-        <span>See Details <Fa icon="chevron-circle-down" /></span> :
+        <StyledSpan
+          color={Category.getColor(eventCategory)}
+        >
+          See Details <Fa icon="chevron-circle-down" />
+        </StyledSpan> :
         null
     }
     {
       eventDescription && isDescriptionExpanded ?
-        <CollapseSpan
-          cursorPointer={isDescriptionExpanded}
+        <StyledSpan
+          color={Category.getColor(eventCategory)}
           onClick={onCollapseClick}
         >
           Collapse <Fa icon="chevron-circle-up" />
-        </CollapseSpan> :
+        </StyledSpan> :
         null
     }
   </CatContainer>
@@ -50,8 +60,9 @@ const CategoryLabel = ({ eventCategory, eventDescription, onCollapseClick, isDes
 
 CategoryLabel.propTypes = {
   eventCategory: PropTypes.string.isRequired,
-  onCollapseClick: PropTypes.func.isRequired,
+  eventDescription: PropTypes.string.isRequired,
   isDescriptionExpanded: PropTypes.bool.isRequired,
+  onCollapseClick: PropTypes.func.isRequired,
 };
 
 export default CategoryLabel;

@@ -21,7 +21,6 @@ const StyledContent = styled.div`
   text-indent: 1.15rem;
   padding: 0 1.15rem;
   padding-top: 0.75rem;
-
   line-height: 1.3rem;
 `;
 

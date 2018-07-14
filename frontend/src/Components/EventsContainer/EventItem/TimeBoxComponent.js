@@ -13,10 +13,10 @@ const DatetimeWrapper = styled.div`
   flex-direction: column;
 `;
 
-const StyledDate = styled.div`
-  font-family: 'Source Code Pro';
-  padding: 0 3px;
-`;
+// const StyledDate = styled.div`
+//   font-family: 'Source Code Pro';
+//   padding: 0 3px;
+// `;
 
 const StyledTime = styled.div`
   text-align: center;
@@ -30,7 +30,7 @@ const StyledTimeIcon = styled.div`
   font-size: 0.95rem;
 `;
 
-const TimeBox = ({ eventDate, eventStartTime, eventEndTime }) => (
+const TimeBox = ({ eventStartTime, eventEndTime }) => (
   <DatetimeWrapper>
     <StyledTime>
       <StyledTimeIcon>
@@ -44,7 +44,7 @@ const TimeBox = ({ eventDate, eventStartTime, eventEndTime }) => (
 );
 
 TimeBox.propTypes = {
-  eventDate: PropTypes.string.isRequired,
+  // eventDate: PropTypes.string.isRequired,
   eventStartTime: PropTypes.string.isRequired,
   eventEndTime: PropTypes.string.isRequired,
 };
