@@ -19,11 +19,24 @@ const StyledCat = styled.div`
   background-color: ${props => `${props.color}1A`};
   border-radius: 5px;
   width: fit-content;
+  margin-right: 5px;
 `;
 
 const StyledSpan = styled.span`
   cursor: pointer;
   color: ${props => `${props.color}A6`};
+`;
+
+const StyledGroup = styled.div`
+  display: inline-flex;
+  align-items: center;
+  padding-right: 10px;
+`;
+
+const StyledIconWrapper = styled.span`
+  margin-right: 5px;
+  font-size: 1.15rem;
+  color: #555;
 `;
 
 const CategoryLabel = ({
@@ -33,28 +46,43 @@ const CategoryLabel = ({
   onCollapseClick,
 }) => (
   <CatContainer>
-    <StyledCat color={Category.getColor(eventCategory)}>
-      {eventCategory}
-    </StyledCat>
-    {
-      eventDescription && !isDescriptionExpanded ?
-        <StyledSpan
-          color={Category.getColor(eventCategory)}
-        >
-          See Details <Fa icon="chevron-circle-down" />
-        </StyledSpan> :
-        null
-    }
-    {
-      eventDescription && isDescriptionExpanded ?
-        <StyledSpan
-          color={Category.getColor(eventCategory)}
-          onClick={onCollapseClick}
-        >
-          Collapse <Fa icon="chevron-circle-up" />
-        </StyledSpan> :
-        null
-    }
+    <StyledGroup>
+      <StyledCat color={Category.getColor(eventCategory)}>
+        {eventCategory}
+      </StyledCat>
+      <StyledCat color={Category.getColor(eventCategory)}>
+        {eventCategory}
+      </StyledCat>
+    </StyledGroup>
+    <StyledGroup>
+      <StyledGroup>
+        <StyledIconWrapper color={Category.getColor(eventCategory)}>
+          <Fa icon="external-link-alt" />
+        </StyledIconWrapper>
+        <StyledIconWrapper color={Category.getColor(eventCategory)}>
+          <Fa icon="copy" />
+        </StyledIconWrapper>
+      </StyledGroup>
+      {
+        eventDescription && !isDescriptionExpanded ?
+          <StyledSpan
+            color={Category.getColor(eventCategory)}
+          >
+            See Details <Fa icon="chevron-circle-down" />
+          </StyledSpan> :
+          null
+      }
+      {
+        eventDescription && isDescriptionExpanded ?
+          <StyledSpan
+            color={Category.getColor(eventCategory)}
+            onClick={onCollapseClick}
+          >
+            Collapse <Fa icon="chevron-circle-up" />
+          </StyledSpan> :
+          null
+      }
+    </StyledGroup>
   </CatContainer>
 );
 
