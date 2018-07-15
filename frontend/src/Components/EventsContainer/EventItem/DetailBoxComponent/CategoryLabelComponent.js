@@ -2,7 +2,7 @@ import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
-import { Category } from '../../../../Data';
+import { DataColor } from '../../../../Data';
 
 const CatContainer = styled.div`
   display: flex;
@@ -40,17 +40,23 @@ const CategoryLabel = ({
 }) => (
   <CatContainer>
     <StyledGroup>
-      <StyledCat color="#ddd">
+      <StyledCat color={DataColor.getSchoolColor(eventCategoryData.school)}>
         {eventCategoryData.school}
       </StyledCat>
-      <StyledCat color={Category.getColor(eventCategoryData.category)}>
-        {eventCategoryData.category}
-      </StyledCat>
+      {
+        !eventCategoryData.school.includes(eventCategoryData.category.split(/ |,\\\//)[0]) ?
+        (
+          <StyledCat color={DataColor.getCatColor(eventCategoryData.category)}>
+            {eventCategoryData.category}
+          </StyledCat>
+        ) :
+        null
+      }
     </StyledGroup>
     {
       eventCategoryData.description && !isDescriptionExpanded ?
         <StyledSpan
-          color={Category.getColor(eventCategoryData.category)}
+          color={DataColor.getCatColor(eventCategoryData.category)}
         >
           See Details <Fa icon="chevron-circle-down" />
         </StyledSpan> :
@@ -59,7 +65,7 @@ const CategoryLabel = ({
     {
       eventCategoryData.description && isDescriptionExpanded ?
         <StyledSpan
-          color={Category.getColor(eventCategoryData.category)}
+          color={DataColor.getCatColor(eventCategoryData.category)}
           onClick={onCollapseClick}
         >
           Collapse <Fa icon="chevron-circle-up" />

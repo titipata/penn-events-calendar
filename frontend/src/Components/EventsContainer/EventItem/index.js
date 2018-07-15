@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { Category } from '../../../Data';
+import { DataColor } from '../../../Data';
 import DetailBox from './DetailBoxComponent';
 import TimeBox from './TimeBoxComponent';
 import DescriptionBox from './DescriptionBoxComponent';
@@ -49,15 +49,15 @@ class EventItem extends Component {
     // https://stackoverflow.com/a/39333479/4010864
     const getEventTime = ({ starttime, endtime }) => ({ starttime, endtime });
     const getEventDetail = ({
-      category, description, location, title, school,
+      category, description, location, title, school, url,
     }) => ({
-      category, description, location, title, school,
+      category, description, location, title, school, url,
     });
 
     return (
       <StyledListItem
         onClick={this._handleCardClick}
-        color={Category.getColor(this.props.ev.category)}
+        color={DataColor.getCatColor(this.props.ev.category)}
         cursorPointer={this.props.ev.description && !this.state.descriptionVisible}
       >
         <StyledContentWrapper>
@@ -90,7 +90,7 @@ EventItem.propTypes = {
     description: PropTypes.string,
     location: PropTypes.string,
     room: PropTypes.string,
-    event_id: PropTypes.number,
+    event_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     url: PropTypes.string,
     student: PropTypes.string,
     privacy: PropTypes.string,

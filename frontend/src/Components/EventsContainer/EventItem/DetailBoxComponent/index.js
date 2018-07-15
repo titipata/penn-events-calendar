@@ -20,11 +20,15 @@ const StyledLocation = styled.div`
   padding-top: 5px;
 `;
 
-const StyledLinkIcon = styled.span`
+const StyledLinkIcon = styled.a.attrs({
+  target: '_blank',
+  rel: 'noopener noreferrer',
+})`
   font-weight: lighter;
   font-size: 1rem;
   padding-left: 8px;
   color: #555;
+  cursor: pointer;
 `;
 
 // https://stackoverflow.com/a/39333479/4010864
@@ -43,12 +47,18 @@ const DetailBox = ({
   <DetailWrapper>
     <StyledTitle>
       {renderHTML(eventDetail.title)}
-      <StyledLinkIcon>
-        <Fa icon="external-link-alt" />
-      </StyledLinkIcon>
+      {
+        eventDetail.url ?
+          (
+            <StyledLinkIcon href={eventDetail.url}>
+              <Fa icon="external-link-alt" />
+            </StyledLinkIcon>
+          ) :
+          null
+      }
     </StyledTitle>
     <StyledLocation>
-      <Fa icon="map-marker-alt" /> {eventDetail.location}
+      <Fa icon="map-marker-alt" /> {renderHTML(eventDetail.location)}
     </StyledLocation>
     <CategoryLabel
       eventCategoryData={getEventCategoryData(eventDetail)}
@@ -65,6 +75,7 @@ DetailBox.propTypes = {
     location: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     school: PropTypes.string.isRequired,
+    url: PropTypes.string.isRequired,
   }).isRequired,
   isDescriptionExpanded: PropTypes.bool.isRequired,
   onCollapseClick: PropTypes.func.isRequired,
