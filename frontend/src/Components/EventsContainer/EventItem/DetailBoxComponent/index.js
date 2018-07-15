@@ -20,24 +20,38 @@ const StyledLocation = styled.div`
   padding-top: 5px;
 `;
 
+const StyledLinkIcon = styled.span`
+  font-weight: lighter;
+  font-size: 1rem;
+  padding-left: 8px;
+  color: #555;
+`;
+
+// https://stackoverflow.com/a/39333479/4010864
+// pick only keys that are used in category
+const getEventCategoryData = ({
+  category, description, school,
+}) => ({
+  category, description, school,
+});
+
 const DetailBox = ({
-  eventCategory,
-  eventDescription,
-  eventLocation,
-  eventTitle,
+  eventDetail,
   isDescriptionExpanded,
   onCollapseClick,
 }) => (
   <DetailWrapper>
     <StyledTitle>
-      {renderHTML(eventTitle)}
+      {renderHTML(eventDetail.title)}
+      <StyledLinkIcon>
+        <Fa icon="external-link-alt" />
+      </StyledLinkIcon>
     </StyledTitle>
     <StyledLocation>
-      <Fa icon="map-marker-alt" /> {eventLocation}
+      <Fa icon="map-marker-alt" /> {eventDetail.location}
     </StyledLocation>
     <CategoryLabel
-      eventCategory={eventCategory}
-      eventDescription={eventDescription}
+      eventCategoryData={getEventCategoryData(eventDetail)}
       isDescriptionExpanded={isDescriptionExpanded}
       onCollapseClick={onCollapseClick}
     />
@@ -45,10 +59,13 @@ const DetailBox = ({
 );
 
 DetailBox.propTypes = {
-  eventCategory: PropTypes.string.isRequired,
-  eventDescription: PropTypes.string.isRequired,
-  eventLocation: PropTypes.string.isRequired,
-  eventTitle: PropTypes.string.isRequired,
+  eventDetail: PropTypes.shape({
+    category: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    location: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    school: PropTypes.string.isRequired,
+  }).isRequired,
   isDescriptionExpanded: PropTypes.bool.isRequired,
   onCollapseClick: PropTypes.func.isRequired,
 };

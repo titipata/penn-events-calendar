@@ -46,6 +46,14 @@ class EventItem extends Component {
   }
 
   render() {
+    // https://stackoverflow.com/a/39333479/4010864
+    const getEventTime = ({ starttime, endtime }) => ({ starttime, endtime });
+    const getEventDetail = ({
+      category, description, location, title, school,
+    }) => ({
+      category, description, location, title, school,
+    });
+
     return (
       <StyledListItem
         onClick={this._handleCardClick}
@@ -54,15 +62,10 @@ class EventItem extends Component {
       >
         <StyledContentWrapper>
           <TimeBox
-            eventDate={this.props.ev.date}
-            eventStartTime={this.props.ev.starttime}
-            eventEndTime={this.props.ev.endtime}
+            eventTime={getEventTime(this.props.ev)}
           />
           <DetailBox
-            eventCategory={this.props.ev.category}
-            eventDescription={this.props.ev.description}
-            eventLocation={this.props.ev.location}
-            eventTitle={this.props.ev.title}
+            eventDetail={getEventDetail(this.props.ev)}
             isDescriptionExpanded={this.state.descriptionVisible}
             onCollapseClick={this._handleCollapseClick}
           />
