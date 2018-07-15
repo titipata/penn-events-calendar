@@ -81,6 +81,17 @@ class ShowEvent(Resource):
         return events_query
 
 
+class GetSimilarEvents(Resource):
+    def get(self, event_id):
+        file_path = 'similar_events.json'
+        if os.path.exists(file_path):
+            similar_events = json.load(open(file_path, 'r'))
+        else:
+            similar_events = {}
+        return similar_events.get(event_id, [])
+    
+
 if __name__ == '__main__':
     api.add_resource(ShowEvent, '/api/v1/getevent')
+    api.add_resource(GetSimilarEvents, '/api/v1/getsimilarevents/<string:event_id>')
     app.run(port=5001, debug=True)
