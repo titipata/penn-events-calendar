@@ -22,7 +22,7 @@ from fetch_events import read_json, save_json
 from flask import Flask
 from flask_restful import Resource, Api
 from flask_cors import CORS
-from gevent.pywsgi import WSGIServer
+
 from webargs import fields, validate
 from webargs.flaskparser import use_args, use_kwargs, parser, abort
 
@@ -89,9 +89,10 @@ class GetSimilarEvents(Resource):
         else:
             similar_events = {}
         return similar_events.get(event_id, [])
-    
+
+
+api.add_resource(ShowEvent, '/api/v1/getevent')
+api.add_resource(GetSimilarEvents, '/api/v1/getsimilarevents/<string:event_id>')
 
 if __name__ == '__main__':
-    api.add_resource(ShowEvent, '/api/v1/getevent')
-    api.add_resource(GetSimilarEvents, '/api/v1/getsimilarevents/<string:event_id>')
     app.run(port=5001, debug=True)

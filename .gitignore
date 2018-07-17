@@ -325,3 +325,4 @@ migrations/
 events.db
 events.json
 *.ipynb
+.tags
