@@ -8,3 +8,4 @@ webargs
 lxml
 spacy
 requests
+uwsgi
