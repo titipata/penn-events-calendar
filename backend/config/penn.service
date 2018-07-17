@@ -1,3 +1,4 @@
+# /etc/systemd/system/penn.service
 [Unit]
 Description=uWSGI instance to serve Penn events calendar
 After=network.target
