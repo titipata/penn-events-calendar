@@ -13,10 +13,10 @@ const DatetimeWrapper = styled.div`
   flex-direction: column;
 `;
 
-const StyledDate = styled.div`
-  font-family: 'Source Code Pro';
-  padding: 0 3px;
-`;
+// const StyledDate = styled.div`
+//   font-family: 'Source Code Pro';
+//   padding: 0 3px;
+// `;
 
 const StyledTime = styled.div`
   text-align: center;
@@ -30,23 +30,24 @@ const StyledTimeIcon = styled.div`
   font-size: 0.95rem;
 `;
 
-const TimeBox = ({ eventDate, eventStartTime, eventEndTime }) => (
+const TimeBox = ({ eventTime }) => (
   <DatetimeWrapper>
     <StyledTime>
       <StyledTimeIcon>
         <Fa icon="clock" />
       </StyledTimeIcon>
-      {dtutil.getTime(eventStartTime)}
+      {dtutil.getTime(eventTime.starttime)}
       <br />
-      {dtutil.getTime(eventEndTime)}
+      {dtutil.getTime(eventTime.endtime)}
     </StyledTime>
   </DatetimeWrapper>
 );
 
 TimeBox.propTypes = {
-  eventDate: PropTypes.string.isRequired,
-  eventStartTime: PropTypes.string.isRequired,
-  eventEndTime: PropTypes.string.isRequired,
+  eventTime: PropTypes.shape({
+    starttime: PropTypes.string.isRequired,
+    endtime: PropTypes.string.isRequired,
+  }).isRequired,
 };
 
 export default TimeBox;

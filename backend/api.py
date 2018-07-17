@@ -7,7 +7,9 @@ Run the app:
 This will serve on localhost:5001.
 
 Example queries:
-    - http://localhost:5001/api/v1/getevent?days=7 # return events happenning in next 7 day_args
+    - http://localhost:5001/api/v1/getevent?days=7 # return events happenning in next 7 days
+    - http://localhost:5001/api/v1/getevent?days=7&school=medicine-health-system # return events in next 7 days from "Medicine/Health System"
+    - http://localhost:5001/api/v1/getevent?days=14&category=academic # return events in academic category
     - http://localhost:5001/api/v1/getevent # return all events
 
 """
@@ -35,46 +37,62 @@ class ShowEvent(Resource):
     """
     Return events base on days ahead
     """
-    day_args = {
-        'days': fields.Int(missing=None, required=False)
+    input_args = {
+        'days': fields.Int(missing=None, required=False),
+        'school': fields.String(missing=None, required=False),
+        'category': fields.String(missing=None, required=False)
     }
 
-    @use_args(day_args)
+    @use_args(input_args)
     def get(self, args):
         """
         Retrieve events from saved JSON
         """
         events = read_json('events.json')
-        date_retrieve = datetime.today()
-        if args['days'] is None:
-            events_to_show = events
-            return events_to_show
+
+        # add school query, parse datetime
+        events_query = []
+        for event in events:
+            event['school_query'] = '-'.join(event['school'].lower().replace('/', ' ').split())
+            event['date_dt'] = dateutil.parser.parse(event['date'])
+            events_query.append(event)
+
+        # filter school name
+        if args['school'] is not None:
+            events_query = list(filter(lambda x: x['school_query'] == args['school'],
+                                events_query))
+
+        # filter date
+        if args['days'] is not None:
+            date_retrieve = datetime.today() + timedelta(days=args['days'])
+            events_query = list(filter(lambda x: x['date_dt'] >= datetime.today() and x['date_dt'] <= date_retrieve,
+                                events_query))
+
+        # filter category
+        if args['category'] is not None:
+            events_query = list(filter(lambda x: x['category'].lower() == args['category'],
+                                events_query))
+
+        # remove generated keys
+        for event in events_query:
+            event.pop('date_dt', None)
+            event.pop('school_query', None)
+
+        return events_query
+
+
+class GetSimilarEvents(Resource):
+    def get(self, event_id):
+        file_path = 'similar_events.json'
+        if os.path.exists(file_path):
+            similar_events = json.load(open(file_path, 'r'))
         else:
-            date_retrieve += timedelta(days=args['days'])
-
-        events_to_show = []
-        for event in events:
-            event_date = dateutil.parser.parse(event['date'])
-            if event_date <= date_retrieve and event_date >= datetime.today():
-                events_to_show.append(event)
-        return events_to_show
-
-
-class ShowEventDetails(Resource):
-    """
-    Return an event's details base on given event ID
-    """
-    def get(self, event_id=None):
-        events = read_json('events.json')
-        event = {}
-        for event in events:
-            if event['event_id'] == event_id:
-                return event
-        return event
+            similar_events = {}
+        return similar_events.get(event_id, [])
 
 
 api.add_resource(ShowEvent, '/api/v1/getevent')
-api.add_resource(ShowEventDetails, '/api/v1/event/<int:event_id>')
+api.add_resource(GetSimilarEvents, '/api/v1/getsimilarevents/<string:event_id>')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+    app.run(port=5001, debug=True)

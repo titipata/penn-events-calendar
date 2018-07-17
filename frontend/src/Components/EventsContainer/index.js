@@ -11,6 +11,7 @@ const StyledSectionText = styled.div`
   font-size: 1.75rem;
   font-weight: bold;
   color: #222;
+  padding-left: 1rem;
   /* text-align: center; */
 `;
 
