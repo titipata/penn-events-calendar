@@ -11,12 +11,12 @@ First, make sure that you have all Python backend as mentioned in
 You can run the web-application from the `frontend` folder by the following
 
 ```sh
-cd fronend/
+cd fronend
 npm install
 npm start
 ```
 
-This will run Python backend (using Flask) in port 5001 and ReactJS frontend on port 3000. 
+This will run Python backend (using Flask) on port 5001 and ReactJS frontend on port 3000. 
 You will see the demo looks something like the following
 
 <img src="demo.png" width="400" />
