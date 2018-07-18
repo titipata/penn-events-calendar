@@ -10,6 +10,7 @@ Example queries:
     - http://localhost:5001/api/v1/getevent?days=7 # return events happenning in next 7 days
     - http://localhost:5001/api/v1/getevent?days=7&school=medicine-health-system # return events in next 7 days from "Medicine/Health System"
     - http://localhost:5001/api/v1/getevent?days=14&category=academic # return events in academic category
+    - http://localhost:5001/api/v1/getsimilarevents/696555 # return similar events to an event with event_id "696555"
     - http://localhost:5001/api/v1/getevent # return all events
 
 """
