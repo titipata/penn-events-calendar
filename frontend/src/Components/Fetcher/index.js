@@ -17,7 +17,7 @@ class Fetcher extends Component {
   getData() {
     this.props.fetchEventsBegin();
 
-    fetch(API.getDaysLink())
+    fetch(API.getEvent())
       .then(API.handleErrors)
       .then(res => res.json())
       .then(events => this.props.fetchEventsSuccess(events))
