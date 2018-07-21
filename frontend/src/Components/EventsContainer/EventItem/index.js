@@ -32,6 +32,9 @@ class EventItem extends Component {
   }
 
   _handleCardClick() {
+    // dispatch event id to get similar events on click
+    this.props.similarEvents(this.props.ev.event_id);
+
     if (!this.state.descriptionVisible) {
       this.setState({
         descriptionVisible: true,
@@ -81,6 +84,7 @@ class EventItem extends Component {
 }
 
 EventItem.propTypes = {
+  similarEvents: PropTypes.func.isRequired,
   ev: PropTypes.shape({
     date: PropTypes.string,
     day_of_week: PropTypes.string,

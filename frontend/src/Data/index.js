@@ -2,6 +2,7 @@ const endPoint = {
   baseURL: 'http://localhost:5001',
   eventEndpoint: '/api/v1/getevent',
   eventDays: '?days=',
+  similarEventsEndpoint: '/api/v1/getsimilarevents/',
 };
 
 const definedDays = {
@@ -12,8 +13,12 @@ const definedDays = {
 };
 
 class API {
-  static getDaysLink(days = definedDays.defaultDays) {
+  static getEvent(days = definedDays.defaultDays) {
     return `${endPoint.baseURL}${endPoint.eventEndpoint}${endPoint.eventDays}${days}`;
+  }
+
+  static getSimilarEvents(id) {
+    return `${endPoint.baseURL}${endPoint.similarEventsEndpoint}${id}`;
   }
 
   // Handle HTTP errors since fetch won't.
