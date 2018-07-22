@@ -9,7 +9,6 @@ import React, { Component } from 'react';
 import styled, { injectGlobal } from 'styled-components';
 import { Container } from './Components/BaseComponents';
 import EventsContainer from './Components/EventsContainer';
-import Fetcher from './Components/Fetcher';
 import NavBar from './Components/Navbar';
 import Footer from './Components/Footer';
 
@@ -51,8 +50,6 @@ class App extends Component {
     return (
       <AppWrapper>
         <NavBar brandname="Upcoming Events" />
-
-        <Fetcher />
 
         <Container>
           <EventsContainer />

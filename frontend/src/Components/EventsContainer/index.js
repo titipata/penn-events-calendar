@@ -1,9 +1,9 @@
 import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import { fetchSimilarEvents } from '../../Actions';
+import { fetchEvents, fetchSimilarEvents } from '../../Actions';
 import { Events as evUtil, Key } from '../../Utils';
 import EventsList from './EventsList';
 
@@ -16,43 +16,55 @@ const StyledSectionText = styled.div`
   /* text-align: center; */
 `;
 
-const EvenstContainer = ({ events, loading, error, getSimilarEvents }) => {
-  // group by date usage
-  // console.log('gbd:', evUtil.groupByDate(events));
-
-  if (error) {
-    return (
-      <div>Error! {error.message}</div>
-    );
+class EvenstContainer extends Component {
+  componentDidMount() {
+    // fetch all events here instead of using fetcher
+    this.props.getEvents();
   }
 
-  return (
-    <React.Fragment>
-      {!loading ?
-        evUtil.groupByDate(events).map(grp =>
-          (
-            <React.Fragment key={Key.getShortKey()}>
-              <StyledSectionText>
-                <Fa icon="calendar-alt" />
-                &nbsp;
-                {grp.dateFormatted}
-              </StyledSectionText>
-              <EventsList
-                events={grp.events}
-                similarEvents={getSimilarEvents}
-              />
-            </React.Fragment>
-          )) :
-        <p>Loading XML data...</p>}
-    </React.Fragment>
-  );
-};
+  render() {
+    const {
+      events,
+      loading,
+      error,
+      getSimilarEvents,
+    } = this.props;
+
+    if (error) {
+      return (
+        <div>Error! {error.message}</div>
+      );
+    }
+
+    return (
+      <React.Fragment>
+        {!loading ?
+          evUtil.groupByDate(events).map(grp =>
+            (
+              <React.Fragment key={Key.getShortKey()}>
+                <StyledSectionText>
+                  <Fa icon="calendar-alt" />
+                  &nbsp;
+                  {grp.dateFormatted}
+                </StyledSectionText>
+                <EventsList
+                  events={grp.events}
+                  similarEvents={getSimilarEvents}
+                />
+              </React.Fragment>
+            )) :
+          <p>Loading XML data...</p>}
+      </React.Fragment>
+    );
+  }
+}
 
 EvenstContainer.propTypes = {
   events: PropTypes.arrayOf(Object).isRequired,
   loading: PropTypes.bool.isRequired,
   error: PropTypes.object,
   getSimilarEvents: PropTypes.func.isRequired,
+  getEvents: PropTypes.func.isRequired,
 };
 
 EvenstContainer.defaultProps = {
@@ -66,6 +78,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
+  getEvents: () => dispatch(fetchEvents()),
   getSimilarEvents: eventId => dispatch(fetchSimilarEvents(eventId)),
 });
 

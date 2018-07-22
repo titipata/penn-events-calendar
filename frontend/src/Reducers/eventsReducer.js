@@ -43,7 +43,7 @@ export default function eventsReducer(state = initialState, action) {
     case fetchActions.FETCH_SIMILAR_EVENTS:
       return {
         ...state,
-        similarEvent: action.similarEvents,
+        similarEvents: action.similarEvents,
       };
 
     default:
