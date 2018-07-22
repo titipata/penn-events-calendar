@@ -7,22 +7,30 @@ export const fetchActions = {
   FETCH_SIMILAR_EVENTS: 'FETCH_SIMILAR_EVENTS',
 };
 
-const fetchEventsBegin = () => ({
-  type: fetchActions.FETCH_EVENTS_BEGIN,
-});
+const fetchEvents = () => (dispatch) => {
+  // dispatch begin fetching action
+  dispatch({ type: fetchActions.FETCH_EVENTS_BEGIN });
 
-const fetchEventsSuccess = events => ({
-  type: fetchActions.FETCH_EVENTS_SUCCESS,
-  events,
-});
-
-const fetchEventsError = error => ({
-  type: fetchActions.FETCH_EVENTS_FAILURE,
-  error,
-});
+  // fetching events
+  fetch(API.getEvent())
+    .then(API.handleErrors)
+    .then(res => res.json())
+    .then((resJson) => {
+      // success ge
+      dispatch({
+        type: fetchActions.FETCH_EVENTS_SUCCESS,
+        events: resJson,
+      });
+    })
+    .catch((error) => {
+      dispatch({ type: fetchActions.FETCH_EVENTS_FAILURE, error });
+      console.log(`[ERROR] failed fetching events: ${error}`);
+    });
+};
 
 const fetchSimilarEvents = eventId => (dispatch) => {
   fetch(API.getSimilarEvents(eventId))
+    .then(API.handleErrors)
     .then(res => res.json())
     .then((resJson) => {
       dispatch({
@@ -31,14 +39,13 @@ const fetchSimilarEvents = eventId => (dispatch) => {
       });
     })
     .catch((error) => {
+      dispatch({ type: fetchActions.FETCH_EVENTS_FAILURE, error });
       console.log(`[ERROR] failed fetching similar events: ${error}`);
     });
 };
 
 export {
-  fetchEventsBegin,
-  fetchEventsSuccess,
-  fetchEventsError,
+  fetchEvents,
   fetchSimilarEvents,
 };
 
