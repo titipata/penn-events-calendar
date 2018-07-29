@@ -5,6 +5,7 @@ import { DataColor } from '../../../Data';
 import DetailBox from './DetailBoxComponent';
 import TimeBox from './TimeBoxComponent';
 import DescriptionBox from './DescriptionBoxComponent';
+import SimilarEventsBox from './SimilarEventsBoxComponent';
 
 const StyledListItem = styled.li`
   margin-bottom: 5px;
@@ -76,6 +77,11 @@ class EventItem extends Component {
         {
           this.state.descriptionVisible && this.props.ev.description ?
             <DescriptionBox eventDescription={this.props.ev.description} /> :
+            null
+        }
+        {
+          this.state.descriptionVisible ?
+            <SimilarEventsBox id={this.props.ev.event_id} similarEvents={this.props.similarEvents} /> :
             null
         }
       </StyledListItem>

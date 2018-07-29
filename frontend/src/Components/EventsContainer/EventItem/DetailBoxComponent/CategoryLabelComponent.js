@@ -24,7 +24,7 @@ const StyledCat = styled.div`
 
 const StyledSpan = styled.span`
   cursor: pointer;
-  color: ${props => `${props.color}A6`};
+  color: #333;
 `;
 
 const StyledGroup = styled.div`
@@ -54,7 +54,7 @@ const CategoryLabel = ({
       }
     </StyledGroup>
     {
-      eventCategoryData.description && !isDescriptionExpanded ?
+      !isDescriptionExpanded ?
         <StyledSpan
           color={DataColor.getCatColor(eventCategoryData.category)}
         >
@@ -63,7 +63,7 @@ const CategoryLabel = ({
         null
     }
     {
-      eventCategoryData.description && isDescriptionExpanded ?
+      isDescriptionExpanded ?
         <StyledSpan
           color={DataColor.getCatColor(eventCategoryData.category)}
           onClick={onCollapseClick}

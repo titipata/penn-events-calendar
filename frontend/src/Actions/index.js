@@ -16,7 +16,7 @@ const fetchEvents = () => (dispatch) => {
     .then(API.handleErrors)
     .then(res => res.json())
     .then((resJson) => {
-      // success ge
+      // success getting events
       dispatch({
         type: fetchActions.FETCH_EVENTS_SUCCESS,
         events: resJson,
@@ -35,7 +35,10 @@ const fetchSimilarEvents = eventId => (dispatch) => {
     .then((resJson) => {
       dispatch({
         type: fetchActions.FETCH_SIMILAR_EVENTS,
-        similarEvents: resJson,
+        similarEvents: {
+          id: eventId,
+          data: resJson,
+        },
       });
     })
     .catch((error) => {

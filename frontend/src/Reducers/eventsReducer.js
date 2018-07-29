@@ -41,10 +41,17 @@ export default function eventsReducer(state = initialState, action) {
       };
 
     case fetchActions.FETCH_SIMILAR_EVENTS:
-      return {
-        ...state,
-        similarEvents: action.similarEvents,
-      };
+      return Object.assign(
+        {},
+        state,
+        {
+          similarEvents:
+            [
+              ...state.similarEvents.filter(ex => ex.id !== action.similarEvents.id),
+              action.similarEvents,
+            ],
+        },
+      );
 
     default:
       // ALWAYS have a default case in a reducer
