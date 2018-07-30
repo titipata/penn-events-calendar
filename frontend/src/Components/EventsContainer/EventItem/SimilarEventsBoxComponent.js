@@ -3,7 +3,6 @@ import React from 'react';
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import { Key } from '../../../Utils';
-import { xml2js } from '../../../../node_modules/xml-js';
 
 const StyledBox = styled.div`
   flex: 1;
@@ -27,20 +26,26 @@ const StyledContent = styled.div`
   line-height: 1.3rem;
 `;
 
-const SimilarEventsBox = ({ similarEvents, id }) => (
-  <StyledBox>
-    <StyledHeader>
-      Similar Events:
-    </StyledHeader>
-    <StyledContent>
-      {/* {console.log('HERE is similar events:', similarEvents)} */}
-      {console.log('HERE is filters events:', similarEvents.find(x => x.id === id))}
-      <ul>
-        {similarEvents.map(event => <li key={Key.getShortKey()}>{event.title}</li>)}
-      </ul>
-    </StyledContent>
-  </StyledBox>
-);
+const SimilarEventsBox = ({ similarEvents, id }) => {
+  const event = similarEvents.find(x => x.id === id);
+  console.log('HERE:', event);
+  return event ? (
+    <StyledBox>
+      <StyledHeader>
+        Similar Events:
+      </StyledHeader>
+      <StyledContent>
+        {/* {console.log('HERE is similar events:', similarEvents)} */}
+        {/* {console.log('HERE is filters events:', similarEvents.find(x => x.id === id))} */}
+        <ul>
+          {
+            event.data.map(simevs => <li key={Key.getShortKey()}>{simevs.title}</li>)
+          }
+        </ul>
+      </StyledContent>
+    </StyledBox>
+  ) : null;
+};
 
 SimilarEventsBox.propTypes = {
   similarEvents: PropTypes.arrayOf(Object).isRequired,

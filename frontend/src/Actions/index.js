@@ -29,6 +29,7 @@ const fetchEvents = () => (dispatch) => {
 };
 
 const fetchSimilarEvents = eventId => (dispatch) => {
+  console.log('GETTING similar for id:', eventId);
   fetch(API.getSimilarEvents(eventId))
     .then(API.handleErrors)
     .then(res => res.json())
