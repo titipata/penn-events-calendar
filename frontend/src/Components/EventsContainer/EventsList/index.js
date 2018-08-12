@@ -10,14 +10,13 @@ const StyledEventsList = styled.ul`
   padding: 0;
 `;
 
-const EventsList = ({ events, similarEvents }) => (
+const EventsList = ({ events }) => (
   <StyledEventsList>
     { events.map(ev =>
       (
         <EventItem
           key={Key.getShortKey()}
           ev={ev}
-          similarEvents={similarEvents}
         />
       ))
     }
@@ -26,7 +25,6 @@ const EventsList = ({ events, similarEvents }) => (
 
 EventsList.propTypes = {
   events: PropTypes.arrayOf(Object).isRequired,
-  similarEvents: PropTypes.func.isRequired,
 };
 
 export default EventsList;

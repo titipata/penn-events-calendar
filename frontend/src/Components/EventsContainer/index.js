@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import { fetchEvents, fetchSimilarEvents } from '../../Actions';
+import { fetchEvents } from '../../Actions';
 import { Events as evUtil, Key } from '../../Utils';
 import EventsList from './EventsList';
 
@@ -23,12 +23,7 @@ class EvenstContainer extends Component {
   }
 
   render() {
-    const {
-      events,
-      loading,
-      error,
-      getSimilarEvents,
-    } = this.props;
+    const { events, loading, error } = this.props;
 
     if (error) {
       return (
@@ -49,7 +44,6 @@ class EvenstContainer extends Component {
                 </StyledSectionText>
                 <EventsList
                   events={grp.events}
-                  similarEvents={getSimilarEvents}
                 />
               </React.Fragment>
             )) :
@@ -63,7 +57,6 @@ EvenstContainer.propTypes = {
   events: PropTypes.arrayOf(Object).isRequired,
   loading: PropTypes.bool.isRequired,
   error: PropTypes.object,
-  getSimilarEvents: PropTypes.func.isRequired,
   getEvents: PropTypes.func.isRequired,
 };
 
@@ -79,7 +72,6 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = dispatch => ({
   getEvents: () => dispatch(fetchEvents()),
-  getSimilarEvents: eventId => dispatch(fetchSimilarEvents(eventId)),
 });
 
 export default connect(

@@ -5,7 +5,7 @@ import { DataColor } from '../../../Data';
 import DetailBox from './DetailBoxComponent';
 import TimeBox from './TimeBoxComponent';
 import DescriptionBox from './DescriptionBoxComponent';
-import SimilarEventsBox from './SimilarEventsBoxComponent';
+import SimilarEventsBox from './SimilarEventsBoxContainer';
 
 const StyledListItem = styled.li`
   margin-bottom: 5px;
@@ -33,9 +33,6 @@ class EventItem extends Component {
   }
 
   _handleCardClick() {
-    // dispatch event id to get similar events on click
-    this.props.similarEvents(this.props.ev.event_id);
-
     if (!this.state.descriptionVisible) {
       this.setState({
         descriptionVisible: true,
@@ -81,7 +78,7 @@ class EventItem extends Component {
         }
         {
           this.state.descriptionVisible ?
-            <SimilarEventsBox id={this.props.ev.event_id} similarEvents={this.props.similarEvents} /> :
+            <SimilarEventsBox id={this.props.ev.event_id} /> :
             null
         }
       </StyledListItem>
@@ -90,7 +87,6 @@ class EventItem extends Component {
 }
 
 EventItem.propTypes = {
-  similarEvents: PropTypes.func.isRequired,
   ev: PropTypes.shape({
     date: PropTypes.string,
     day_of_week: PropTypes.string,
