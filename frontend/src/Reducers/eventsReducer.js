@@ -5,6 +5,7 @@ const initialState = {
   loading: false,
   similarEvents: [],
   error: null,
+  eventDetails: [],
 };
 
 export default function eventsReducer(state = initialState, action) {
@@ -47,8 +48,25 @@ export default function eventsReducer(state = initialState, action) {
         {
           similarEvents:
             [
+              // all ids that is not this id will be copied
               ...state.similarEvents.filter(ex => ex.id !== action.similarEvents.id),
+              // this id will we updated when fetching success
               action.similarEvents,
+            ],
+        },
+      );
+
+    case fetchActions.GET_EVENT_DETAILS:
+      return Object.assign(
+        {},
+        state,
+        {
+          eventDetails:
+            [
+              // all ids that is not this id will be copied
+              ...state.eventDetails.filter(ex => ex.id !== action.eventDetails.id),
+              // this id will we updated when fetching success
+              action.eventDetails,
             ],
         },
       );

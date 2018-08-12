@@ -5,6 +5,11 @@ export const fetchActions = {
   FETCH_EVENTS_SUCCESS: 'FETCH_EVENTS_SUCCESS',
   FETCH_EVENTS_FAILURE: 'FETCH_EVENTS_FAILURE',
   FETCH_SIMILAR_EVENTS: 'FETCH_SIMILAR_EVENTS',
+  GET_EVENT_DETAILS: 'GET_EVENT_DETAILS',
+};
+
+export const visibilityActions = {
+  TOGGLE_VISIBILITY: 'TOGGLE_VISIBILITY',
 };
 
 const fetchEvents = () => (dispatch) => {
@@ -48,8 +53,22 @@ const fetchSimilarEvents = eventId => (dispatch) => {
     });
 };
 
+const getEventDetails = eventId => (dispatch, getState) => {
+  // what to do to get event detail of this id
+  // 1 get description of this id
+  // 2 get similar events of this id
+  // 3 set visibility of detail of this id
+};
+
+const toggleEventDetail = eventId => ({
+  type: visibilityActions.TOGGLE_VISIBILITY,
+  id: eventId,
+});
+
 export {
   fetchEvents,
   fetchSimilarEvents,
+  getEventDetails,
+  toggleEventDetail,
 };
 
