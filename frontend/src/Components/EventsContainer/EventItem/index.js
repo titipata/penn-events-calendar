@@ -60,7 +60,11 @@ class EventItem extends Component {
           this.props.ev.detailVisible ?
             <React.Fragment>
               <DescriptionBox description={this.props.ev.description} />
-              <SimilarEventsBox similarEvents={null} />
+              <SimilarEventsBox
+                similarEvents={
+                  this.props.similarEvents.find(simev => simev.id === this.props.ev.event_id)
+                }
+              />
             </React.Fragment> :
             null
         }
@@ -70,6 +74,7 @@ class EventItem extends Component {
 }
 
 EventItem.propTypes = {
+  similarEvents: PropTypes.arrayOf(Object).isRequired,
   getSimilarEvents: PropTypes.func.isRequired,
   toggleVisibility: PropTypes.func.isRequired,
   ev: PropTypes.shape({
@@ -93,12 +98,16 @@ EventItem.propTypes = {
   }).isRequired,
 };
 
+const mapStateToProps = state => ({
+  similarEvents: state.events.similarEvents,
+});
+
 const mapDispatchToProps = dispatch => ({
   getSimilarEvents: eventId => dispatch(fetchSimilarEvents(eventId)),
   toggleVisibility: eventId => dispatch(toggleEventDetail(eventId)),
 });
 
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps,
 )(EventItem);

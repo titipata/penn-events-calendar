@@ -1,9 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { connect } from 'react-redux';
 import { Key } from '../../../Utils';
-import { fetchSimilarEvents } from '../../../Actions';
 
 const StyledBox = styled.div`
   flex: 1;
@@ -27,6 +25,10 @@ const StyledContent = styled.div`
   line-height: 1.3rem;
 `;
 
+const StyledUl = styled.ul`
+  padding: 0;
+`;
+
 class SimilarEventsBox extends Component {
   componentDidMount() {
     // get similar events of this
@@ -34,12 +36,10 @@ class SimilarEventsBox extends Component {
   }
 
   render() {
-    const { similarEvents, id } = this.props;
-    const matchId = similarEvents.find(x => x.id === id);
-    const similarEvent = matchId ? matchId.data : null;
+    const { similarEvents } = this.props;
 
     // check first if the returned event is array and is not empty
-    return Array.isArray(similarEvent) && similarEvent.length ? (
+    return (
       <StyledBox>
         <StyledHeader>
           Similar Events:
@@ -47,32 +47,36 @@ class SimilarEventsBox extends Component {
         <StyledContent>
           {/* {console.log('HERE is similar events:', similarEvents)} */}
           {/* {console.log('HERE is filters events:', similarEvents.find(x => x.id === id))} */}
-          <ul>
-            {
-              similarEvent.map(simevs => <li key={Key.getShortKey()}>{simevs.title}</li>)
-            }
-          </ul>
+          {
+            similarEvents ?
+            (
+              <StyledUl>
+                {
+                  similarEvents.data.length !== 0 ?
+                    similarEvents.data.map(simevs =>
+                    (
+                      <li key={Key.getShortKey()}>{simevs.title}</li>
+                    )) :
+                    'No similar events for this event.'
+                }
+              </StyledUl>
+            ) : 'No similar events for this event id.'
+          }
         </StyledContent>
       </StyledBox>
-    ) : null;
+    );
   }
 }
 
 SimilarEventsBox.propTypes = {
-  similarEvents: PropTypes.arrayOf(Object).isRequired,
-  id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
-  getSimilarEvents: PropTypes.func.isRequired,
+  similarEvents: PropTypes.shape({
+    id: PropTypes.string,
+    data: PropTypes.arrayOf(Object),
+  }),
 };
 
-const mapStateToProps = state => ({
-  similarEvents: state.events.similarEvents,
-});
+SimilarEventsBox.defaultProps = {
+  similarEvents: null,
+};
 
-const mapDispatchToProps = dispatch => ({
-  getSimilarEvents: eventId => dispatch(fetchSimilarEvents(eventId)),
-});
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(SimilarEventsBox);
+export default SimilarEventsBox;
