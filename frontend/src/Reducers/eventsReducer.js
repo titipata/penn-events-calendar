@@ -1,4 +1,4 @@
-import { fetchActions } from '../Actions';
+import { fetchActions, visibilityActions } from '../Actions';
 
 const initialState = {
   allEvents: [],
@@ -67,6 +67,27 @@ export default function eventsReducer(state = initialState, action) {
               ...state.eventDetails.filter(ex => ex.id !== action.eventDetails.id),
               // this id will we updated when fetching success
               action.eventDetails,
+            ],
+        },
+      );
+
+    case visibilityActions.TOGGLE_VISIBILITY:
+      return Object.assign(
+        {},
+        state,
+        {
+          eventDetails:
+            [
+              // all ids that is not this id will be copied
+              ...state.eventDetails.filter(ex => ex.id !== action.id),
+              // this id will be altered
+              Object.assign(
+                {},
+                state.eventDetails.find(ex => ex.id === action.id),
+                {
+                  visible: !state.eventDetails.find(ex => ex.id === action.id).visible,
+                },
+              ),
             ],
         },
       );

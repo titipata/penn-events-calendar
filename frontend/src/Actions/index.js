@@ -46,7 +46,7 @@ const fetchSimilarEvents = eventId => (dispatch) => {
           data: resJson,
         },
       });
-    })
+    }, () => console.log(`fail fetching similar events for id: ${eventId}!`))
     .catch((error) => {
       dispatch({ type: fetchActions.FETCH_EVENTS_FAILURE, error });
       console.log(`[ERROR] failed fetching similar events: ${error}`);
@@ -58,6 +58,29 @@ const getEventDetails = eventId => (dispatch, getState) => {
   // 1 get description of this id
   // 2 get similar events of this id
   // 3 set visibility of detail of this id
+  const { events } = getState();
+  const thisId = events.allEvents.find(ev => ev.event_id === eventId);
+  const description = thisId && thisId.description ? thisId.description : null;
+
+  console.log('GETTING event detail for id:', eventId);
+  fetch(API.getSimilarEvents(eventId))
+    .then(API.handleErrors)
+    .then(res => res.json())
+    .then((resJson) => {
+      dispatch({
+        type: fetchActions.FETCH_SIMILAR_EVENTS,
+        eventDetails: {
+          id: eventId,
+          similarEvents: resJson,
+          description,
+          visible: false,
+        },
+      });
+    })
+    .catch((error) => {
+      dispatch({ type: fetchActions.FETCH_EVENTS_FAILURE, error });
+      console.log(`[ERROR] failed fetching similar events: ${error}`);
+    });
 };
 
 const toggleEventDetail = eventId => ({

@@ -35,10 +35,11 @@ class SimilarEventsBox extends Component {
 
   render() {
     const { similarEvents, id } = this.props;
-    const event = similarEvents.find(x => x.id === id);
+    const matchId = similarEvents.find(x => x.id === id);
+    const similarEvent = matchId ? matchId.data : null;
 
     // check first if the returned event is array and is not empty
-    return Array.isArray(event) && event.length ? (
+    return Array.isArray(similarEvent) && similarEvent.length ? (
       <StyledBox>
         <StyledHeader>
           Similar Events:
@@ -48,7 +49,7 @@ class SimilarEventsBox extends Component {
           {/* {console.log('HERE is filters events:', similarEvents.find(x => x.id === id))} */}
           <ul>
             {
-              event.data.map(simevs => <li key={Key.getShortKey()}>{simevs.title}</li>)
+              similarEvent.map(simevs => <li key={Key.getShortKey()}>{simevs.title}</li>)
             }
           </ul>
         </StyledContent>

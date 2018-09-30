@@ -114,7 +114,7 @@ def extract_event_details(event_site):
     """
     Extract event details from CNI detail page
     """
-    dt, location, description = [stringify_children(s).strip() 
+    dt, location, description = [stringify_children(s).strip()
                                  for s in event_site.xpath('//div[@class="field-item even"]')]
     event_time = dateutil.parser.parse(dt)
     date = event_time.strftime("%Y-%m-%d")
@@ -209,9 +209,9 @@ def fetch_events_english_dept():
             starttimes.append(event_time.text or '')
             endtimes.append(event_time.text or '')
 
-    titles = [span.find('a').text for span in events.xpath('//span[@class="field-content"]') 
+    titles = [span.find('a').text for span in events.xpath('//span[@class="field-content"]')
             if span.find('a') is not None]
-    urls = [span.find('a').attrib.get('href') for span in events.xpath('//span[@class="field-content"]') 
+    urls = [span.find('a').attrib.get('href') for span in events.xpath('//span[@class="field-content"]')
             if span.find('a') is not None]
     descriptions = [stringify_children(e).strip() for e in events.xpath('//div[@class="span10"]')]
 
@@ -250,7 +250,7 @@ def fetch_events_english_dept():
 
 def calculate_document_similarity(n_documents=6, days=21):
     """
-    Calculate similarity between talks, 
+    Calculate similarity between talks,
     only calculate for recent one
     """
     import numpy as np
@@ -263,12 +263,12 @@ def calculate_document_similarity(n_documents=6, days=21):
     events = list(filter(lambda x: dateutil.parser.parse(x['date']) >= datetime.today() and dateutil.parser.parse(x['date']) <= date_retrieve,
                         events))
 
-    # transforming description to spacy tokens 
+    # transforming description to spacy tokens
     docs = []
     for event in events:
         description = '{} {}'.format(event.get('title', ''), event.get('description'))
         docs.append(nlp(description))
-    
+
     # dates
     dates = [dateutil.parser.parse(event['date']) for event in events]
 
@@ -279,11 +279,11 @@ def calculate_document_similarity(n_documents=6, days=21):
         # looking for future documents only
         date_filter = np.array([d >= dates[i] for d in dates])
         document_similarities[np.logical_not(date_filter)] = 0
-        
+
         similar_events_idx = np.argsort(document_similarities)[::-1][1: n_documents + 1]
-        top_similar_events = [events[idx] for idx in similar_events_idx]    
+        top_similar_events = [events[idx] for idx in similar_events_idx]
         similar_events[event['event_id']] = top_similar_events
-    
+
     json.dump(similar_events, open(PATH_SIMILAR_EVENTS, 'w'))
 
 

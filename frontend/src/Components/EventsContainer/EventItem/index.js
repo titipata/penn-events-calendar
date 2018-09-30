@@ -6,6 +6,8 @@ import DetailBox from './DetailBoxComponent';
 import TimeBox from './TimeBoxComponent';
 import DescriptionBox from './DescriptionBoxComponent';
 import SimilarEventsBox from './SimilarEventsBoxContainer';
+import { connect } from 'react-redux';
+import { getEventDetails } from '../../../Actions';
 
 const StyledListItem = styled.li`
   margin-bottom: 5px;
@@ -30,6 +32,10 @@ class EventItem extends Component {
 
     this._handleCardClick = this._handleCardClick.bind(this);
     this._handleCollapseClick = this._handleCollapseClick.bind(this);
+  }
+
+  componentDidMount() {
+    // this.props.getDetail(this.props.ev.event_id);
   }
 
   _handleCardClick() {
@@ -87,6 +93,7 @@ class EventItem extends Component {
 }
 
 EventItem.propTypes = {
+  getDetail: PropTypes.func.isRequired,
   ev: PropTypes.shape({
     date: PropTypes.string,
     day_of_week: PropTypes.string,
@@ -107,4 +114,11 @@ EventItem.propTypes = {
   }).isRequired,
 };
 
-export default EventItem;
+const mapDispatchToProps = dispatch => ({
+  getDetail: eventId => dispatch(getEventDetails(eventId)),
+});
+
+export default connect(
+  null,
+  mapDispatchToProps,
+)(EventItem);
