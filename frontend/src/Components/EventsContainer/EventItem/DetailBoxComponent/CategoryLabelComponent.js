@@ -1,4 +1,3 @@
-import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
@@ -22,22 +21,13 @@ const StyledCat = styled.div`
   margin-right: 5px;
 `;
 
-const StyledSpan = styled.span`
-  cursor: pointer;
-  color: #333;
-`;
-
 const StyledGroup = styled.div`
   display: inline-flex;
   align-items: center;
   padding-right: 10px;
 `;
 
-const CategoryLabel = ({
-  eventCategoryData,
-  isDescriptionExpanded,
-  onCollapseClick,
-}) => (
+const CategoryLabel = ({ eventCategoryData }) => (
   <CatContainer>
     <StyledGroup>
       <StyledCat color={DataColor.getSchoolColor(eventCategoryData.school)}>
@@ -53,25 +43,6 @@ const CategoryLabel = ({
         null
       }
     </StyledGroup>
-    {
-      !isDescriptionExpanded ?
-        <StyledSpan
-          color={DataColor.getCatColor(eventCategoryData.category)}
-        >
-          See Details <Fa icon="chevron-circle-down" />
-        </StyledSpan> :
-        null
-    }
-    {
-      isDescriptionExpanded ?
-        <StyledSpan
-          color={DataColor.getCatColor(eventCategoryData.category)}
-          onClick={onCollapseClick}
-        >
-          Collapse <Fa icon="chevron-circle-up" />
-        </StyledSpan> :
-        null
-    }
   </CatContainer>
 );
 
@@ -81,8 +52,6 @@ CategoryLabel.propTypes = {
     description: PropTypes.string.isRequired,
     school: PropTypes.string.isRequired,
   }).isRequired,
-  isDescriptionExpanded: PropTypes.bool.isRequired,
-  onCollapseClick: PropTypes.func.isRequired,
 };
 
 export default CategoryLabel;

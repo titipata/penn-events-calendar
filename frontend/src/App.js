@@ -2,8 +2,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faBookmark, faCalendarAlt, faClock, faExternalLinkAlt,
   faFileAlt, faMapMarkerAlt, faSchool, faUniversity,
-  faUserTie, faChevronCircleDown, faChevronCircleUp,
-  faCopy,
+  faUserTie, faCopy, faChevronDown, faChevronUp,
 } from '@fortawesome/free-solid-svg-icons';
 import React, { Component } from 'react';
 import styled, { injectGlobal } from 'styled-components';
@@ -16,7 +15,7 @@ import Footer from './Components/Footer';
 library.add(
   faCalendarAlt, faMapMarkerAlt, faClock, faFileAlt,
   faExternalLinkAlt, faUserTie, faSchool, faUniversity,
-  faBookmark, faChevronCircleDown, faChevronCircleUp,
+  faBookmark, faChevronDown, faChevronUp,
   faCopy,
 );
 

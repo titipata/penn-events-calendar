@@ -13,6 +13,8 @@ const DetailWrapper = styled.div`
 const StyledTitle = styled.div`
   font-size: 1.3rem;
   font-weight: 600;
+  padding-right: 20px;
+  word-break: break-all;
 `;
 
 const StyledLocation = styled.div`
@@ -26,7 +28,7 @@ const StyledLinkIcon = styled.a.attrs({
 })`
   font-weight: lighter;
   font-size: 1rem;
-  padding-left: 8px;
+  padding-right: 8px;
   color: #555;
   cursor: pointer;
 `;
@@ -39,14 +41,9 @@ const getEventCategoryData = ({
   category, description, school,
 });
 
-const DetailBox = ({
-  eventDetail,
-  isDescriptionExpanded,
-  onCollapseClick,
-}) => (
+const DetailBox = ({ eventDetail }) => (
   <DetailWrapper>
     <StyledTitle>
-      {renderHTML(eventDetail.title)}
       {
         eventDetail.url ?
           (
@@ -56,14 +53,13 @@ const DetailBox = ({
           ) :
           null
       }
+      {renderHTML(eventDetail.title)}
     </StyledTitle>
     <StyledLocation>
       <Fa icon="map-marker-alt" /> {renderHTML(eventDetail.location)}
     </StyledLocation>
     <CategoryLabel
       eventCategoryData={getEventCategoryData(eventDetail)}
-      isDescriptionExpanded={isDescriptionExpanded}
-      onCollapseClick={onCollapseClick}
     />
   </DetailWrapper>
 );
@@ -77,8 +73,6 @@ DetailBox.propTypes = {
     school: PropTypes.string.isRequired,
     url: PropTypes.string.isRequired,
   }).isRequired,
-  isDescriptionExpanded: PropTypes.bool.isRequired,
-  onCollapseClick: PropTypes.func.isRequired,
 };
 
 export default DetailBox;

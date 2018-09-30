@@ -1,8 +1,9 @@
+import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import styled from 'styled-components';
-import { getEventDetails, fetchSimilarEvents, toggleEventDetail } from '../../../Actions';
+import { fetchSimilarEvents, toggleEventDetail } from '../../../Actions';
 import { DataColor } from '../../../Data';
 import DescriptionBox from './DescriptionBoxComponent';
 import DetailBox from './DetailBoxComponent';
@@ -10,6 +11,7 @@ import SimilarEventsBox from './SimilarEventsBoxContainer';
 import TimeBox from './TimeBoxComponent';
 
 const StyledListItem = styled.li`
+  position: relative;
   margin-bottom: 5px;
   padding: 10px 0;
   border: 1px solid #eee;
@@ -22,6 +24,16 @@ const StyledListItem = styled.li`
 const StyledContentWrapper = styled.div`
   display: flex;
   flex-direction: row;
+`;
+
+const StyledSpan = styled.span`
+  background-color: white;
+  padding: 2px 0 0 3px;
+  position: absolute;
+  right: 8px;
+  bottom: 2px;
+  cursor: pointer;
+  color: #333;
 `;
 
 class EventItem extends Component {
@@ -68,6 +80,23 @@ class EventItem extends Component {
             </React.Fragment> :
             null
         }
+        <StyledSpan
+          color={DataColor.getCatColor(this.props.ev.category)}
+        >
+          {
+            this.props.ev.detailVisible ?
+              (
+                <React.Fragment>
+                  <Fa icon="chevron-up" />
+                </React.Fragment>
+              ) :
+              (
+                <React.Fragment>
+                  <Fa icon="chevron-down" />
+                </React.Fragment>
+              )
+          }
+        </StyledSpan>
       </StyledListItem>
     );
   }
