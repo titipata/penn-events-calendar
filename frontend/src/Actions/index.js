@@ -79,7 +79,7 @@ const getEventDetails = eventId => (dispatch, getState) => {
     })
     .catch((error) => {
       dispatch({ type: fetchActions.FETCH_EVENTS_FAILURE, error });
-      console.log(`[ERROR] failed fetching similar events: ${error}`);
+      console.log('[ERROR] failed fetching similar events:', error);
     });
 };
 

@@ -25,7 +25,12 @@ export default function eventsReducer(state = initialState, action) {
       return {
         ...state,
         loading: false,
-        allEvents: action.events,
+        allEvents: action.events.map(event =>
+          Object.assign(
+            {},
+            event,
+            { detailVisible: false },
+          )),
       };
 
     case fetchActions.FETCH_EVENTS_FAILURE:
@@ -72,25 +77,26 @@ export default function eventsReducer(state = initialState, action) {
       );
 
     case visibilityActions.TOGGLE_VISIBILITY:
-      return Object.assign(
-        {},
-        state,
-        {
-          eventDetails:
-            [
-              // all ids that is not this id will be copied
-              ...state.eventDetails.filter(ex => ex.id !== action.id),
-              // this id will be altered
-              Object.assign(
-                {},
-                state.eventDetails.find(ex => ex.id === action.id),
-                {
-                  visible: !state.eventDetails.find(ex => ex.id === action.id).visible,
-                },
-              ),
-            ],
-        },
-      );
+      if (state.allEvents.length !== 0) {
+        return Object.assign(
+          {},
+          state,
+          {
+            allEvents: state.allEvents.map((event) => {
+              if (event.event_id !== action.id) {
+                return event;
+              }
+
+              return {
+                ...event,
+                detailVisible: !event.detailVisible,
+              };
+            }),
+          },
+        );
+      }
+
+      return state;
 
     default:
       // ALWAYS have a default case in a reducer

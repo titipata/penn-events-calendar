@@ -24,19 +24,19 @@ const StyledContent = styled.div`
   line-height: 1.3rem;
 `;
 
-const DescriptionBox = ({ eventDescription }) => (
+const DescriptionBox = ({ description }) => (
   <StyledDescriptionBox>
     <StyledHeader>
       Description:
     </StyledHeader>
     <StyledContent>
-      {eventDescription}
+      {description || 'No description for this event.'}
     </StyledContent>
   </StyledDescriptionBox>
 );
 
 DescriptionBox.propTypes = {
-  eventDescription: PropTypes.string.isRequired,
+  description: PropTypes.string.isRequired,
 };
 
 export default DescriptionBox;

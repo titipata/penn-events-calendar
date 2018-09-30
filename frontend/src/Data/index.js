@@ -24,7 +24,7 @@ class API {
   // Handle HTTP errors since fetch won't.
   static handleErrors(response) {
     if (!response.ok) {
-      console.log(`[ERROR] failed fetching: ${response}`);
+      console.log('[ERROR] failed fetching:', response);
       throw Error(response.statusText);
     }
     return response;

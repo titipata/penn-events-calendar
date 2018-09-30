@@ -30,7 +30,7 @@ const StyledContent = styled.div`
 class SimilarEventsBox extends Component {
   componentDidMount() {
     // get similar events of this
-    this.props.getSimilarEvents(this.props.id);
+    // this.props.getSimilarEvents(this.props.id);
   }
 
   render() {

@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import styled from 'styled-components';
-import { DataColor } from '../../../Data';
-import DetailBox from './DetailBoxComponent';
-import TimeBox from './TimeBoxComponent';
-import DescriptionBox from './DescriptionBoxComponent';
-import SimilarEventsBox from './SimilarEventsBoxContainer';
 import { connect } from 'react-redux';
-import { getEventDetails } from '../../../Actions';
+import styled from 'styled-components';
+import { getEventDetails, fetchSimilarEvents, toggleEventDetail } from '../../../Actions';
+import { DataColor } from '../../../Data';
+import DescriptionBox from './DescriptionBoxComponent';
+import DetailBox from './DetailBoxComponent';
+import SimilarEventsBox from './SimilarEventsBoxContainer';
+import TimeBox from './TimeBoxComponent';
 
 const StyledListItem = styled.li`
   margin-bottom: 5px;
@@ -15,7 +15,8 @@ const StyledListItem = styled.li`
   border: 1px solid #eee;
   border-left: 5px solid ${props => props.color};
   border-radius: 5px;
-  cursor: ${props => (props.cursorPointer ? 'pointer' : 'default')};
+  /* cursor: ${props => (props.cursorPointer ? 'pointer' : 'default')}; */
+  cursor: pointer;
 `;
 
 const StyledContentWrapper = styled.div`
@@ -24,35 +25,12 @@ const StyledContentWrapper = styled.div`
 `;
 
 class EventItem extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      descriptionVisible: false,
-    };
-
-    this._handleCardClick = this._handleCardClick.bind(this);
-    this._handleCollapseClick = this._handleCollapseClick.bind(this);
-  }
-
   componentDidMount() {
-    // this.props.getDetail(this.props.ev.event_id);
-  }
-
-  _handleCardClick() {
-    if (!this.state.descriptionVisible) {
-      this.setState({
-        descriptionVisible: true,
-      });
-    }
-  }
-
-  _handleCollapseClick() {
-    this.setState({
-      descriptionVisible: false,
-    });
+    console.log('yay');
   }
 
   render() {
+    const eventId = this.props.ev.event_id;
     // https://stackoverflow.com/a/39333479/4010864
     const getEventTime = ({ starttime, endtime }) => ({ starttime, endtime });
     const getEventDetail = ({
@@ -63,9 +41,12 @@ class EventItem extends Component {
 
     return (
       <StyledListItem
-        onClick={this._handleCardClick}
+        onClick={() => {
+          this.props.toggleVisibility(eventId);
+          this.props.getSimilarEvents(eventId);
+        }}
         color={DataColor.getCatColor(this.props.ev.category)}
-        cursorPointer={this.props.ev.description && !this.state.descriptionVisible}
+        // cursorPointer={!this.state.descriptionVisible}
       >
         <StyledContentWrapper>
           <TimeBox
@@ -73,18 +54,14 @@ class EventItem extends Component {
           />
           <DetailBox
             eventDetail={getEventDetail(this.props.ev)}
-            isDescriptionExpanded={this.state.descriptionVisible}
-            onCollapseClick={this._handleCollapseClick}
           />
         </StyledContentWrapper>
         {
-          this.state.descriptionVisible && this.props.ev.description ?
-            <DescriptionBox eventDescription={this.props.ev.description} /> :
-            null
-        }
-        {
-          this.state.descriptionVisible ?
-            <SimilarEventsBox id={this.props.ev.event_id} /> :
+          this.props.ev.detailVisible ?
+            <React.Fragment>
+              <DescriptionBox description={this.props.ev.description} />
+              <SimilarEventsBox similarEvents={null} />
+            </React.Fragment> :
             null
         }
       </StyledListItem>
@@ -93,7 +70,8 @@ class EventItem extends Component {
 }
 
 EventItem.propTypes = {
-  getDetail: PropTypes.func.isRequired,
+  getSimilarEvents: PropTypes.func.isRequired,
+  toggleVisibility: PropTypes.func.isRequired,
   ev: PropTypes.shape({
     date: PropTypes.string,
     day_of_week: PropTypes.string,
@@ -111,11 +89,13 @@ EventItem.propTypes = {
     school: PropTypes.string,
     owner: PropTypes.string,
     link: PropTypes.string,
+    visible: PropTypes.bool,
   }).isRequired,
 };
 
 const mapDispatchToProps = dispatch => ({
-  getDetail: eventId => dispatch(getEventDetails(eventId)),
+  getSimilarEvents: eventId => dispatch(fetchSimilarEvents(eventId)),
+  toggleVisibility: eventId => dispatch(toggleEventDetail(eventId)),
 });
 
 export default connect(
