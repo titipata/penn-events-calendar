@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components';
+import LoadingScreen from './LoadingScreenComponent';
 
 const mediaSizes = {
   extraSmall: 576,
@@ -63,4 +64,4 @@ const Container = styled.div`
   `}
 `;
 
-export { media, Container };
+export { media, Container, LoadingScreen };

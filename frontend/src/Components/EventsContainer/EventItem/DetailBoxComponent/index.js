@@ -26,6 +26,7 @@ const StyledLinkIcon = styled.a.attrs({
   target: '_blank',
   rel: 'noopener noreferrer',
 })`
+  display: ${props => (props.href ? 'inline-flex' : 'none')};
   font-weight: lighter;
   font-size: 1rem;
   padding-right: 8px;
@@ -44,15 +45,13 @@ const getEventCategoryData = ({
 const DetailBox = ({ eventDetail }) => (
   <DetailWrapper>
     <StyledTitle>
-      {
-        eventDetail.url ?
-          (
-            <StyledLinkIcon href={eventDetail.url}>
-              <Fa icon="external-link-alt" />
-            </StyledLinkIcon>
-          ) :
-          null
-      }
+      <StyledLinkIcon
+        href={eventDetail.url}
+        // do not pass click to children underneath, only open a link
+        onClick={e => e.stopPropagation()}
+      >
+        <Fa icon="external-link-alt" />
+      </StyledLinkIcon>
       {renderHTML(eventDetail.title)}
     </StyledTitle>
     <StyledLocation>

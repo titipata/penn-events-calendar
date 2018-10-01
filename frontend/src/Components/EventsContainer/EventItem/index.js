@@ -80,22 +80,9 @@ class EventItem extends Component {
             </React.Fragment> :
             null
         }
-        <StyledSpan
-          color={DataColor.getCatColor(this.props.ev.category)}
-        >
-          {
-            this.props.ev.detailVisible ?
-              (
-                <React.Fragment>
-                  <Fa icon="chevron-up" />
-                </React.Fragment>
-              ) :
-              (
-                <React.Fragment>
-                  <Fa icon="chevron-down" />
-                </React.Fragment>
-              )
-          }
+        {/* indicator icon */}
+        <StyledSpan>
+          <Fa icon={`chevron-${this.props.ev.detailVisible ? 'up' : 'down'}`} />
         </StyledSpan>
       </StyledListItem>
     );
@@ -124,6 +111,7 @@ EventItem.propTypes = {
     owner: PropTypes.string,
     link: PropTypes.string,
     visible: PropTypes.bool,
+    detailVisible: PropTypes.bool,
   }).isRequired,
 };
 
