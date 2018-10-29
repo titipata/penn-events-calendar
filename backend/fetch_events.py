@@ -245,7 +245,67 @@ def fetch_events_english_dept():
     print('English Department events Downloaded!')
 
 
+def fetch_event_crim(base_url='https://crim.sas.upenn.edu'):
+    """
+    Fetch events from CRIM
+    """
+    events = []
+    page = requests.get(base_url + '/events')
+    soup = BeautifulSoup(page.content)
+    tree = soup.find('div', attrs={'class': 'item-list'}).find('ul', attrs={'class': 'unstyled'})
+    for a in tree.find_all('a'):
+        event_path = a.get('href')
+        event_url = base_url + event_path
+        event_page = requests.get(event_url)
+        soup = BeautifulSoup(event_page.content)
+        title = soup.find('div', attrs={'class': 'span-inner-wrapper'}).\
+            find('h1', attrs={'class': 'page-header'}).text
+        date = soup.find('div', attrs={'class': 'field-date'}).find('span').text
+        location = soup.find('div', attrs={'class': 'field-location'})
+        location = location.find('p').text or ''
+        description = soup.find('div', attrs={'class': 'field-body'}).find('p').text or ''
+        events.append({
+            'title': title,
+            'date': date, 
+            'location': location, 
+            'description': description, 
+            'owner': 'CRIM'
+        })
+    return events
+
+
+def fetch_event_sas(base_url='https://www.sas.upenn.edu'):
+    """
+    Fetch events from SAS
+    """
+    events = []
+    base_url = 'https://www.sas.upenn.edu'
+    page = requests.get(base_url + '/mec/events')
+    soup = BeautifulSoup(page.content, 'html.parser')
+    event_urls = soup.find_all('div', attrs={'class': 'frontpage-calendar-link'})
+    for div in event_urls:
+        event_url = base_url + div.find('a')['href']
+        event_page = requests.get(event_url)
+        event_soup = BeautifulSoup(event_page.content, 'html.parser')
+        event_details = event_soup.find('div', attrs={'class': 'node-inner'})
+        date = event_details.find('div', attrs={'class': 'event_date'}).text
+        title = event_details.find('div', attrs={'class': 'event_title'}).text
+        try:
+            description = (event_details.find('div', attrs={'class': 'event_content'}).text or '').strip()
+        except:
+            pass
+        events.append({
+            'title': title, 
+            'date': date, 
+            'description': description, 
+            'owner': 'SAS'
+        })
+    return events
+
+
 if __name__ == '__main__':
     fetch_events()
     fetch_events_cni()
     fetch_events_english_dept()
+    fetch_event_crim()
+    fetch_event_sas()
