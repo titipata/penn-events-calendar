@@ -247,7 +247,7 @@ def fetch_events_english_dept():
 
 def fetch_event_crim(base_url='https://crim.sas.upenn.edu'):
     """
-    Fetch events from CRIM
+    Fetch events from Department of Criminology (CRIM)
     """
     events = []
     page = requests.get(base_url + '/events')
@@ -269,17 +269,16 @@ def fetch_event_crim(base_url='https://crim.sas.upenn.edu'):
             'date': date, 
             'location': location, 
             'description': description, 
-            'owner': 'CRIM'
+            'owner': 'C'
         })
     return events
 
 
-def fetch_event_sas(base_url='https://www.sas.upenn.edu'):
+def fetch_event_mec(base_url='https://www.sas.upenn.edu'):
     """
-    Fetch events from SAS
+    Fetch events from Middle East Center (MEC) https://www.sas.upenn.edu/mec/events
     """
     events = []
-    base_url = 'https://www.sas.upenn.edu'
     page = requests.get(base_url + '/mec/events')
     soup = BeautifulSoup(page.content, 'html.parser')
     event_urls = soup.find_all('div', attrs={'class': 'frontpage-calendar-link'})
@@ -298,8 +297,123 @@ def fetch_event_sas(base_url='https://www.sas.upenn.edu'):
             'title': title, 
             'date': date, 
             'description': description, 
-            'owner': 'SAS'
+            'owner': 'Middle East Center', 
+            'url': event_url
         })
+    return events
+
+
+def fetch_event_biology(base_url='http://www.bio.upenn.edu'):
+    """
+    Fetch events from Department of Biology http://www.bio.upenn.edu/events/
+    """
+    events = []
+    page = requests.get(base_url + '/events')
+    soup = BeautifulSoup(page.content, 'html.parser')
+
+    for a in soup.find('div', attrs={'id': 'content-area'}).find_all('a'):
+        event_url = base_url + a['href']
+        page = requests.get(event_url)
+        event_soup = BeautifulSoup(page.content, 'html.parser')
+        title = event_soup.find('h1', attrs={'class': 'title'}).text or ''
+        date = event_soup.find('span', attrs={'class': 'date-display-single'}).text
+        location = (event_soup.find('div', attrs={'class': 'field field-type-text field-field-event-location'}).\
+            find('div', attrs={'class': 'field-item odd'}).text or '').strip()
+        description = event_soup.find('div', attrs={'class': 'node-inner'}).\
+            find('div', attrs={'class': 'content'}).find('p').text
+        events.append({
+            'title': title, 
+            'date': date,
+            'location': location, 
+            'description': description, 
+            'owner': 'Department of Biology', 
+            'url': event_url
+        })
+    return events
+
+
+def fetch_event_economics(base_url='https://economics.sas.upenn.edu'):
+    """
+    Fetch events from Economics department https://economics.sas.upenn.edu/events
+    
+    Note that we still have problem with when parsing the description
+    """
+    events = []
+    html_page = requests.get(base_url + '/events')
+    soup = BeautifulSoup(html_page.content)
+    pagination = soup.find('nav', attrs={'class': 'pager-nav text-center'})
+    n_pages = max([int(a['href'][-1]) for a in pagination.find_all('a')])
+
+    # loop through all pages
+    for page in range(n_pages + 1):
+        all_event_url = 'https://economics.sas.upenn.edu/events?tid=All&page=%s' % str(page)
+        page = requests.get(all_event_url)
+        all_event_soup = BeautifulSoup(page.content, 'html.parser')
+        page_events = all_event_soup.find('ul', attrs={'class': 'list-unstyled row'}).find_all('li')
+
+        for event in page_events:
+            title = event.find('h4').text
+            event_url = base_url + event.find('a')['href']
+            start_time, end_time = event.find_all('time')
+            start_time, end_time = start_time.text, end_time.text
+            event_page = requests.get(event_url)
+            event_soup = BeautifulSoup(event_page.content)
+            description = event_soup.find('div', attrs={'class': 'col-sm-8 bs-region bs-region--left'}).text.strip()
+            location = event_soup.find('p', attrs={'class': 'address'}).text.strip()
+            events.append({
+                'title': title,
+                'start_time': start_time, 
+                'end_time': end_time, 
+                'description': description,
+                'location': location
+            })
+    return events
+
+
+def fetch_event_math(base_url='https://www.math.upenn.edu'):
+    """
+    Fetch event from Math department
+    """
+    events = []
+    html_page = requests.get(base_url + '/events')
+
+    page_soup = BeautifulSoup(html_page.content)
+    pagination = page_soup.find('div', attrs={'class': 'pagination pagination-centered'})
+
+    n_pages = max([int(page.text) for page in pagination.find_all('li') if page.text.isdigit()])
+
+    for page in range(n_pages):
+        all_event_url = 'https://www.math.upenn.edu/events/?page=%s' % str(page)
+        all_event_page = requests.get(all_event_url)
+        all_event_soup = BeautifulSoup(all_event_page.content)
+
+        event_urls = [base_url + header.find('a')['href'] for header in all_event_soup.find_all('h3') 
+           if 'events' in header.find('a')['href']]
+
+        for event_url in event_urls:
+            event_page = requests.get(event_url)
+            event_soup = BeautifulSoup(event_page.content)
+            try:
+                event_detail_soup = event_soup.find('div', attrs={'class': "pull-right span9"})
+                title = event_detail_soup.find('h3', attrs={'class': 'field-og-group-ref'}).find('a').text
+                date = event_detail_soup.find('p', attrs={'class': 'field-date'}).text.strip()
+                speaker = event_detail_soup.find('h4', attrs={'class': 'field-speaker-name'}).text.strip()
+                speaker_affil = event_detail_soup.find('p', attrs={'class': 'field-speaker-affiliation'}).text.strip()
+                location = event_detail_soup.find('div', attrs={'class': 'fieldset-wrapper'}).text.strip()
+                description_soup = event_detail_soup.find('div', attrs={'class': 'field-body'})
+                if description_soup is not None:
+                    description = description_soup.text.strip()
+                else:
+                    description = ''
+                events.append({
+                    'title': title, 
+                    'date': date,
+                    'speaker': speaker + ', ' + speaker_affil, 
+                    'location': location, 
+                    'description': description
+                })
+            except:
+                pass
     return events
 
 
@@ -308,4 +422,7 @@ if __name__ == '__main__':
     fetch_events_cni()
     fetch_events_english_dept()
     fetch_event_crim()
-    fetch_event_sas()
+    fetch_event_mec()
+    fetch_event_biology()
+    fetch_event_economics()
+    fetch_event_math()
