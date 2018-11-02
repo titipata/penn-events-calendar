@@ -75,27 +75,14 @@ def fetch_events():
     tree = html.fromstring(page.content)
     events = tree.findall('event')
 
-    # read JSON file is exist
-    if os.path.isfile(PATH_JSON):
-        events_list = read_json(PATH_JSON)
-    else:
-        events_list = []
-
+    events_list = []
     for event in events:
         try:
             event_dict = convert_event_to_dict(event)
-
-            # get current event ids
-            if len(events_list) > 0:
-                event_ids = [e_['event_id'] for e_ in events_list]
-            else:
-                event_ids = []
-            if event_dict['event_id'] not in event_ids:
-                events_list.append(event_dict)
+            events_list.append(event_dict)
         except:
             pass
-    save_json(events_list, PATH_JSON)
-    print('Events Downloaded!')
+    return events_list
 
 
 def stringify_children(node):
@@ -138,55 +125,33 @@ def extract_event_details(event_site):
     return event_json
 
 
-def fetch_events_cni():
+def fetch_events_cni(base_url='https://cni.upenn.edu/events'):
     """
     Saving Computational Neuroscience Initiative to JSON format
     """
-
-    # read JSON file is exist
-    if os.path.isfile(PATH_JSON):
-        events_list = read_json(PATH_JSON)
-    else:
-        events_list = []
-
-    page = requests.get('https://cni.upenn.edu/events')
+    events_list = []
+    page = requests.get(base_url)
     site = html.fromstring(page.text)
     events = site.xpath('//h4/span/a[@href]/@href') # all events
     for event_id in events:
         try:
-            event_url = urljoin('https://cni.upenn.edu/events', event_id)
+            event_url = urljoin(base_url, event_id)
             event_page = requests.get(event_url)
             event_site = html.fromstring(event_page.text)
             event_dict = extract_event_details(event_site)
             event_dict['event_id'] = event_id
             event_dict['url'] = event_url
-
-            # get current event ids
-            if len(events_list) > 0:
-                event_ids = [e_['event_id'] for e_ in events_list]
-            else:
-                event_ids = []
-            if event_dict['event_id'] not in event_ids:
-                events_list.append(event_dict)
+            events_list.append(event_dict)
         except:
             pass
-
-    save_json(events_list, PATH_JSON)
-    print('CNI Events Downloaded!')
+    return events_list
 
 
-def fetch_events_english_dept():
+def fetch_events_english_dept(base_url='https://www.english.upenn.edu/events/calendar-export/'):
     """
     Saving English Department events to JSON format
     """
-
-    # read JSON file is exist
-    if os.path.isfile(PATH_JSON):
-        events_list = read_json(PATH_JSON)
-    else:
-        events_list = []
-
-    base_url = 'https://www.english.upenn.edu/events/calendar-export/'
+    events_list = []
     page = requests.get(base_url)
     site = html.fromstring(page.text)
     events = site.xpath('//ul[@class="unstyled"]//li//span[@class="field-content"]')
@@ -232,17 +197,10 @@ def fetch_events_english_dept():
                 "owner": "English Department",
                 "link": ""
             }
-            # get current event ids
-            if len(events_list) > 0:
-                event_ids = [e_['event_id'] for e_ in events_list]
-            else:
-                event_ids = []
-            if event_dict['event_id'] not in event_ids:
-                events_list.append(event_dict)
+            events_list.append(event_dict)
         except:
             pass
-    save_json(events_list, PATH_JSON)
-    print('English Department events Downloaded!')
+    return events_list
 
 
 def fetch_event_crim(base_url='https://crim.sas.upenn.edu'):
@@ -365,7 +323,8 @@ def fetch_event_economics(base_url='https://economics.sas.upenn.edu'):
                 'start_time': start_time, 
                 'end_time': end_time, 
                 'description': description,
-                'location': location
+                'location': location, 
+                'url': event_url
             })
     return events
 
@@ -410,19 +369,131 @@ def fetch_event_math(base_url='https://www.math.upenn.edu'):
                     'date': date,
                     'speaker': speaker + ', ' + speaker_affil, 
                     'location': location, 
-                    'description': description
+                    'description': description, 
+                    'url': event_url
                 })
             except:
                 pass
     return events
 
 
+def fetch_event_philosophy(base_url='https://philosophy.sas.upenn.edu'):
+    """
+    Fetch event from Philosophy (Penn Arts & Science) at https://philosophy.sas.upenn.edu
+    """
+    events = []
+    html_page = requests.get(base_url + '/events')
+    page_soup = BeautifulSoup(html_page.content)
+    events_list = page_soup.find('div', attrs={'class': 'item-list'}).find_all('li')
+
+    if len(events_list) > 0:
+        for li in events_list:
+            event_url = base_url + li.find('a')['href']
+            title = li.find('h3').text.strip()
+            date = li.find('p', attrs={'class': 'dateline'}).text
+            location = li.find('div', attrs={'class': 'location'}).text
+
+            event_page = requests.get(event_url)
+            event_soup = BeautifulSoup(event_page.content)
+            description = event_soup.find('div', attrs={'class': 'field-body'})
+            if description is not None:
+                description = description.text.strip()
+            else:
+                description = ''
+
+            events.append({
+                'title': title,
+                'date': date, 
+                'location': location, 
+                'description': description, 
+                'url': event_url
+            })
+    return events
+
+
+def fetch_event_classical_studies(base_url='https://www.classics.upenn.edu'):
+    """
+    Fetch events from Classical studies
+    """
+    events = []
+    html_page = requests.get(base_url + '/events')
+    page_soup = BeautifulSoup(html_page.content)
+    events_list = page_soup.find('div', attrs={'class': 'item-list'})
+
+    for event_url in events_list.find_all('a'):
+        event_url = base_url + event_url['href']
+        event_page = requests.get(event_url)
+        event_soup = BeautifulSoup(event_page.content)
+        title = event_soup.find('h1', attrs={'class': 'page-header'}).text
+        date = event_soup.find('span', attrs={'class': 'date-display-single'}).text
+        if event_soup.find('p', attrs={'class': 'MsoNormal'}) is not None:
+            location = event_soup.find('p', attrs={'class': 'MsoNormal'}).text
+        elif event_soup.find('p').text is not None:
+            location = event_soup.find('p').text
+        else:
+            location = ''
+        description = event_soup.find('div', attrs={'class': 'field field-name-body field-type-text-with-summary field-label-hidden'})
+        if description is not None:
+            description = description.text
+        else:
+            description = ''
+        events.append({
+            'title': title,
+            'date': date, 
+            'location': location, 
+            'description': description, 
+            'url': event_url
+        })
+    return events
+
+
+def fetch_event_linguistic(base_url='https://www.ling.upenn.edu'):
+    """
+    Fetch events from Linguistic Department
+    """
+    events = []
+    html_page = requests.get(base_url + '/events')
+    page_soup = BeautifulSoup(html_page.content)
+    for event in page_soup.find('div', attrs={'class': 'view-content'}).find_all('li'):
+        if event.find('a') is not None:
+            event_url = base_url + event.find('a')['href']
+            title = event.find('h3').text.strip()
+            date = event.find('span', attrs={'class': 'date-display-single'})
+            if date is not None:
+                date = date.text
+            location = event.find('div', attrs={'class': 'where-label'})
+            if location is not None:
+                location = location.text.replace('Where:', '').strip()
+            else:
+                location = ''
+            event_page = requests.get(event_url)
+            event_soup = BeautifulSoup(event_page.content)
+            description = event_soup.find('div', attrs={'id': 'content-area'}).find('div', attrs={'class': 'content'}).text.strip()
+            date = event_soup.find('span', attrs={'class': 'date-display-single'})
+            if date is not None:
+                date = date.text.strip()
+            else:
+                date = ''
+
+            events.append({
+                'title': title,
+                'date': date, 
+                'location': location, 
+                'description': description, 
+                'url': event_url
+            })
+    return events
+
+
 if __name__ == '__main__':
-    fetch_events()
-    fetch_events_cni()
-    fetch_events_english_dept()
-    fetch_event_crim()
-    fetch_event_mec()
-    fetch_event_biology()
-    fetch_event_economics()
-    fetch_event_math()
+    events = []
+    events.append(fetch_events())
+    events.append(fetch_events_cni())
+    events.append(fetch_events_english_dept())
+    events.append(fetch_event_crim())
+    events.append(fetch_event_mec())
+    events.append(fetch_event_biology())
+    events.append(fetch_event_economics())
+    events.append(fetch_event_math())
+    events.append(fetch_event_philosophy())
+    events.append(fetch_event_linguistic())
