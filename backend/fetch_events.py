@@ -485,6 +485,141 @@ def fetch_event_linguistic(base_url='https://www.ling.upenn.edu'):
     return events
 
 
+def fetch_event_earth_enviromental_science(base_url='https://www.sas.upenn.edu'):
+    """
+    Fetch events from the first page from the Earth and Environmental Science department
+
+    Note: We might need to scrape other pages later
+    """
+    html_page = requests.get(base_url + '/earth/events')
+    page_soup = BeautifulSoup(html_page.content)
+
+    events = []
+    all_events = page_soup.find('div', attrs={'class': 'item-list'}).find_all('li')
+    for event in all_events:
+        event_url = base_url + event.find('a')['href']
+        title = event.find('h3').text.strip()
+        presenter = event.find('p', attrs={'presenter'}).text.strip() if event.find('p', attrs={'presenter'}) is not None else ''
+        event_type = event.find('h4').text if event.find('h4') is not None else ''
+        date = event.find('p', attrs={'class': 'dateline'}).text
+        location = event.find('div', attrs={'class': 'location'}).text.strip() if event.find('div', attrs={'class': 'location'}) is not None else ''
+        description = ''
+        events.append({
+            'title': title,
+            'date': date,
+            'location': location,
+            'description': description,
+            'presenter': presenter,
+            'event_type': event_type,
+            'url': event_url
+        })
+    return events
+
+
+def fetch_event_arthistory(base_url='https://www.sas.upenn.edu'):
+    """
+    Fetch events from Art History Department
+    """
+    page = requests.get(base_url + '/arthistory/events')
+    page_soup = BeautifulSoup(page.content, 'html.parser')
+    range_pages = max([int(n_page.text) for n_page in page_soup.find('div', 
+                                                                     attrs={'class': 'pagination pagination-centered'}).find_all('li') if n_page.text.isdigit()])
+
+    events = []
+    for n_page in range(1, range_pages):
+        page = requests.get((base_url + '/arthistory/events?&page={}').format(n_page))
+        page_soup = BeautifulSoup(page.content, 'html.parser')
+        all_events = page_soup.find('section', attrs={'class': 'main-content is-sidebar'}).find_all('li')
+        for event in all_events:
+            event_url = base_url + event.find('a')['href']
+            title = event.find('h3').text if event.find('h3') is not None else ''
+            event_type = event.find('strong').text if event.find('strong') is not None else ''
+            date = event.find('p', attrs={'class': 'dateline'}).text if event.find('p', attrs={'class': 'dateline'}) is not None else ''
+            location = event.find('div', attrs={'class': 'location'}).text if event.find('div', attrs={'class': 'location'}) is not None else ''
+            event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+            description = event_soup.find('div', attrs={'class': 'field-body'})
+            if description is not None:
+                description = description.text.strip()
+            else:
+                description = ''
+            events.append({
+                'title': title,
+                'date': date,
+                'location': location,
+                'description': description,
+                'event_type': event_type,
+                'url': event_url
+            })
+    return events
+
+
+def fetch_event_sociology(base_url='https://sociology.sas.upenn.edu'):
+    """
+    Fetch events Sociology department at https://sociology.sas.upenn.edu/events?page=0
+    """
+    events = []
+    html_page = requests.get(base_url + '/events')
+    page_soup = BeautifulSoup(html_page.content)
+
+    range_pages = max([int(n_page.text) for n_page in 
+                       page_soup.find('div', attrs={'class': 'item-list'}).find_all('li') if n_page.text.isdigit()])
+
+    for n_page in range(range_pages):
+        all_events_url = base_url + '/events?page={}'.format(n_page)
+        all_events_soup = BeautifulSoup(requests.get(all_events_url).content)
+        all_events = all_events_soup.find('div', attrs={'id': 'content'}).find_all('li')
+        for event_section in all_events:
+            event_url = base_url + event_section.find('a')['href'] if event_section.find('a') is not None else ''
+            title = event_section.find('a')
+            title = title.text.strip() if title is not None else ''
+
+            date = event_section.find('p', attrs={'class': 'dateline'})
+            date = date.text.strip() if date is not None else ''
+
+            location = event_section.find('p', attrs={'class': 'location'})
+            location = location.text.strip() if location is not None else ''
+
+            if len(event_url) != 0:
+                event_page = BeautifulSoup(requests.get(event_url).content)
+                description = event_page.find('div', attrs={'class': 'content'})
+                description = description.text.strip() if description is not None else ''
+                subtitle = event_page.find('div', attrs={'class': 'field-items'})
+                subtitle = subtitle.text.strip() if subtitle is not None else ''
+            events.append({
+                'title': title,
+                'subtitle': subtitle,
+                'date': date,
+                'location': location,
+                'description': description,
+                'url': event_url
+            })
+    return events
+
+
+def fetch_event_cceb(base_url='https://www.cceb.med.upenn.edu/events'):
+    """
+    Scrape events from Center for Clinical Epidemiology and Biostatistics (CCEB)
+    
+    TO DO: attemp to scrape https://events.med.upenn.edu/cceb/#!view/event/event_id/698917 
+    still does not work
+    """
+    html_page = requests.get(base_url + '/events')
+    page_soup = BeautifulSoup(html_page.content)
+    event_section = page_soup.find('div', attrs={'class': 'region-inner region-content-inner'})
+
+    all_events = event_section.find_all('div', attrs={'class': 'views-row'})
+    for event in all_events:
+        event_url = event.find('a')['href']
+        title = event.find('a').text.strip()
+        if 'events.med' in event_url:
+            event_soup = BeautifulSoup(requests.get(event_url).content)
+        events.append({
+            'title': title, 
+            'url': event_url
+        })
+    return events
+
+
 if __name__ == '__main__':
     events = []
     events.append(fetch_events())
@@ -497,3 +632,6 @@ if __name__ == '__main__':
     events.append(fetch_event_math())
     events.append(fetch_event_philosophy())
     events.append(fetch_event_linguistic())
+    events.append(fetch_event_earth_enviromental_science())
+    events.append(fetch_event_arthistory())
+    events.append(fetch_event_sociology())
