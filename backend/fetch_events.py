@@ -627,7 +627,6 @@ def fetch_event_CIS(base_url="http://www.cis.upenn.edu/about-cis/events/index.ph
     events = []
     page_soup = BeautifulSoup(requests.get(base_url).content)
     title, date, description, speaker = '', '', '', ''
-    event_url = "http://www.cis.upenn.edu/about-cis/events/index.php"
     for tr in page_soup.find_all('tr'):
         if tr.find('img') is not None:
             events.append({
@@ -635,7 +634,7 @@ def fetch_event_CIS(base_url="http://www.cis.upenn.edu/about-cis/events/index.ph
                 'title': title,
                 'description': description,
                 'speaker': speaker,
-                'url': event_url
+                'url': base_url
             })
             title, date, description = '', '', ''
         else:
@@ -646,6 +645,35 @@ def fetch_event_CIS(base_url="http://www.cis.upenn.edu/about-cis/events/index.ph
                 if event_header is not None:
                     date = tr.find('strong').text.strip() if tr.find('strong') is not None else ''
                     title = ' '.join(tr.text.replace(date, '').strip().split())             
+    return events
+
+
+def fetch_event_dsl(base_url='http://dsl.cis.upenn.edu/seminar/'):
+    """
+    Scrape events from DSL seminar.
+    The DSL Seminar is a weekly gathering of the research students and professors in the Distributed Systems Laboratory
+    """
+    page_soup = BeautifulSoup(requests.get(base_url).content)
+    events_list = page_soup.find('table').find_all('tr')
+    events = []
+    for event in events_list[1::]:
+        date = event.find('td', attrs={'class': 'ms-grid5-left'}).text
+        speaker = event.find('td', attrs={'class': 'ms-grid5-even'}).text
+        description = event.find_all('td', attrs={'class': 'ms-grid5-even'})[-1].text.strip()
+        if 'Abstract' in description:
+            title = description.split('Abstract')[0].strip()
+            description = ' '.join(description.split('Abstract')[1::]).strip()
+            description = ' '.join(description.split())
+        else:
+            title = description
+            description = description
+        events.append({
+            'title': title, 
+            'description': description, 
+            'date': date, 
+            'url': base_url, 
+            'speaker': speaker,
+        })
     return events
 
 
