@@ -620,6 +620,35 @@ def fetch_event_cceb(base_url='https://www.cceb.med.upenn.edu/events'):
     return events
 
 
+def fetch_event_CIS(base_url="http://www.cis.upenn.edu/about-cis/events/index.php"):
+    """
+    Fetch events from CIS department. Scrape this site is a little tricky
+    """
+    events = []
+    page_soup = BeautifulSoup(requests.get(base_url).content)
+    title, date, description, speaker = '', '', '', ''
+    event_url = "http://www.cis.upenn.edu/about-cis/events/index.php"
+    for tr in page_soup.find_all('tr'):
+        if tr.find('img') is not None:
+            events.append({
+                'date': date,
+                'title': title,
+                'description': description,
+                'speaker': speaker,
+                'url': event_url
+            })
+            title, date, description = '', '', ''
+        else:
+            if tr.find('div', attrs={'class': 'CollapsiblePanelContent'}) is not None:
+                description = tr.find('div', attrs={'class': 'CollapsiblePanelContent'}).text.strip()
+            if tr.find('div', attrs={'class': 'CollapsiblePanelContent'}) is None:
+                event_header = tr.find('td')
+                if event_header is not None:
+                    date = tr.find('strong').text.strip() if tr.find('strong') is not None else ''
+                    title = ' '.join(tr.text.replace(date, '').strip().split())             
+    return events
+
+
 if __name__ == '__main__':
     events = []
     events.append(fetch_events())
