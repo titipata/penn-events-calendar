@@ -677,6 +677,68 @@ def fetch_event_dsl(base_url='http://dsl.cis.upenn.edu/seminar/'):
     return events
 
 
+def fetch_event_CURF(base_url='https://www.curf.upenn.edu'):
+    """
+    Center for Undergrad Research and Fellowship
+    """
+    page_soup = BeautifulSoup(requests.get(base_url + '/curf-events').content)
+
+    events = []
+    event_table = page_soup.find('table', attrs={'class': 'views-table cols-3'})
+    all_events = event_table.find_all('tr')
+    for event in all_events[1::]:
+        title = event.find('div').text
+        event_url = base_url + event.find('a')['href']
+        date = event.find('span', attrs={'class': 'date-display-single'}).text
+        description = event.find('td', attrs={'class': 'eventbody'}).text.strip()
+        
+        # scrape description directly from ``event_url``
+        event_soup = BeautifulSoup(requests.get(event_url).content)
+        event_details = event_soup.find('div', attrs={'class': 'eventdetails'})
+        if event_details is not None:
+            event_description = event_details.find('div', attrs={'class': 'eventdescription'})
+            if event_description is not None:
+                description = event_description.text.replace('Description:', '').strip()
+        
+        events.append({
+            'title': title, 
+            'description': description,
+            'url': event_url, 
+            'date': date
+        })
+    return events
+
+
+def fetch_event_upibi(base_url='http://upibi.org/events/'):
+    """
+    Fetch events from Institute for Biomedical Informatics, http://upibi.org/events/
+    
+    TO DO: scrape event's description from URL, fix try and except
+    """
+    events = []
+    page_soup = BeautifulSoup(requests.get(base_url).content)
+    all_events = page_soup.find_all('div', 
+                                    attrs={'class': 'type-tribe_events'})
+    events = []
+    for event in all_events:
+        try:
+            title = event.find('h3').text.strip()
+            date = event.find('div', attrs={'class': 'tribe-event-schedule-details'}).text.strip()
+            location = event.find('div', attrs={'class': 'tribe-events-venue-details'}).text.replace('+ Google Map', '').strip()
+            description = event.find('div', attrs={'class': 'tribe-events-list-event-description tribe-events-content description entry-summary'}).text.strip()
+            event_url = event.find('a')['href']
+            events.append({
+                'title': title, 
+                'description': description,
+                'url': event_url, 
+                'date': date, 
+                'location': location
+            })
+        except:
+            pass
+    return events
+
+
 if __name__ == '__main__':
     events = []
     events.append(fetch_events())
