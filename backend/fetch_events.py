@@ -492,7 +492,7 @@ def fetch_event_earth_enviromental_science(base_url='https://www.sas.upenn.edu')
     Note: We might need to scrape other pages later
     """
     html_page = requests.get(base_url + '/earth/events')
-    page_soup = BeautifulSoup(html_page.content)
+    page_soup = BeautifulSoup(html_page.content, 'html.parser')
 
     events = []
     all_events = page_soup.find('div', attrs={'class': 'item-list'}).find_all('li')
@@ -559,14 +559,14 @@ def fetch_event_sociology(base_url='https://sociology.sas.upenn.edu'):
     """
     events = []
     html_page = requests.get(base_url + '/events')
-    page_soup = BeautifulSoup(html_page.content)
+    page_soup = BeautifulSoup(html_page.content, 'html.parser')
 
     range_pages = max([int(n_page.text) for n_page in 
                        page_soup.find('div', attrs={'class': 'item-list'}).find_all('li') if n_page.text.isdigit()])
 
     for n_page in range(range_pages):
         all_events_url = base_url + '/events?page={}'.format(n_page)
-        all_events_soup = BeautifulSoup(requests.get(all_events_url).content)
+        all_events_soup = BeautifulSoup(requests.get(all_events_url).content, 'html.parser')
         all_events = all_events_soup.find('div', attrs={'id': 'content'}).find_all('li')
         for event_section in all_events:
             event_url = base_url + event_section.find('a')['href'] if event_section.find('a') is not None else ''
@@ -602,7 +602,7 @@ def fetch_event_cceb(base_url='https://www.cceb.med.upenn.edu/events'):
     """
     events = []
     html_page = requests.get(base_url + '/events')
-    page_soup = BeautifulSoup(html_page.content)
+    page_soup = BeautifulSoup(html_page.content, 'html.parser')
     event_section = page_soup.find('div', attrs={'class': 'region-inner region-content-inner'})
 
     all_events = event_section.find_all('div', attrs={'class': 'views-row'})
@@ -644,7 +644,7 @@ def fetch_event_cis(base_url="http://www.cis.upenn.edu/about-cis/events/index.ph
     Fetch events from CIS department. Scrape this site is a little tricky
     """
     events = []
-    page_soup = BeautifulSoup(requests.get(base_url).content)
+    page_soup = BeautifulSoup(requests.get(base_url).content, 'html.parser')
     title, date, description, speaker = '', '', '', ''
     for tr in page_soup.find_all('tr'):
         if tr.find('img') is not None:
@@ -672,7 +672,7 @@ def fetch_event_dsl(base_url='http://dsl.cis.upenn.edu/seminar/'):
     Scrape events from DSL seminar.
     The DSL Seminar is a weekly gathering of the research students and professors in the Distributed Systems Laboratory
     """
-    page_soup = BeautifulSoup(requests.get(base_url).content)
+    page_soup = BeautifulSoup(requests.get(base_url).content, 'html.parser')
     events_list = page_soup.find('table').find_all('tr')
     events = []
     for event in events_list[1::]:
@@ -700,7 +700,7 @@ def fetch_event_CURF(base_url='https://www.curf.upenn.edu'):
     """
     Center for Undergrad Research and Fellowship
     """
-    page_soup = BeautifulSoup(requests.get(base_url + '/curf-events').content)
+    page_soup = BeautifulSoup(requests.get(base_url + '/curf-events').content, 'html.parser')
 
     events = []
     event_table = page_soup.find('table', attrs={'class': 'views-table cols-3'})
@@ -735,7 +735,7 @@ def fetch_event_upibi(base_url='http://upibi.org/events/'):
     TO DO: scrape event's description from URL, fix try and except
     """
     events = []
-    page_soup = BeautifulSoup(requests.get(base_url).content)
+    page_soup = BeautifulSoup(requests.get(base_url).content, 'html.parser')
     all_events = page_soup.find_all('div', 
                                     attrs={'class': 'type-tribe_events'})
     events = []
@@ -765,7 +765,7 @@ def fetch_event_ldi(base_url='https://ldi.upenn.edu'):
     """
 
     events = []
-    page_soup = BeautifulSoup(requests.get(base_url + '/events').content)
+    page_soup = BeautifulSoup(requests.get(base_url + '/events').content, 'html.parser')
 
     try:
         pages = page_soup.find('ul', attrs={'class': 'pager'}).find_all('li')
@@ -775,7 +775,7 @@ def fetch_event_ldi(base_url='https://ldi.upenn.edu'):
 
     for n_page in range(n_pages):
         event_page_url = base_url + '/events?page={}'.format(n_page) 
-        page_soup = BeautifulSoup(requests.get(event_page_url).content)
+        page_soup = BeautifulSoup(requests.get(event_page_url).content, 'html.parser')
         all_events = page_soup.find_all('div', attrs={'class': 'views-row'})
         for event in all_events:
             if event.find('span', attrs={'class': 'date-display-single'}) is not None:
@@ -791,7 +791,7 @@ def fetch_event_ldi(base_url='https://ldi.upenn.edu'):
             try:
                 event_url = event.find('h2').find('a')['href'] 
                 event_url = base_url + event_url
-                event_soup = BeautifulSoup(requests.get(event_url).content)
+                event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
                 description = event_soup.find('div', attrs={'class': 'event-body'}).text.strip()
                 
                 speaker = event_soup.find('div', attrs={'class': 'field-name-field-persons-name'})
@@ -812,6 +812,76 @@ def fetch_event_ldi(base_url='https://ldi.upenn.edu'):
                 'url': event_url
             })
     return events
+
+
+def fetch_event_korean_studies(base_url='https://www.sas.upenn.edu'):
+    """
+    Fetch events from Korean Studies
+    """
+    events = []
+    page_soup = BeautifulSoup(requests.get(base_url + '/koreanstudies/events').content, 'html.parser')
+
+    events = []
+    event_table = page_soup.find('ul', attrs={'class': 'unstyled'})
+    all_events = event_table.find_all('li', attrs = {'class': 'row-fluid'})
+    for event in all_events:
+        event_url = base_url + event.find('a')['href']
+        event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+        title = event_soup.find('h1', attrs={'class': 'page-header'})
+        title = title.text.strip() if title is not None else ''
+        date = event_soup.find('div', attrs={'class': 'field-date'}).text.strip()
+        description = event_soup.find('div', attrs={'class': 'field-body'})
+        description = description.text.strip() if description is not None else ''
+        event_speaker = event_soup.find('div', attrs={'class': 'fieldset-wrapper'}).text.strip()
+        events.append({
+            'title': title, 
+            'description': description,
+            'url': event_url, 
+            'date': date,
+            'speaker': event_speaker
+        })
+    return events
+
+
+def fetch_event_cscc(base_url='https://cscc.sas.upenn.edu/'):
+    """
+    Fetch events from Penn Arts & Sciences, Center for the Study of Contemporary China
+
+    TO DO: Fix try, except in for this function
+    """
+    events = []
+    page_soup = BeautifulSoup(requests.get(base_url).content, 'html.parser')
+    all_events = page_soup.find_all('div', attrs={'class':'events-listing'})
+
+    for div in all_events:
+        try:
+            title = div.find('h3', attrs={'class': 'events-title'}).text.strip()
+            location = div.find('span', attrs={'class': 'news-date'})
+            if location is not None and location.find('span') is not None:
+                location = location.find('span').text.strip()
+            else:
+                location = ''
+            event_time = div.find('span', attrs={'class': 'news-date'}).text.replace('\n', ' ').replace(location, '').strip()
+            event_date = div.find('div', attrs={'class': 'event-date'})
+            event_date = ' '.join([t.text for t in event_date.find_all('time')])
+            date = event_date + event_time
+            speaker = div.find_all('h5')[-1].text
+            event_url = base_url + div.find('a')['href']
+            event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+            description = event_soup.find('div', attrs={'class': 'events-page'}).find('div', attrs={'class': 'body'})
+            description = description.text.strip() if description is not None else ''
+            events.append({
+                'title': title, 
+                'location': location,
+                'date': date,
+                'speaker': speaker,
+                'url': event_url, 
+                'description': description
+            })
+        except:
+            pass
+    return events
+
 
 
 if __name__ == '__main__':
