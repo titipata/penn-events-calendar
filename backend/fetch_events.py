@@ -599,10 +599,8 @@ def fetch_event_sociology(base_url='https://sociology.sas.upenn.edu'):
 def fetch_event_cceb(base_url='https://www.cceb.med.upenn.edu/events'):
     """
     Scrape events from Center for Clinical Epidemiology and Biostatistics (CCEB)
-    
-    TO DO: attemp to scrape https://events.med.upenn.edu/cceb/#!view/event/event_id/698917 
-    still does not work
     """
+    events = []
     html_page = requests.get(base_url + '/events')
     page_soup = BeautifulSoup(html_page.content)
     event_section = page_soup.find('div', attrs={'class': 'region-inner region-content-inner'})
@@ -611,16 +609,37 @@ def fetch_event_cceb(base_url='https://www.cceb.med.upenn.edu/events'):
     for event in all_events:
         event_url = event.find('a')['href']
         title = event.find('a').text.strip()
-        if 'events.med' in event_url:
-            event_soup = BeautifulSoup(requests.get(event_url).content)
-        events.append({
-            'title': title, 
-            'url': event_url
-        })
+        event_id = event_url.split('/')[-1]
+        text = """https://events.med.upenn.edu/live/calendar/view/event/event_id/{}?user_tz=IT&synta
+        x=%3Cwidget%20type%3D%22events_calendar%22%3E%3Carg%20id%3D%22mini_cal_heat_map%22%3Etrue%3C%2Fa
+        rg%3E%3Carg%20id%3D%22thumb_width%22%3E200%3C%2Farg%3E%3Carg%20id%3D%22thumb_height%22%3E200%3C%
+        2Farg%3E%3Carg%20id%3D%22hide_repeats%22%3Efalse%3C%2Farg%3E%3Carg%20id%3D%22show_groups%22%3Efa
+        lse%3C%2Farg%3E%3Carg%20id%3D%22show_tags%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22default_view%22%
+        3Eday%3C%2Farg%3E%3Carg%20id%3D%22group%22%3ECenter%20for%20Clinical%20Epidemiology%20and%20Bios
+        tatistics%20%28CCEB%29%3C%2Farg%3E%3C%21--start%20excluded%20groups--%3E%3C%21--%20if%20you%20ar
+        e%20changing%20the%20excluded%20groups%2C%20they%20should%20also%20be%20changed%20in%20this%20fi
+        le%3A%0A%09%2Fpublic_html%2Fpsom-excluded-groups.php--%3E%3Carg%20id%3D%22exclude_group%22%3EAdm
+        in%3C%2Farg%3E%3Carg%20id%3D%22exclude_group%22%3ETest%20Import%3C%2Farg%3E%3Carg%20id%3D%22excl
+        ude_group%22%3ELiveWhale%3C%2Farg%3E%3Carg%20id%3D%22exclude_group%22%3ETest%20Department%3C%2Fa
+        rg%3E%3C%21--end%20excluded%20groups--%3E%3Carg%20id%3D%22webcal_feed_links%22%3Etrue%3C%2Farg%3
+        E%3C%2Fwidget%3E""".format(event_id).replace('\n', '').replace(' ', '')
+        event_json = requests.get(text).json()
+        if len(event_json) != 0:
+            date = BeautifulSoup(event_json['event']['date']).text
+            title = event_json['event']['title']
+            location = event_json['event']['location']
+            description = BeautifulSoup(event_json['event']['description']).text.strip()
+            events.append({
+                'title': title, 
+                'date': date,
+                'location': location,
+                'description': description,
+                'url': event_url
+            })
     return events
 
 
-def fetch_event_CIS(base_url="http://www.cis.upenn.edu/about-cis/events/index.php"):
+def fetch_event_cis(base_url="http://www.cis.upenn.edu/about-cis/events/index.php"):
     """
     Fetch events from CIS department. Scrape this site is a little tricky
     """
