@@ -739,6 +739,62 @@ def fetch_event_upibi(base_url='http://upibi.org/events/'):
     return events
 
 
+def fetch_event_ldi(base_url='https://ldi.upenn.edu'):
+    """
+    Fetch events from Leonard & Davis Institute, https://ldi.upenn.edu
+    
+    """
+
+    events = []
+    page_soup = BeautifulSoup(requests.get(base_url + '/events').content)
+
+    try:
+        pages = page_soup.find('ul', attrs={'class': 'pager'}).find_all('li')
+        n_pages = max([int(p.text) for p in pages if p.text.isdigit()])
+    except:
+        n_pages = 1
+
+    for n_page in range(n_pages):
+        event_page_url = base_url + '/events?page={}'.format(n_page) 
+        page_soup = BeautifulSoup(requests.get(event_page_url).content)
+        all_events = page_soup.find_all('div', attrs={'class': 'views-row'})
+        for event in all_events:
+            if event.find('span', attrs={'class': 'date-display-single'}) is not None:
+                date = event.find('span', attrs={'class': 'date-display-single'}).text.strip()
+            elif event.find('span', attrs={'class': 'date-display-start'}) is not None:
+                date = event.find('span', attrs={'class': 'date-display-start'}).text.strip()
+            location = event.find('div', attrs={'class': 'field-name-field-location'})
+            location = location.text.strip() if location is not None else ''
+            title = event.find('h2').text.strip() if event.find('h2') is not None else ''
+            subtitle = event.find('div', attrs={'class': 'field-name-field-subhead'})
+            title = title + ' ({})'.format(subtitle.text.strip()) if subtitle is not None else title
+
+            try:
+                event_url = event.find('h2').find('a')['href'] 
+                event_url = base_url + event_url
+                event_soup = BeautifulSoup(requests.get(event_url).content)
+                description = event_soup.find('div', attrs={'class': 'event-body'}).text.strip()
+                
+                speaker = event_soup.find('div', attrs={'class': 'field-name-field-persons-name'})
+                speaker = speaker.text.strip() if speaker is not None else ''
+                speaker_affil = event_soup.find('div', attrs={'class': 'field-name-field-title'})
+                speaker_affil = speaker_affil.text.strip() if speaker_affil is not None else ''
+                speaker = (speaker + ' ' + speaker_affil).strip()
+            except:
+                description = ''
+                speaker = ''
+
+            events.append({
+                'title': title, 
+                'description': description,
+                'date': date,
+                'location': location, 
+                'speaker': speaker,
+                'url': event_url
+            })
+    return events
+
+
 if __name__ == '__main__':
     events = []
     events.append(fetch_events())
