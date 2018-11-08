@@ -883,6 +883,71 @@ def fetch_event_cscc(base_url='https://cscc.sas.upenn.edu/'):
     return events
 
 
+def fetch_event_fels(base_url='https://www.fels.upenn.edu'):
+    """
+    Fetch events from Fels institute of Government at University of Pennsylvania
+    """
+    events = []
+    page_soup = BeautifulSoup(requests.get(base_url + '/events').content, 'html.parser')
+    all_events = page_soup.find('div', attrs={'class': 'view-content'})
+    event_urls = [base_url + a['href'] for a in all_events.find_all('a') if a is not None]
+    
+    for event_url in event_urls:
+        event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+        title = event_soup.find('h1', attrs={'id': 'page-title'}).text.strip()
+        description = event_soup.find('div', attrs={'class': 'field-name-body'}).text.strip()
+        location = event_soup.find('div', attrs={'class': 'field-name-field-event-location'})
+        location = location.text.replace("Location Address:", '').strip() if location is not None else ''
+        room = event_soup.find('div', attrs={'class': 'field-name-field-event-location-name'})
+        room = room.text.replace('Location Name:', '').strip() if room is not None else ''
+        date = event_soup.find('span', attrs={'class': 'date-display-single'}).text.strip()
+        location = (location + ' ' + room).strip()
+        speaker = event_soup.find('div', attrs={'class': 'breadcrumb-top'})
+        speaker = speaker.text.replace('Home\xa0 // \xa0', '').strip() if speaker is not None else ''
+        events.append({
+            'title': title, 
+            'location': location, 
+            'date': date, 
+            'description': description, 
+            'speaker': speaker, 
+            'url': event_url
+        })
+    return events
+
+
+def fetch_event_sciencehistory(base_url='https://www.sciencehistory.org'):
+    """
+    Fetch events from Science History Institute, https://www.sciencehistory.org/events
+    """
+    events = []
+    page_soup = BeautifulSoup(requests.get(base_url + '/events').content, 'html.parser')
+
+    all_events = page_soup.find('div', attrs={'class': 'eventpageleft'})
+    all_events = all_events.find_all('div', attrs={'class': 'views-row'})
+
+    for event in all_events:
+        title = event.find('div', attrs={'class': 'eventtitle'}).text.strip()
+        date = event.find('div', attrs={'class': 'eventdate'}).text.strip()
+        event_url = base_url + event.find('div', attrs={'class': 'eventtitle'}).find('a')['href']
+        event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+        location = event_soup.find('div', attrs={'class': 'event-location'})
+        location = ', '.join([div.text.strip() for div in location.find_all('div') if div is not None])
+
+        descriptions = event_soup.find_all('p')
+        if len(descriptions) >= 5:
+            descriptions = ' '.join([p.text.strip() for p in descriptions[0:5]])
+        else:
+            descriptions = ' '.join([p.text.strip() for p in descriptions])
+
+        events.append({
+            'title': title, 
+            'description': descriptions,
+            'date': date, 
+            'location': location,
+            'url': event_url, 
+        })
+    return events
+
 
 if __name__ == '__main__':
     events = []
