@@ -1001,6 +1001,84 @@ def fetch_event_ItalianStudies(base_url='https://www.sas.upenn.edu'):
     return events
 
 
+def fetch_event_CEMB(base_url='https://cemb.upenn.edu'):
+    """
+    Penn Events for Center for Engineering MechanoBiology
+    """
+    page_soup = BeautifulSoup(requests.get(base_url + '/items/calendar/').content, 'html.parser')
+
+    events = []
+    event_table = page_soup.find('div', attrs={'class': 'gumm-layout-element event-layout-element span5'})
+    all_events = event_table.find_all('div', attrs = {'class': 'event-details'})
+    for event in all_events:
+        event_url = event.find('a')['href']
+        event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+        title = event_soup.find('h1')
+        title = title.text.strip() if title is not None else ''
+        date = event_soup.find('div', attrs={'class': 'event-meta'}).text.strip()
+        details = event_soup.find('div', attrs={'class': 'event-details'})
+        details = details.text if details is not None else ''
+        events.append({
+            'title': title,
+            'date': date,
+            'url': event_url, 
+            'details': details
+        })
+    return events
+
+
+def fetch_event_CEAS(base_url='https://ceas.sas.upenn.edu'):
+    """
+    Penn Events for Center for East Asian Studies
+    """
+    page_soup = BeautifulSoup(requests.get(base_url + '/events').content, 'html.parser')
+
+    events = []
+    all_events = page_soup.find_all('li', attrs={'class':'views-row'})
+    for event in all_events:
+        event_url = base_url + event.find('a')['href']
+        event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+        title = event_soup.find('h1', attrs={'class':'page-header'})
+        title = title.text.strip() if title is not None else ''
+        date = event_soup.find('span', attrs={'class': 'date-display-single'}).text.strip()
+        details = event_soup.find('div', attrs={'class': 'field field-name-body field-type-text-with-summary field-label-hidden'})
+        details = details.text if details is not None else ''
+        events.append({
+            'title': title,
+            'date': date,
+            'url': event_url, 
+            'details': details
+        })
+    return events
+
+
+def fetch_event_CASI(base_url='https://casi.ssc.upenn.edu'):
+    """
+    Penn Events for Center for the Advanced Study of India
+    """
+    page_soup = BeautifulSoup(requests.get(base_url + '/events').content, 'html.parser')
+
+    events = []
+    event_table = page_soup.find('div', attrs={'class': 'main-container container'})
+    all_events = event_table.find_all('div', attrs = {'class': 'views-row'})
+    for event in all_events:
+        event_url = base_url+event.find('a')['href']
+        event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+        title = event_soup.find('h1', attrs={'class': 'page-header'})
+        title = title.text.strip() if title is not None else ''
+        date = event_soup.find('span', attrs={'class': 'date-display-single'})
+        date = date.text.strip() if date is not None else ''
+        details = event_soup.find('div', attrs={'class': 'field field-name-body field-type-text-with-summary field-label-hidden'})
+        details = details.text.strip() if details is not None else ''
+        events.append({
+            'title': title,
+            'date': date,
+            'details': details,
+            'url': event_url
+        })
+    return events
+
+    
 if __name__ == '__main__':
     events = []
     events.append(fetch_events())
