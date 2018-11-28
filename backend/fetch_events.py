@@ -949,6 +949,58 @@ def fetch_event_sciencehistory(base_url='https://www.sciencehistory.org'):
     return events
 
 
+def fetch_event_HIP(base_url='https://www.impact.upenn.edu/'):
+    """
+    Penn Events for Center for High Impact Philanthropy
+    """
+    page_soup = BeautifulSoup(requests.get(base_url + 'events/').content, 'html.parser')
+
+    events = []
+    event_table = page_soup.find('div', attrs={'class': 'entry-content'})
+    all_events = event_table.find_all('h2', attrs = {'class': 'entry-title'})
+    for event in all_events:
+        event_url = event.find('a')['href']
+        event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+        title = event_soup.find('h1', attrs={'class': 'entry-title'})
+        title = title.text.strip() if title is not None else ''
+        details = event_soup.find('div', attrs={'class': 'entry-content clearfix'})
+        details = details.text.strip() if details is not None else ''
+        events.append({
+            'title': title,
+            'details': details,
+            'url': event_url
+        })
+    return events
+
+
+def fetch_event_ItalianStudies(base_url='https://www.sas.upenn.edu'):
+    """
+    Penn Events for Italian Studies
+    """
+    page_soup = BeautifulSoup(requests.get(base_url + '/italians/center/events').content, 'html.parser')
+
+    events = []
+    event_table = page_soup.find('div', attrs={'class': 'view-content'})
+    all_events = event_table.find_all('div', attrs = {'class': 'field-content'})
+    for event in all_events:
+        event_url = base_url + event.find('a')['href']
+        event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+        title = event_soup.find('h1', attrs={'class': 'title'})
+        title = title.text.strip() if title is not None else ''
+        date = event_soup.find('span', attrs={'class': 'date-display-single'}).text.strip()
+        time = event_soup.find('div', attrs={'class': 'field field-type-datetime field-field-event-time'})
+        time = time.text if time is not None else ''
+        event_location = event_soup.find('div', attrs={'class': 'field-item odd'}).text.strip()
+        events.append({
+            'title': title,
+            'start time': time,
+            'url': event_url, 
+            'date': date,
+            'location': event_location
+        })
+    return events
+
+
 if __name__ == '__main__':
     events = []
     events.append(fetch_events())
