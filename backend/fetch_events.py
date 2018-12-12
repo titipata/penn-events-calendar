@@ -269,16 +269,19 @@ def fetch_event_biology(base_url='http://www.bio.upenn.edu'):
     page = requests.get(base_url + '/events')
     soup = BeautifulSoup(page.content, 'html.parser')
 
-    for a in soup.find('div', attrs={'id': 'content-area'}).find_all('a'):
-        event_url = base_url + a['href']
-        page = requests.get(event_url)
+    for event in soup.find('div', attrs={'class': 'events-listing'}).find_all('summary', attrs={'class': 'col-md-11'}):
+        event_url = base_url + event.find('a')['href']
+        title = event.find('a')
+        title = title.text if title is not None else ''
+        event_time = event.find('span', attrs={'class': 'news-date'})
+        event_time = event_time.text if event_time is not None else ''
         event_soup = BeautifulSoup(page.content, 'html.parser')
-        title = event_soup.find('h1', attrs={'class': 'title'}).text or ''
-        date = event_soup.find('span', attrs={'class': 'date-display-single'}).text
-        location = (event_soup.find('div', attrs={'class': 'field field-type-text field-field-event-location'}).\
-            find('div', attrs={'class': 'field-item odd'}).text or '').strip()
-        description = event_soup.find('div', attrs={'class': 'node-inner'}).\
-            find('div', attrs={'class': 'content'}).find('p').text
+        date = event_soup.find('span', attrs={'class': 'date-display-single'})
+        date = date.text if date is not None else ''
+        location = event_soup.find('div', attrs={'class': 'field field-type-text field-field-event-location'})
+        location = location.find('div', attrs={'class': 'field-item odd'}).text if location is not None else ''
+        description = event_soup.find('div', attrs={'class': 'node-inner'})
+        description = description.find('div', attrs={'class': 'content'}).find('p').text if description is not None else ''
         events.append({
             'title': title, 
             'date': date,
@@ -315,7 +318,7 @@ def fetch_event_economics(base_url='https://economics.sas.upenn.edu'):
             start_time, end_time = event.find_all('time')
             start_time, end_time = start_time.text, end_time.text
             event_page = requests.get(event_url)
-            event_soup = BeautifulSoup(event_page.content)
+            event_soup = BeautifulSoup(event_page.content, 'html.parser')
             description = event_soup.find('div', attrs={'class': 'col-sm-8 bs-region bs-region--left'}).text.strip()
             location = event_soup.find('p', attrs={'class': 'address'}).text.strip()
             events.append({
@@ -324,7 +327,8 @@ def fetch_event_economics(base_url='https://economics.sas.upenn.edu'):
                 'end_time': end_time, 
                 'description': description,
                 'location': location, 
-                'url': event_url
+                'url': event_url,
+                'owner': 'Department of Economics'
             })
     return events
 
@@ -344,14 +348,14 @@ def fetch_event_math(base_url='https://www.math.upenn.edu'):
     for page in range(n_pages):
         all_event_url = 'https://www.math.upenn.edu/events/?page=%s' % str(page)
         all_event_page = requests.get(all_event_url)
-        all_event_soup = BeautifulSoup(all_event_page.content)
+        all_event_soup = BeautifulSoup(all_event_page.content, 'html.parser')
 
         event_urls = [base_url + header.find('a')['href'] for header in all_event_soup.find_all('h3') 
            if 'events' in header.find('a')['href']]
 
         for event_url in event_urls:
             event_page = requests.get(event_url)
-            event_soup = BeautifulSoup(event_page.content)
+            event_soup = BeautifulSoup(event_page.content, 'html.parser')
             try:
                 event_detail_soup = event_soup.find('div', attrs={'class': "pull-right span9"})
                 title = event_detail_soup.find('h3', attrs={'class': 'field-og-group-ref'}).find('a').text
@@ -712,7 +716,7 @@ def fetch_event_CURF(base_url='https://www.curf.upenn.edu'):
         description = event.find('td', attrs={'class': 'eventbody'}).text.strip()
         
         # scrape description directly from ``event_url``
-        event_soup = BeautifulSoup(requests.get(event_url).content)
+        event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
         event_details = event_soup.find('div', attrs={'class': 'eventdetails'})
         if event_details is not None:
             event_description = event_details.find('div', attrs={'class': 'eventdescription'})
