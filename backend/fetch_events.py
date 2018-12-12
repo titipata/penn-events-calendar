@@ -1430,7 +1430,7 @@ def fetch_event_Ortner(base_url='http://ortnercenter.org'):
 
 def fetch_event_PennToday(base_url='https://penntoday.upenn.edu'):
     """
-    Penn School of Medicine Events
+    Penn Today Events
     """
     events = requests.get('https://penntoday.upenn.edu/events-feed?_format=json').json()
     events_list = []
