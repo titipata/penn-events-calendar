@@ -1427,6 +1427,25 @@ def fetch_event_Ortner(base_url='http://ortnercenter.org'):
         })
     return events
 
+
+def fetch_event_PennToday(base_url='https://penntoday.upenn.edu'):
+    """
+    Penn School of Medicine Events
+    """
+    events = requests.get('https://penntoday.upenn.edu/events-feed?_format=json').json()
+    events_list = []
+    for event in events:
+        events_list.append({
+            'event_id': event['id'],
+            'title': event['title'],
+            'description': event['body'],
+            'Startate' : event['start'],
+            'StartTime': event['starttime'],
+            'location': event['location'],
+            'event url': base_url+ event['path']
+        })
+    return events_list
+
 if __name__ == '__main__':
     events = []
     events.append(fetch_events())
