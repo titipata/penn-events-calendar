@@ -187,15 +187,15 @@ def fetch_events_english_dept(base_url='https://www.english.upenn.edu/events/cal
                 "title": title,
                 "description": description,
                 "location": location,
-                "room": "",
-                "event_id": url + date, # using url and date, probably change later
+                ##"room": "",
+                ##"event_id": url + date, # using url and date, probably change later
                 "url": urljoin(base_url, url),
-                "student": "0",
-                "privacy": "0",
-                "category": "English Dept",
-                "school": "English Department",
+                ##"student": "0",
+                ##"privacy": "0",
+                ##"category": "English Dept",
+                ##"school": "English Department",
                 "owner": "English Department",
-                "link": ""
+                ##"link": ""
             }
             events_list.append(event_dict)
         except:
@@ -259,7 +259,9 @@ def fetch_event_mec(base_url='https://www.sas.upenn.edu'):
             'owner': 'Middle East Center', 
             'url': event_url,
             'location': '',
-            'speaker': ''
+            'speaker': '',
+            'starttime':'',
+            'endtime':''
         })
     return events
 
@@ -378,7 +380,9 @@ def fetch_event_math(base_url='https://www.math.upenn.edu'):
                     'location': location, 
                     'description': description, 
                     'url': event_url,
-                    'owner': 'Math Department'
+                    'owner': 'Math Department',
+                    'starttime': '',
+                    'endtime': ''
                 })
             except:
                 pass
@@ -1317,7 +1321,9 @@ def fetch_event_Annenberg(base_url='https://www.asc.upenn.edu'):
             'description': details,
             'url': event_url,
             'owner': 'Annenberg School of Communications',
-            'speaker': ''
+            'speaker': '',
+            'starttime': '',
+            'endtime': ''
         })
     return events
 
