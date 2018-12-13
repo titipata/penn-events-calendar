@@ -257,7 +257,9 @@ def fetch_event_mec(base_url='https://www.sas.upenn.edu'):
             'date': date, 
             'description': description, 
             'owner': 'Middle East Center', 
-            'url': event_url
+            'url': event_url,
+            'location': '',
+            'speaker': ''
         })
     return events
 
@@ -1312,8 +1314,10 @@ def fetch_event_Annenberg(base_url='https://www.asc.upenn.edu'):
             'title': title,
             'date': date,
             'location': location,
-            'details': details,
-            'url': event_url
+            'description': details,
+            'url': event_url,
+            'owner': 'Annenberg School of Communications',
+            'speaker': ''
         })
     return events
 
