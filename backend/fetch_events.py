@@ -187,6 +187,7 @@ def fetch_events_english_dept(base_url='https://www.english.upenn.edu/events/cal
                 "title": title,
                 "description": description,
                 "location": location,
+                'speaker': '',
                 ##"room": "",
                 ##"event_id": url + date, # using url and date, probably change later
                 "url": urljoin(base_url, url),
