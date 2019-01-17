@@ -204,7 +204,7 @@ def fetch_events_english_dept(base_url='https://www.english.upenn.edu/events/cal
     return events_list
 
 
-def fetch_event_crim(base_url='https://crim.sas.upenn.edu'):
+def fetch_events_crim(base_url='https://crim.sas.upenn.edu'):
     """
     Fetch events from Department of Criminology (CRIM)
     """
@@ -234,7 +234,7 @@ def fetch_event_crim(base_url='https://crim.sas.upenn.edu'):
     return events
 
 
-def fetch_event_mec(base_url='https://www.sas.upenn.edu'):
+def fetch_events_mec(base_url='https://www.sas.upenn.edu'):
     """
     Fetch events from Middle East Center (MEC) https://www.sas.upenn.edu/mec/events
     """
@@ -267,7 +267,7 @@ def fetch_event_mec(base_url='https://www.sas.upenn.edu'):
     return events
 
 
-def fetch_event_biology(base_url='http://www.bio.upenn.edu'):
+def fetch_events_biology(base_url='http://www.bio.upenn.edu'):
     """
     Fetch events from Department of Biology http://www.bio.upenn.edu/events/
     """
@@ -299,7 +299,7 @@ def fetch_event_biology(base_url='http://www.bio.upenn.edu'):
     return events
 
 
-def fetch_event_economics(base_url='https://economics.sas.upenn.edu'):
+def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
     """
     Fetch events from Economics department https://economics.sas.upenn.edu/events
     
@@ -339,7 +339,7 @@ def fetch_event_economics(base_url='https://economics.sas.upenn.edu'):
     return events
 
 
-def fetch_event_math(base_url='https://www.math.upenn.edu'):
+def fetch_events_math(base_url='https://www.math.upenn.edu'):
     """
     Fetch event from Math department
     """
@@ -390,7 +390,7 @@ def fetch_event_math(base_url='https://www.math.upenn.edu'):
     return events
 
 
-def fetch_event_philosophy(base_url='https://philosophy.sas.upenn.edu'):
+def fetch_events_philosophy(base_url='https://philosophy.sas.upenn.edu'):
     """
     Fetch event from Philosophy (Penn Arts & Science) at https://philosophy.sas.upenn.edu
     """
@@ -424,7 +424,7 @@ def fetch_event_philosophy(base_url='https://philosophy.sas.upenn.edu'):
     return events
 
 
-def fetch_event_classical_studies(base_url='https://www.classics.upenn.edu'):
+def fetch_events_classical_studies(base_url='https://www.classics.upenn.edu'):
     """
     Fetch events from Classical studies
     """
@@ -460,7 +460,7 @@ def fetch_event_classical_studies(base_url='https://www.classics.upenn.edu'):
     return events
 
 
-def fetch_event_linguistic(base_url='https://www.ling.upenn.edu'):
+def fetch_events_linguistic(base_url='https://www.ling.upenn.edu'):
     """
     Fetch events from Linguistic Department
     """
@@ -498,7 +498,7 @@ def fetch_event_linguistic(base_url='https://www.ling.upenn.edu'):
     return events
 
 
-def fetch_event_earth_enviromental_science(base_url='https://www.sas.upenn.edu'):
+def fetch_events_earth_enviromental_science(base_url='https://www.sas.upenn.edu'):
     """
     Fetch events from the first page from the Earth and Environmental Science department
 
@@ -524,12 +524,13 @@ def fetch_event_earth_enviromental_science(base_url='https://www.sas.upenn.edu')
             'description': description,
             'presenter': presenter,
             'event_type': event_type,
-            'url': event_url
+            'url': event_url, 
+            'owner': 'Earth and Environmental Science'
         })
     return events
 
 
-def fetch_event_arthistory(base_url='https://www.sas.upenn.edu'):
+def fetch_events_arthistory(base_url='https://www.sas.upenn.edu'):
     """
     Fetch events from Art History Department
     """
@@ -561,12 +562,13 @@ def fetch_event_arthistory(base_url='https://www.sas.upenn.edu'):
                 'location': location,
                 'description': description,
                 'event_type': event_type,
-                'url': event_url
+                'url': event_url, 
+                'owner': 'Art History'
             })
     return events
 
 
-def fetch_event_sociology(base_url='https://sociology.sas.upenn.edu'):
+def fetch_events_sociology(base_url='https://sociology.sas.upenn.edu'):
     """
     Fetch events Sociology department at https://sociology.sas.upenn.edu/events?page=0
     """
@@ -604,12 +606,13 @@ def fetch_event_sociology(base_url='https://sociology.sas.upenn.edu'):
                 'date': date,
                 'location': location,
                 'description': description,
-                'url': event_url
+                'url': event_url, 
+                'owner': 'Sociology Department'
             })
     return events
 
 
-def fetch_event_cceb(base_url='https://www.cceb.med.upenn.edu/events'):
+def fetch_events_cceb(base_url='https://www.cceb.med.upenn.edu/events'):
     """
     Scrape events from Center for Clinical Epidemiology and Biostatistics (CCEB)
     """
@@ -647,12 +650,13 @@ def fetch_event_cceb(base_url='https://www.cceb.med.upenn.edu/events'):
                 'date': date,
                 'location': location,
                 'description': description,
-                'url': event_url
+                'url': event_url, 
+                'owner': 'Clinical Epidemiology and Biostatistics (CCEB)'
             })
     return events
 
 
-def fetch_event_cis(base_url="http://www.cis.upenn.edu/about-cis/events/index.php"):
+def fetch_events_cis(base_url="http://www.cis.upenn.edu/about-cis/events/index.php"):
     """
     Fetch events from CIS department. Scrape this site is a little tricky
     """
@@ -666,7 +670,8 @@ def fetch_event_cis(base_url="http://www.cis.upenn.edu/about-cis/events/index.ph
                 'title': title,
                 'description': description,
                 'speaker': speaker,
-                'url': base_url
+                'url': base_url, 
+                'owner': 'CIS'
             })
             title, date, description = '', '', ''
         else:
@@ -676,11 +681,11 @@ def fetch_event_cis(base_url="http://www.cis.upenn.edu/about-cis/events/index.ph
                 event_header = tr.find('td')
                 if event_header is not None:
                     date = tr.find('strong').text.strip() if tr.find('strong') is not None else ''
-                    title = ' '.join(tr.text.replace(date, '').strip().split())             
+                    title = ' '.join(tr.text.replace(date, '').strip().split())
     return events
 
 
-def fetch_event_dsl(base_url='http://dsl.cis.upenn.edu/seminar/'):
+def fetch_events_dsl(base_url='http://dsl.cis.upenn.edu/seminar/'):
     """
     Scrape events from DSL seminar.
     The DSL Seminar is a weekly gathering of the research students and professors in the Distributed Systems Laboratory
@@ -705,11 +710,12 @@ def fetch_event_dsl(base_url='http://dsl.cis.upenn.edu/seminar/'):
             'date': date, 
             'url': base_url, 
             'speaker': speaker,
+            'owner': 'DSL'
         })
     return events
 
 
-def fetch_event_CURF(base_url='https://www.curf.upenn.edu'):
+def fetch_events_CURF(base_url='https://www.curf.upenn.edu'):
     """
     Center for Undergrad Research and Fellowship
     """
@@ -736,12 +742,13 @@ def fetch_event_CURF(base_url='https://www.curf.upenn.edu'):
             'title': title, 
             'description': description,
             'url': event_url, 
-            'date': date
+            'date': date, 
+            'owner': 'CURF'
         })
     return events
 
 
-def fetch_event_upibi(base_url='http://upibi.org/events/'):
+def fetch_events_upibi(base_url='http://upibi.org/events/'):
     """
     Fetch events from Institute for Biomedical Informatics, http://upibi.org/events/
     
@@ -764,19 +771,18 @@ def fetch_event_upibi(base_url='http://upibi.org/events/'):
                 'description': description,
                 'url': event_url, 
                 'date': date, 
-                'location': location
+                'location': location, 
+                'owner': 'Institute for Biomedical Informatics (UPIBI)'
             })
         except:
             pass
     return events
 
 
-def fetch_event_ldi(base_url='https://ldi.upenn.edu'):
+def fetch_events_ldi(base_url='https://ldi.upenn.edu'):
     """
     Fetch events from Leonard & Davis Institute, https://ldi.upenn.edu
-    
     """
-
     events = []
     page_soup = BeautifulSoup(requests.get(base_url + '/events').content, 'html.parser')
 
@@ -822,12 +828,13 @@ def fetch_event_ldi(base_url='https://ldi.upenn.edu'):
                 'date': date,
                 'location': location, 
                 'speaker': speaker,
-                'url': event_url
+                'url': event_url, 
+                'owner': 'Leonard & Davis Institute (LDI)'
             })
     return events
 
 
-def fetch_event_korean_studies(base_url='https://www.sas.upenn.edu'):
+def fetch_events_korean_studies(base_url='https://www.sas.upenn.edu'):
     """
     Fetch events from Korean Studies
     """
@@ -851,12 +858,13 @@ def fetch_event_korean_studies(base_url='https://www.sas.upenn.edu'):
             'description': description,
             'url': event_url, 
             'date': date,
-            'speaker': event_speaker
+            'speaker': event_speaker, 
+            'owner': 'Korean Studies'
         })
     return events
 
 
-def fetch_event_cscc(base_url='https://cscc.sas.upenn.edu/'):
+def fetch_events_cscc(base_url='https://cscc.sas.upenn.edu/'):
     """
     Fetch events from Penn Arts & Sciences, Center for the Study of Contemporary China
 
@@ -889,14 +897,15 @@ def fetch_event_cscc(base_url='https://cscc.sas.upenn.edu/'):
                 'date': date,
                 'speaker': speaker,
                 'url': event_url, 
-                'description': description
+                'description': description, 
+                'owner': 'Center for the Study of Contemporary China'
             })
         except:
             pass
     return events
 
 
-def fetch_event_fels(base_url='https://www.fels.upenn.edu'):
+def fetch_events_fels(base_url='https://www.fels.upenn.edu'):
     """
     Fetch events from Fels institute of Government at University of Pennsylvania
     """
@@ -928,7 +937,7 @@ def fetch_event_fels(base_url='https://www.fels.upenn.edu'):
     return events
 
 
-def fetch_event_sciencehistory(base_url='https://www.sciencehistory.org'):
+def fetch_events_sciencehistory(base_url='https://www.sciencehistory.org'):
     """
     Fetch events from Science History Institute, https://www.sciencehistory.org/events
     """
@@ -962,7 +971,7 @@ def fetch_event_sciencehistory(base_url='https://www.sciencehistory.org'):
     return events
 
 
-def fetch_event_HIP(base_url='https://www.impact.upenn.edu/'):
+def fetch_events_HIP(base_url='https://www.impact.upenn.edu/'):
     """
     Penn Events for Center for High Impact Philanthropy
     """
@@ -986,7 +995,7 @@ def fetch_event_HIP(base_url='https://www.impact.upenn.edu/'):
     return events
 
 
-def fetch_event_ItalianStudies(base_url='https://www.sas.upenn.edu'):
+def fetch_events_italian_studies(base_url='https://www.sas.upenn.edu'):
     """
     Penn Events for Italian Studies
     """
@@ -1006,7 +1015,7 @@ def fetch_event_ItalianStudies(base_url='https://www.sas.upenn.edu'):
         event_location = event_soup.find('div', attrs={'class': 'field-item odd'}).text.strip()
         events.append({
             'title': title,
-            'start time': time,
+            'start_time': time,
             'url': event_url, 
             'date': date,
             'location': event_location
@@ -1014,7 +1023,7 @@ def fetch_event_ItalianStudies(base_url='https://www.sas.upenn.edu'):
     return events
 
 
-def fetch_event_CEMB(base_url='https://cemb.upenn.edu'):
+def fetch_events_CEMB(base_url='https://cemb.upenn.edu'):
     """
     Penn Events for Center for Engineering MechanoBiology
     """
@@ -1040,7 +1049,7 @@ def fetch_event_CEMB(base_url='https://cemb.upenn.edu'):
     return events
 
 
-def fetch_event_CEAS(base_url='https://ceas.sas.upenn.edu'):
+def fetch_events_CEAS(base_url='https://ceas.sas.upenn.edu'):
     """
     Penn Events for Center for East Asian Studies
     """
@@ -1065,7 +1074,7 @@ def fetch_event_CEAS(base_url='https://ceas.sas.upenn.edu'):
     return events
 
 
-def fetch_event_CASI(base_url='https://casi.ssc.upenn.edu'):
+def fetch_events_CASI(base_url='https://casi.ssc.upenn.edu'):
     """
     Penn Events for Center for the Advanced Study of India
     """
@@ -1093,9 +1102,10 @@ def fetch_event_CASI(base_url='https://casi.ssc.upenn.edu'):
 
 
 
-def fetch_event_AfricanStud(base_url='https://africana.sas.upenn.edu'):
+def fetch_events_african_studies(base_url='https://africana.sas.upenn.edu'):
     """
     Penn Events for African Studies
+    site available at https://africana.sas.upenn.edu/center/events
     """
     page_soup = BeautifulSoup(requests.get(base_url + '/center/events').content, 'html.parser')
 
@@ -1118,13 +1128,13 @@ def fetch_event_AfricanStud(base_url='https://africana.sas.upenn.edu'):
             'speaker': speaker,
             'date': date,
             'details': details,
-            'url': event_url
+            'url': event_url, 
+            'owner': 'African Studies'
         })
     return events
 
 
-
-def fetch_event_BusinessEthics(base_url='https://zicklincenter.wharton.upenn.edu'):
+def fetch_events_business_ethics(base_url='https://zicklincenter.wharton.upenn.edu'):
     """
     Penn Events for Carol and Lawrence Zicklin Center for Business Ethics Research: 
     """
@@ -1146,12 +1156,13 @@ def fetch_event_BusinessEthics(base_url='https://zicklincenter.wharton.upenn.edu
             'title': title,
             'date': date,
             'details': details,
-            'url': event_url
+            'url': event_url, 
+            'owner': 'Zicklincenter Center for Business Ethics'
         })
     return events
 
 
-def fetch_event_law(base_url='https://www.law.upenn.edu/institutes/legalhistory/workshops-lectures.php'):
+def fetch_events_law(base_url='https://www.law.upenn.edu/institutes/legalhistory/workshops-lectures.php'):
     """
     Fetch event from Penn Law School
     """
@@ -1171,15 +1182,15 @@ def fetch_event_law(base_url='https://www.law.upenn.edu/institutes/legalhistory/
             'summary': BeautifulSoup(event_detail['event'].get('summary', '')).text.strip(), 
             'location': event_detail['event']['location'],
             'description': BeautifulSoup(event_detail['event'].get('description', '')).text.strip(), 
-            'event_url': 'https://www.law.upenn.edu/newsevents/calendar.php#event_id/{}/view/event'.format(event_id)
+            'url': 'https://www.law.upenn.edu/newsevents/calendar.php#event_id/{}/view/event'.format(event_id),
+            'owner': 'Penn Law School' 
         })
     return events
 
 
-
-def fetch_event_PennSAS(base_url='https://www.sas.upenn.edu'):
+def fetch_events_penn_SAS(base_url='https://www.sas.upenn.edu'):
     """
-    Penn Events for Penn SAS: 
+    Penn Events for Penn SAS
     """
     page_soup = BeautifulSoup(requests.get(base_url + '/events/upcoming-events').content, 'html.parser')
 
@@ -1205,12 +1216,13 @@ def fetch_event_PennSAS(base_url='https://www.sas.upenn.edu'):
             'location': location,
             'speaker': speaker,
             'details': details,
-            'url': event_url
+            'url': event_url, 
+            'owner': 'Penn SAS'
         })
     return events
 
 
-def fetch_event_PhysicsAstron(base_url='https://www.physics.upenn.edu'):
+def fetch_events_physics_astronomy(base_url='https://www.physics.upenn.edu'):
     """
     Penn Events Penn Physics and Astronomy Department
     """
@@ -1234,12 +1246,13 @@ def fetch_event_PhysicsAstron(base_url='https://www.physics.upenn.edu'):
             'date': date,
             'speaker': speaker,
             'description': description,
-            'url': event_url
+            'url': event_url, 
+            'owner': 'Penn Physics and Astronomy Department'
         })
     return events
 
 
-def fetch_event_WolfHum(base_url='http://wolfhumanities.upenn.edu'):
+def fetch_events_wolf_humanities(base_url='http://wolfhumanities.upenn.edu'):
     """
     Wolf Humanities Center Events
     """
@@ -1264,12 +1277,13 @@ def fetch_event_WolfHum(base_url='http://wolfhumanities.upenn.edu'):
             'date': date,
             'location': location,
             'details': details,
-            'url': event_url
+            'url': event_url, 
+            'owner': 'Wolf Humanities Center Events'
         })
     return events
 
 
-def fetch_event_MusicDept(base_url='https://www.sas.upenn.edu'):
+def fetch_events_music_dept(base_url='https://www.sas.upenn.edu'):
     """
     Department of Music... details does not output anything
     """
@@ -1289,13 +1303,13 @@ def fetch_event_MusicDept(base_url='https://www.sas.upenn.edu'):
         details = details.text.strip() if details is not None else ''
         events.append({
             'title': title,
-            'Date': date,
+            'date': date,
             'details': details,
             'url': event_url
         })
     return events
 
-def fetch_event_Annenberg(base_url='https://www.asc.upenn.edu'):
+def fetch_events_annenberg(base_url='https://www.asc.upenn.edu'):
     """
     Penn Events for Annenberg School of Communication
     """
@@ -1325,11 +1339,12 @@ def fetch_event_Annenberg(base_url='https://www.asc.upenn.edu'):
             'speaker': '',
             'starttime': '',
             'endtime': ''
+            'owner': 'Annenberg School of Communication'
         })
     return events
 
 
-def fetch_event_ReligiousStudies(base_url='https://www.sas.upenn.edu'):
+def fetch_events_religious_studies(base_url='https://www.sas.upenn.edu'):
     """
     Penn Events for Department of Religious Studies
     """
@@ -1354,12 +1369,13 @@ def fetch_event_ReligiousStudies(base_url='https://www.sas.upenn.edu'):
             'date': date,
             'location': location,
             'speakers': details,
-            'url': event_url
+            'url': event_url, 
+            'owner': 'Department of Religious Studies'
         })
     return events
 
 
-def fetch_event_AHEAD(base_url='http://www.ahead-penn.org'):
+def fetch_events_AHEAD(base_url='http://www.ahead-penn.org'):
     """
     Penn Events for Penn AHEAD 
     """
@@ -1384,12 +1400,13 @@ def fetch_event_AHEAD(base_url='http://www.ahead-penn.org'):
             'date': date,
             'location': location,
             'details': details,
-            'url': event_url
+            'url': event_url, 
+            'owner': 'Penn AHEAD'
         })
     return events
 
 
-def fetch_event_SPP(base_url='https://www.sp2.upenn.edu'):
+def fetch_events_SPP(base_url='https://www.sp2.upenn.edu'):
     """
     Penn Events for Penn Social Policy & Practice
     """
@@ -1414,11 +1431,12 @@ def fetch_event_SPP(base_url='https://www.sp2.upenn.edu'):
             'date': date,
             'time': time,
             'details': details,
-            'url': event_url
+            'url': event_url, 
+            'owner': 'Penn Social Policy & Practice'
         })
     return events
 
-def fetch_event_Ortner(base_url='http://ortnercenter.org'):
+def fetch_events_ortner_center(base_url='http://ortnercenter.org'):
     """
     Penn Events for Ortner Center for Violence and Abuse in Relationships
     """
@@ -1440,7 +1458,8 @@ def fetch_event_Ortner(base_url='http://ortnercenter.org'):
             'title': title,
             'date': date,
             'details': details,
-            'url': event_url
+            'url': event_url, 
+            'owner': 'Ortner Center for Violence and Abuse in Relationships'
         })
     return events
 
@@ -1456,12 +1475,14 @@ def fetch_event_PennToday(base_url='https://penntoday.upenn.edu'):
             'event_id': event['id'],
             'title': event['title'],
             'description': event['body'],
-            'Startate' : event['start'],
-            'StartTime': event['starttime'],
+            'date' : event['start'],
+            'start_time': event['starttime'],
             'location': event['location'],
-            'event url': base_url+ event['path']
+            'event_url': base_url+ event['path'], 
+            'owner': 'Penn Today Events'
         })
     return events_list
+
 
 if __name__ == '__main__':
     events = []
