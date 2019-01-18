@@ -47,7 +47,6 @@ def convert_event_to_dict(event):
         'title', 'description', 'location',
         'room', 'url', 'student', 'privacy',
         'category', 'school', 'owner',
-        'link'
     ]
     for key in keys:
         value = event.find(key).text or ''
@@ -96,7 +95,7 @@ def stringify_children(node):
     return ''.join(filter(None, parts))
 
 
-def extract_event_details(event_site):
+def extract_event_details_cni(event_site):
     """
     Extract event details from CNI detail page
     """
@@ -114,13 +113,7 @@ def extract_event_details(event_site):
         "title": title,
         "description": description,
         "location": location,
-        "room": "",
-        "student": "0",
-        "privacy": "0",
-        "category": "CNI",
-        "school": "Computational Neuroscience Initiative",
-        "owner": "Computational Neuroscience Initiative",
-        "link": ""
+        "owner": "Computational Neuroscience Initiative (CNI)"
     }
     return event_json
 
@@ -138,8 +131,7 @@ def fetch_events_cni(base_url='https://cni.upenn.edu/events'):
             event_url = urljoin(base_url, event_id)
             event_page = requests.get(event_url)
             event_site = html.fromstring(event_page.text)
-            event_dict = extract_event_details(event_site)
-            event_dict['event_id'] = event_id
+            event_dict = extract_event_details_cni(event_site)
             event_dict['url'] = event_url
             events_list.append(event_dict)
         except:
@@ -180,10 +172,11 @@ def fetch_events_english_dept(base_url='https://www.english.upenn.edu/events/cal
     for (month, day, location, starttime, endtime, title, description, url) in zip(event_months, event_days, event_locations, starttimes, endtimes, titles, descriptions, urls):
         try:
             date = '{} {}'.format(day, month)
+            date = re.sub(r'to \d+', '', date)
             event_dict = {
-                "date": dateutil.parser.parse(re.sub('to \d+', '', date)).strftime("%Y-%m-%d"),
+                "date": dateutil.parser.parse(date).strftime("%Y-%m-%d"),
                 "starttime": starttime,
-                "endtime": "",
+                "endtime": endtime,
                 "title": title,
                 "description": description,
                 "location": location,
@@ -323,8 +316,8 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
             location = event_soup.find('p', attrs={'class': 'address'}).text.strip()
             events.append({
                 'title': title,
-                'start_time': start_time, 
-                'end_time': end_time, 
+                'starttime': start_time, 
+                'endtime': end_time, 
                 'description': description,
                 'location': location, 
                 'url': event_url,
@@ -518,7 +511,7 @@ def fetch_events_earth_enviromental_science(base_url='https://www.sas.upenn.edu'
             'date': date,
             'location': location,
             'description': description,
-            'presenter': presenter,
+            'speaker': presenter,
             'event_type': event_type,
             'url': event_url, 
             'owner': 'Earth and Environmental Science'
@@ -1016,7 +1009,7 @@ def fetch_events_italian_studies(base_url='https://www.sas.upenn.edu'):
         event_location = event_soup.find('div', attrs={'class': 'field-item odd'}).text.strip()
         events.append({
             'title': title,
-            'start_time': time,
+            'starttime': time,
             'url': event_url, 
             'date': date,
             'location': event_location
@@ -1371,7 +1364,7 @@ def fetch_events_religious_studies(base_url='https://www.sas.upenn.edu'):
             'title': title,
             'date': date,
             'location': location,
-            'speakers': details,
+            'speaker': details,
             'url': event_url, 
             'owner': 'Department of Religious Studies'
         })
@@ -1480,9 +1473,9 @@ def fetch_event_penn_today(base_url='https://penntoday.upenn.edu'):
             'title': event['title'],
             'description': BeautifulSoup(event['body'], 'html.parser').text.strip(),
             'date' : event['start'],
-            'start_time': event['starttime'],
+            'starttime': event['starttime'],
             'location': event['location'],
-            'event_url': base_url+ event['path'], 
+            'url': base_url+ event['path'], 
             'owner': 'Penn Today Events'
         })
     return events_list
