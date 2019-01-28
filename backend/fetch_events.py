@@ -506,17 +506,19 @@ def fetch_events_earth_enviromental_science(base_url='https://www.sas.upenn.edu'
         event_url = base_url + event.find('a')['href']
         title = event.find('h3').text.strip()
         presenter = event.find('p', attrs={'presenter'}).text.strip() if event.find('p', attrs={'presenter'}) is not None else ''
-        event_type = event.find('h4').text if event.find('h4') is not None else ''
-        date = event.find('p', attrs={'class': 'dateline'}).text
+        # event_type = event.find('h4').text if event.find('h4') is not None else ''
         location = event.find('div', attrs={'class': 'location'}).text.strip() if event.find('div', attrs={'class': 'location'}) is not None else ''
         description = ''
+        event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+        date = event_soup.find('span', attrs={'class': 'date-display-single'})
+        date = date.text if date is not None else ''
         events.append({
             'title': title,
             'date': date,
             'location': location,
             'description': description,
             'speaker': presenter,
-            'event_type': event_type,
+            'starttime': date,
             'url': event_url, 
             'owner': 'Earth and Environmental Science'
         })
@@ -540,11 +542,13 @@ def fetch_events_art_history(base_url='https://www.sas.upenn.edu'):
         for event in all_events:
             event_url = base_url + event.find('a')['href']
             title = event.find('h3').text if event.find('h3') is not None else ''
-            event_type = event.find('strong').text if event.find('strong') is not None else ''
+            # event_type = event.find('strong').text if event.find('strong') is not None else ''
             date = event.find('p', attrs={'class': 'dateline'}).text if event.find('p', attrs={'class': 'dateline'}) is not None else ''
             location = event.find('div', attrs={'class': 'location'}).text if event.find('div', attrs={'class': 'location'}) is not None else ''
             event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
             description = event_soup.find('div', attrs={'class': 'field-body'})
+            starttime = event_soup.find('p', attrs={'class': 'field-date'})
+            starttime =  starttime.text.strip() if starttime is not None else ''
             if description is not None:
                 description = description.text.strip()
             else:
@@ -554,7 +558,8 @@ def fetch_events_art_history(base_url='https://www.sas.upenn.edu'):
                 'date': date,
                 'location': location,
                 'description': description,
-                'event_type': event_type,
+                'starttime': starttime,
+                'endtime': '',
                 'url': event_url, 
                 'owner': 'Art History'
             })
