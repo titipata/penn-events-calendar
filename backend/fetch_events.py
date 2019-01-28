@@ -131,7 +131,6 @@ def fetch_events_cni(base_url='https://cni.upenn.edu/events'):
             events.append({
                 'title': title, 
                 'date': date,
-                '', 
                 'location': location, 
                 'description': description.replace('A pizza lunch will be served.', '').replace(speaker, ''), 
                 'speaker': speaker,
@@ -595,8 +594,7 @@ def fetch_events_sociology(base_url='https://sociology.sas.upenn.edu'):
                 subtitle = event_page.find('div', attrs={'class': 'field-items'})
                 subtitle = subtitle.text.strip() if subtitle is not None else ''
             events.append({
-                'title': title,
-                'subtitle': subtitle,
+                'title': title + ' ' + subtitle,
                 'date': date,
                 'location': location,
                 'description': description,
@@ -1430,7 +1428,7 @@ def fetch_events_SPP(base_url='https://www.sp2.upenn.edu'):
         events.append({
             'title': title,
             'date': date,
-            'time': time,
+            'starttime': time,
             'description': details,
             'url': event_url, 
             'owner': 'Penn Social Policy & Practice'
