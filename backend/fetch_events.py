@@ -707,7 +707,10 @@ def fetch_events_dsl(base_url='http://dsl.cis.upenn.edu/seminar/'):
             'date': date, 
             'url': base_url, 
             'speaker': speaker,
-            'owner': 'DSL'
+            'owner': 'DSL', 
+            'location': 'DSL Conference Room',
+            'starttime': '12 PM', 
+            'endtime': '1 PM'
         })
     return events
 
