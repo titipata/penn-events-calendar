@@ -95,48 +95,52 @@ def stringify_children(node):
     return ''.join(filter(None, parts))
 
 
-def extract_event_details_cni(event_site):
-    """
-    Extract event details from CNI detail page
-    """
-    dt, location, description = [stringify_children(s).strip() 
-                                 for s in event_site.xpath('//div[@class="field-item even"]')]
-    event_time = dateutil.parser.parse(dt)
-    date = event_time.strftime("%Y-%m-%d")
-    starttime = event_time.strftime("%I:%M %p")
-    title = event_site.xpath('//h1[@class="page-header"]')[0].text
-
-    event_json = {
-        "date": date,
-        "starttime": starttime,
-        "endtime": "",
-        "title": title,
-        "description": description,
-        "location": location,
-        "owner": "Computational Neuroscience Initiative (CNI)"
-    }
-    return event_json
-
-
 def fetch_events_cni(base_url='https://cni.upenn.edu/events'):
     """
     Saving Computational Neuroscience Initiative to JSON format
     """
-    events_list = []
+    events = []
     page = requests.get(base_url)
     site = html.fromstring(page.text)
-    events = site.xpath('//h4/span/a[@href]/@href') # all events
-    for event_id in events:
+    event_ids = site.xpath('//h4/span/a[@href]/@href') # all events
+    for event_id in event_ids:
         try:
             event_url = urljoin(base_url, event_id)
             event_page = requests.get(event_url)
-            event_site = html.fromstring(event_page.text)
-            event_dict = extract_event_details_cni(event_site)
-            event_dict['url'] = event_url
-            events_list.append(event_dict)
+            event_soup = BeautifulSoup(event_page.content, 'html.parser')
+            title = event_soup.find('h1', attrs={'class': 'page-header'})
+            title = title.text if title is not None else ''
+            date = event_soup.find('span', attrs={'class': 'date-display-single'})
+            date = date.text if date is not None else ''
+            details = event_soup.find_all('div', attrs={'class':'field-item even'})
+            if len(details) >= 2:
+                location = details[1].text.strip()
+            else:
+                location = ''
+            if len(details) >= 3:
+                description = details[2].text.strip()
+                speaker = details[2].find('a')
+                speaker = speaker.text if speaker is not None else ''
+            else:
+                description = ''
+                speaker = ''
+            event_details = details[2].find_all('strong')
+            if len(event_details) >= 2:
+                title = event_details[1]
+                title = title.text if title is not None else ''
+            events.append({
+                'title': title, 
+                'date': date,
+                '', 
+                'location': location, 
+                'description': description.replace('A pizza lunch will be served.', '').replace(speaker, ''), 
+                'speaker': speaker,
+                'owner': 'Computational Neuroscience Initiative (CNI)', 
+                'url': event_url
+            })
         except:
             pass
-    return events_list
+    return events
 
 
 def fetch_events_english_dept(base_url='https://www.english.upenn.edu/events/calendar-export/'):
@@ -216,6 +220,7 @@ def fetch_events_crim(base_url='https://crim.sas.upenn.edu'):
                 'date': date, 
                 'location': location, 
                 'description': description, 
+                'url': event_url,
                 'owner': 'Dapartment of Criminology'
             })
     return events
@@ -982,7 +987,7 @@ def fetch_events_HIP(base_url='https://www.impact.upenn.edu/'):
         details = details.text.strip() if details is not None else ''
         events.append({
             'title': title,
-            'details': details,
+            'description': details,
             'url': event_url, 
             'owner': "Center for High Impact Philanthropy"
         })
@@ -1038,7 +1043,7 @@ def fetch_events_CEMB(base_url='https://cemb.upenn.edu'):
             'title': title,
             'date': date,
             'url': event_url, 
-            'details': details,
+            'description': details,
             'owner': 'Center for Engineering MechanoBiology'
         })
     return events
@@ -1064,7 +1069,7 @@ def fetch_events_CEAS(base_url='https://ceas.sas.upenn.edu'):
             'title': title,
             'date': date,
             'url': event_url, 
-            'details': details, 
+            'description': details, 
             'owner': 'Center for East Asian Studies'
         })
     return events
@@ -1091,7 +1096,7 @@ def fetch_events_CASI(base_url='https://casi.ssc.upenn.edu'):
         events.append({
             'title': title,
             'date': date,
-            'details': details,
+            'description': details,
             'url': event_url,
             'owner': 'Center for the Advanced Study of India'
         })
@@ -1123,7 +1128,7 @@ def fetch_events_african_studies(base_url='https://africana.sas.upenn.edu'):
             'title': title,
             'speaker': speaker,
             'date': date,
-            'details': details,
+            'description': details,
             'url': event_url, 
             'owner': 'African Studies'
         })
@@ -1151,7 +1156,7 @@ def fetch_events_business_ethics(base_url='https://zicklincenter.wharton.upenn.e
         events.append({
             'title': title,
             'date': date,
-            'details': details,
+            'description': details,
             'url': event_url, 
             'owner': 'Zicklincenter Center for Business Ethics'
         })
@@ -1211,7 +1216,7 @@ def fetch_events_penn_SAS(base_url='https://www.sas.upenn.edu'):
             'date': date,
             'location': location,
             'speaker': speaker,
-            'details': details,
+            'description': details,
             'url': event_url, 
             'owner': 'Penn SAS'
         })
@@ -1272,7 +1277,7 @@ def fetch_events_wolf_humanities(base_url='http://wolfhumanities.upenn.edu'):
             'title': title,
             'date': date,
             'location': location,
-            'details': details,
+            'description': details,
             'url': event_url, 
             'owner': 'Wolf Humanities Center Events'
         })
@@ -1300,7 +1305,7 @@ def fetch_events_music_dept(base_url='https://www.sas.upenn.edu'):
         events.append({
             'title': title,
             'date': date,
-            'details': details,
+            'description': details,
             'url': event_url,
             'owner': 'Department of Music'
         })
@@ -1395,7 +1400,7 @@ def fetch_events_AHEAD(base_url='http://www.ahead-penn.org'):
             'title': title,
             'date': date,
             'location': location,
-            'details': details,
+            'description': details,
             'url': event_url, 
             'owner': 'Penn AHEAD'
         })
@@ -1426,7 +1431,7 @@ def fetch_events_SPP(base_url='https://www.sp2.upenn.edu'):
             'title': title,
             'date': date,
             'time': time,
-            'details': details,
+            'description': details,
             'url': event_url, 
             'owner': 'Penn Social Policy & Practice'
         })
@@ -1454,7 +1459,7 @@ def fetch_events_ortner_center(base_url='http://ortnercenter.org'):
         events.append({
             'title': title,
             'date': date,
-            'details': details,
+            'description': details,
             'url': event_url, 
             'owner': 'Ortner Center for Violence and Abuse in Relationships'
         })
