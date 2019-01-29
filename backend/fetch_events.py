@@ -1016,14 +1016,27 @@ def fetch_events_italian_studies(base_url='https://www.sas.upenn.edu'):
         title = title.text.strip() if title is not None else ''
         date = event_soup.find('span', attrs={'class': 'date-display-single'}).text.strip()
         time = event_soup.find('div', attrs={'class': 'field field-type-datetime field-field-event-time'})
-        time = time.text if time is not None else ''
-        event_location = event_soup.find('div', attrs={'class': 'field-item odd'}).text.strip()
+        time = time.text.replace('Time:', '').strip() if time is not None else ''
+        
+        page_details = [t.text.strip() for t in event_soup.find_all('div', attrs={'class': 'field-items'})]
+        location, speaker = '', ''
+        for detail in page_details:
+            if 'Speaker' in detail:
+                speaker = detail.replace('Speaker:', '').strip()
+            if 'Location' in detail:
+                location = detail.replace('Location:', '').strip()
+
+        description = event_soup.find('div', attrs={'id': 'content-area'}).find('div', attrs={'class': 'content'})
+        description = '\n'.join([t.text for t in description.find_all('p')]) if description is not None else ''
         events.append({
             'title': title,
             'starttime': time,
             'url': event_url, 
             'date': date,
-            'location': event_location
+            'location': location, 
+            'description': description, 
+            'speaker': speaker,
+            'owner': 'Italian Studies'
         })
     return events
 
@@ -1306,12 +1319,14 @@ def fetch_events_music_dept(base_url='https://www.sas.upenn.edu'):
         title = title.text.strip() if title is not None else ''
         date = event_soup.find('div', attrs={'class': 'field field-type-date field-field-events-date'})
         date = date.text.strip() if date is not None else ''
-        details = event_soup.find('$0')
-        details = details.text.strip() if details is not None else ''
+        details = event_soup.find('div', attrs={'class': 'content'})
+        details = '\n'.join([p.text.strip() for p in details.find_all('p')]) if details is not None else ''
         events.append({
             'title': title,
             'date': date,
-            'description': details,
+            'starttime': date,
+            'endtime': date,
+            'description': details.strip(),
             'url': event_url,
             'owner': 'Department of Music'
         })
@@ -1369,13 +1384,13 @@ def fetch_events_religious_studies(base_url='https://www.sas.upenn.edu'):
         date = date.text.strip() if date is not None else ''
         location = event_soup.find('div', attrs={'class':'field field-type-text field-field-event-location'})
         location = location.text.strip() if location is not None else ''
-        details = event_soup.find('p')
-        details = details.text.strip() if details is not None else ''
+        details = event_soup.find('div', attrs={'class': 'content'})
+        details = '\n'.join([d.text for d in details.find_all('p')]) if details is not None else ''
         events.append({
             'title': title,
             'date': date,
             'location': location,
-            'speaker': details,
+            'description': details,
             'url': event_url, 
             'owner': 'Department of Religious Studies'
         })
