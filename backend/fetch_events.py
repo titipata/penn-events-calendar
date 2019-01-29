@@ -313,13 +313,15 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
             title = event.find('h4').text
             event_url = base_url + event.find('a')['href']
             start_time, end_time = event.find_all('time')
-            start_time, end_time = start_time.text, end_time.text
+            start_time = start_time.text.strip() if start_time is not None else ''
+            end_time = end_time.text.strip() if end_time is not None else ''
             event_page = requests.get(event_url)
             event_soup = BeautifulSoup(event_page.content, 'html.parser')
             description = event_soup.find('div', attrs={'class': 'col-sm-8 bs-region bs-region--left'}).text.strip()
             location = event_soup.find('p', attrs={'class': 'address'}).text.strip()
             events.append({
                 'title': title,
+                'date': start_time,
                 'starttime': start_time, 
                 'endtime': end_time, 
                 'description': description,
@@ -372,7 +374,7 @@ def fetch_events_math(base_url='https://www.math.upenn.edu'):
                     'description': description, 
                     'url': event_url,
                     'owner': 'Math Department',
-                    'starttime': '',
+                    'starttime': date,
                     'endtime': ''
                 })
             except:
