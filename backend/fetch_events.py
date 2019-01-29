@@ -1340,29 +1340,32 @@ def fetch_events_annenberg(base_url='https://www.asc.upenn.edu'):
 
     events = []
     event_table = page_soup.find('div', attrs={'id': 'content'})
-    all_events = event_table.find_all('div', attrs = {'class': 'views-row'})
+    all_events = event_table.find_all('h3', attrs = {'class': 'field-content'})
     for event in all_events:
-        event_url = base_url + event.find('a')['href']
-        event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
-        title = event_soup.find('h1', attrs={'class': 'title'})
-        title = title.text.strip() if title is not None else ''
-        date = event_soup.find('span', attrs={'class': 'date-display-single'})
-        date = date.text.strip() if date is not None else ''
-        location = event_soup.find('div', attrs={'class':'field field-name-field-event-location field-type-text field-label-inline clearfix'})
-        location = location.text.strip() if location is not None else ''
-        details = event_soup.find('div', attrs={'class': 'field field-name-body field-type-text-with-summary field-label-hidden'})
-        details = details.text.strip() if details is not None else ''
-        events.append({
-            'title': title,
-            'date': date,
-            'location': location,
-            'description': details,
-            'url': event_url,
-            'speaker': '',
-            'starttime': '',
-            'endtime': '',
-            'owner': 'Annenberg School of Communication'
-        })
+        try:
+            event_url = base_url + event.find('a')['href']
+            event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+            title = event_soup.find('h1', attrs={'class': 'title'})
+            title = title.text.strip() if title is not None else ''
+            date = event_soup.find('span', attrs={'class': 'date-display-single'})
+            date = date.text.strip() if date is not None else ''
+            location = event_soup.find('div', attrs={'class':'field field-name-field-event-location field-type-text field-label-inline clearfix'})
+            location = location.text.strip() if location is not None else ''
+            details = event_soup.find('div', attrs={'class': 'field field-name-body field-type-text-with-summary field-label-hidden'})
+            details = details.text.strip() if details is not None else ''
+            events.append({
+                'title': title,
+                'date': date,
+                'location': location,
+                'description': details,
+                'url': event_url,
+                'speaker': '',
+                'starttime': '',
+                'endtime': '',
+                'owner': 'Annenberg School of Communication'
+            })
+        except:
+            pass
     return events
 
 
