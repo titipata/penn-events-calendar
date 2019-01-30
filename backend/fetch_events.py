@@ -217,9 +217,15 @@ def fetch_events_crim(base_url='https://crim.sas.upenn.edu'):
             location = location.find('p').text or ''
             description = soup.find('div', attrs={'class': 'field-body'})
             description = description.find('p').text if description is not None else ''
+            try:
+                dt = dateutil.parser.parse(date)
+                starttime = dt.strftime('%I:%M %p')
+            except:
+                starttime = ''
             events.append({
                 'title': title,
                 'date': date,
+                'starttime': starttime,
                 'location': location,
                 'description': description,
                 'url': event_url,
@@ -247,6 +253,11 @@ def fetch_events_mec(base_url='https://www.sas.upenn.edu'):
             description = (event_details.find('div', attrs={'class': 'event_content'}).text or '').strip()
         except:
             pass
+        try:
+            dt = dateutil.parser.parse(date)
+            starttime = dt.strftime('%I:%M %p')
+        except:
+            starttime = ''
         events.append({
             'title': title,
             'date': date,
@@ -255,8 +266,8 @@ def fetch_events_mec(base_url='https://www.sas.upenn.edu'):
             'url': event_url,
             'location': '',
             'speaker': '',
-            'starttime':'',
-            'endtime':''
+            'starttime': starttime,
+            'endtime': ''
         })
     return events
 
