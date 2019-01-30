@@ -327,7 +327,7 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
                 pdf_path = event_soup.find('a', attrs={'class': 'btn btn-lg btn-primary btn-download'})['href']
                 pdf_url = urljoin('https://economics.sas.upenn.edu/', pdf_path)
                 parsed_article = requests.post(url, files={'input': requests.get(pdf_url).content}).text
-                pdf_soup = BeautifulSoup(parsed_article)
+                pdf_soup = BeautifulSoup(parsed_article, 'lxml')
                 title = pdf_soup.find('title')
                 title = title.text if title is not None else ''
                 description = pdf_soup.find('abstract')
@@ -665,10 +665,10 @@ def fetch_events_cceb(base_url='https://www.cceb.med.upenn.edu/events'):
         E%3C%2Fwidget%3E""".format(event_id).replace('\n', '').replace(' ', '')
         event_json = requests.get(text).json()
         if len(event_json) != 0:
-            date = BeautifulSoup(event_json['event']['date']).text
+            date = BeautifulSoup(event_json['event']['date'], 'html.parser').text
             title = event_json['event']['title']
             location = event_json['event']['location']
-            description = BeautifulSoup(event_json['event']['description'] or '').text.strip()
+            description = BeautifulSoup(event_json['event']['description'] or '', 'html.parser').text.strip()
             events.append({
                 'title': title,
                 'date': date,
@@ -1551,7 +1551,7 @@ if __name__ == '__main__':
     events.extend(fetch_events_earth_enviromental_science())
     events.extend(fetch_events_art_history())
     events.extend(fetch_events_sociology())
-    # events.extend(fetch_events_cceb())
+    events.extend(fetch_events_cceb())
     events.extend(fetch_events_cis())
     events.extend(fetch_events_CURF())
     events.extend(fetch_events_upibi())
