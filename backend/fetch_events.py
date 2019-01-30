@@ -129,9 +129,18 @@ def fetch_events_cni(base_url='https://cni.upenn.edu/events'):
             if len(event_details) >= 2:
                 title = event_details[1]
                 title = title.text if title is not None else ''
+            try:
+                dt = dateutil.parser.parse(date)
+                starttime = dt.strftime('%I:%M %p')
+                endtime = (dt + timedelta(hours=1)).strftime('%I:%M %p')
+            except:
+                starttime, endtime = '', ''
+
             events.append({
                 'title': title,
                 'date': date,
+                'starttime': starttime,
+                'endtime': endtime,
                 'location': location,
                 'description': description.replace('A pizza lunch will be served.', '').replace(speaker, ''),
                 'speaker': speaker,
@@ -324,7 +333,6 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
         page_events = all_event_soup.find('ul', attrs={'class': 'list-unstyled row'}).find_all('li')
 
         for event in page_events:
-            title = event.find('h4').text
             event_url = base_url + event.find('a')['href']
             start_time, end_time = event.find_all('time')
             start_time = start_time.text.strip() if start_time is not None else ''
@@ -332,6 +340,8 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
             event_page = requests.get(event_url)
             event_soup = BeautifulSoup(event_page.content, 'html.parser')
             
+            title = event.find('h1', attrs={'class': 'page-header'})
+            title = title.text.strip() if title is not None else ''
             speaker = event_soup.find('div', attrs={'class': 'col-sm-4 bs-region bs-region--right'})
             speaker = speaker.text.replace('Download Paper', '').strip() if speaker is not None else ''
 
@@ -346,7 +356,6 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
                 description = pdf_soup.find('abstract')
                 description = description.text.strip() if description is not None else ''
             except:
-                title = ''
                 description = ''
 
             location = event_soup.find('p', attrs={'class': 'address'}).text.strip()
@@ -679,12 +688,16 @@ def fetch_events_cceb(base_url='https://www.cceb.med.upenn.edu/events'):
         event_json = requests.get(text).json()
         if len(event_json) != 0:
             date = BeautifulSoup(event_json['event']['date'], 'html.parser').text
+            date = re.sub(r'((1[0-2]|0?[1-9]):([0-5][0-9])([AaPp][Mm]))', '', date).replace('-', '').replace('EST', '').strip()
+            starttime, endtime = BeautifulSoup(event_json['event']['date_time'], 'html.parser').text.split('-')
             title = event_json['event']['title']
             location = event_json['event']['location']
             description = BeautifulSoup(event_json['event']['description'] or '', 'html.parser').text.strip()
             events.append({
                 'title': title,
                 'date': date,
+                'starttime': starttime,
+                'endtime': endtime,
                 'location': location,
                 'description': description,
                 'url': event_url,
