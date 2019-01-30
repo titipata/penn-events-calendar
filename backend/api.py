@@ -10,6 +10,7 @@ Example queries:
     - http://localhost:5001/api/v1/getevent?days=7 # return events happenning in next 7 days
     - http://localhost:5001/api/v1/getevent?days=7&school=medicine-health-system # return events in next 7 days from "Medicine/Health System"
     - http://localhost:5001/api/v1/getevent?days=14&category=academic # return events in academic category
+    - http://localhost:5001/api/v1/getsimilarevents/696555 # return similar events to an event with event_id "696555"
     - http://localhost:5001/api/v1/getevent # return all events
 
 """
@@ -59,18 +60,18 @@ class ShowEvent(Resource):
 
         # filter school name
         if args['school'] is not None:
-            events_query = list(filter(lambda x: x['school_query'] == args['school'], 
+            events_query = list(filter(lambda x: x['school_query'] == args['school'],
                                 events_query))
 
         # filter date
         if args['days'] is not None:
             date_retrieve = datetime.today() + timedelta(days=args['days'])
-            events_query = list(filter(lambda x: x['date_dt'] >= datetime.today() and x['date_dt'] <= date_retrieve, 
+            events_query = list(filter(lambda x: x['date_dt'] >= datetime.today() and x['date_dt'] <= date_retrieve,
                                 events_query))
 
         # filter category
         if args['category'] is not None:
-            events_query = list(filter(lambda x: x['category'].lower() == args['category'], 
+            events_query = list(filter(lambda x: x['category'].lower() == args['category'],
                                 events_query))
 
         # remove generated keys
@@ -81,6 +82,18 @@ class ShowEvent(Resource):
         return events_query
 
 
+class GetSimilarEvents(Resource):
+    def get(self, event_id):
+        file_path = 'similar_events.json'
+        if os.path.exists(file_path):
+            similar_events = json.load(open(file_path, 'r'))
+        else:
+            similar_events = {}
+        return similar_events.get(event_id, [])
+
+
+api.add_resource(ShowEvent, '/api/v1/getevent')
+api.add_resource(GetSimilarEvents, '/api/v1/getsimilarevents/<string:event_id>')
+
 if __name__ == '__main__':
-    api.add_resource(ShowEvent, '/api/v1/getevent')
     app.run(port=5001, debug=True)

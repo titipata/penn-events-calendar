@@ -1,17 +1,51 @@
-export const FETCH_EVENTS_BEGIN = 'FETCH_EVENTS_BEGIN';
-export const FETCH_EVENTS_SUCCESS = 'FETCH_EVENTS_SUCCESS';
-export const FETCH_EVENTS_FAILURE = 'FETCH_EVENTS_FAILURE';
+import { API } from '../Data';
 
-export const fetchEventsBegin = () => ({
-  type: FETCH_EVENTS_BEGIN,
-});
+export const fetchActions = {
+  FETCH_EVENTS_BEGIN: 'FETCH_EVENTS_BEGIN',
+  FETCH_EVENTS_SUCCESS: 'FETCH_EVENTS_SUCCESS',
+  FETCH_EVENTS_FAILURE: 'FETCH_EVENTS_FAILURE',
+  FETCH_SIMILAR_EVENTS: 'FETCH_SIMILAR_EVENTS',
+};
 
-export const fetchEventsSuccess = events => ({
-  type: FETCH_EVENTS_SUCCESS,
-  payload: { events },
-});
+const fetchEvents = () => (dispatch) => {
+  // dispatch begin fetching action
+  dispatch({ type: fetchActions.FETCH_EVENTS_BEGIN });
 
-export const fetchEventsError = error => ({
-  type: FETCH_EVENTS_FAILURE,
-  payload: { error },
-});
+  // fetching events
+  fetch(API.getEvent())
+    .then(API.handleErrors)
+    .then(res => res.json())
+    .then((resJson) => {
+      // success ge
+      dispatch({
+        type: fetchActions.FETCH_EVENTS_SUCCESS,
+        events: resJson,
+      });
+    })
+    .catch((error) => {
+      dispatch({ type: fetchActions.FETCH_EVENTS_FAILURE, error });
+      console.log(`[ERROR] failed fetching events: ${error}`);
+    });
+};
+
+const fetchSimilarEvents = eventId => (dispatch) => {
+  fetch(API.getSimilarEvents(eventId))
+    .then(API.handleErrors)
+    .then(res => res.json())
+    .then((resJson) => {
+      dispatch({
+        type: fetchActions.FETCH_SIMILAR_EVENTS,
+        similarEvents: resJson,
+      });
+    })
+    .catch((error) => {
+      dispatch({ type: fetchActions.FETCH_EVENTS_FAILURE, error });
+      console.log(`[ERROR] failed fetching similar events: ${error}`);
+    });
+};
+
+export {
+  fetchEvents,
+  fetchSimilarEvents,
+};
+

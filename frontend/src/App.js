@@ -1,10 +1,14 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faBookmark, faCalendarAlt, faClock, faExternalLinkAlt, faFileAlt, faMapMarkerAlt, faSchool, faUniversity, faUserTie, faChevronCircleDown } from '@fortawesome/free-solid-svg-icons';
+import {
+  faBookmark, faCalendarAlt, faClock, faExternalLinkAlt,
+  faFileAlt, faMapMarkerAlt, faSchool, faUniversity,
+  faUserTie, faChevronCircleDown, faChevronCircleUp,
+  faCopy,
+} from '@fortawesome/free-solid-svg-icons';
 import React, { Component } from 'react';
 import styled, { injectGlobal } from 'styled-components';
 import { Container } from './Components/BaseComponents';
 import EventsContainer from './Components/EventsContainer';
-import Fetcher from './Components/Fetcher';
 import NavBar from './Components/Navbar';
 import Footer from './Components/Footer';
 
@@ -12,7 +16,8 @@ import Footer from './Components/Footer';
 library.add(
   faCalendarAlt, faMapMarkerAlt, faClock, faFileAlt,
   faExternalLinkAlt, faUserTie, faSchool, faUniversity,
-  faBookmark, faChevronCircleDown,
+  faBookmark, faChevronCircleDown, faChevronCircleUp,
+  faCopy,
 );
 
 const AppWrapper = styled.div`
@@ -45,8 +50,6 @@ class App extends Component {
     return (
       <AppWrapper>
         <NavBar brandname="Upcoming Events" />
-
-        <Fetcher />
 
         <Container>
           <EventsContainer />

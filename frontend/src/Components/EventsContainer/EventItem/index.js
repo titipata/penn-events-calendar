@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import styled from 'styled-components';
-import { Category } from '../../../Data';
+import { DataColor } from '../../../Data';
 import DetailBox from './DetailBoxComponent';
 import TimeBox from './TimeBoxComponent';
 import DescriptionBox from './DescriptionBoxComponent';
@@ -12,6 +12,7 @@ const StyledListItem = styled.li`
   border: 1px solid #eee;
   border-left: 5px solid ${props => props.color};
   border-radius: 5px;
+  cursor: ${props => (props.cursorPointer ? 'pointer' : 'default')};
 `;
 
 const StyledContentWrapper = styled.div`
@@ -26,29 +27,50 @@ class EventItem extends Component {
       descriptionVisible: false,
     };
 
-    this._handleClick = this._handleClick.bind(this);
+    this._handleCardClick = this._handleCardClick.bind(this);
+    this._handleCollapseClick = this._handleCollapseClick.bind(this);
   }
 
-  _handleClick() {
+  _handleCardClick() {
+    // dispatch event id to get similar events on click
+    this.props.similarEvents(this.props.ev.event_id);
+
+    if (!this.state.descriptionVisible) {
+      this.setState({
+        descriptionVisible: true,
+      });
+    }
+  }
+
+  _handleCollapseClick() {
     this.setState({
-      descriptionVisible: !this.state.descriptionVisible,
+      descriptionVisible: false,
     });
   }
 
   render() {
+    // https://stackoverflow.com/a/39333479/4010864
+    const getEventTime = ({ starttime, endtime }) => ({ starttime, endtime });
+    const getEventDetail = ({
+      category, description, location, title, school, url,
+    }) => ({
+      category, description, location, title, school, url,
+    });
+
     return (
-      <StyledListItem onClick={this._handleClick} color={Category.getColor(this.props.ev.category)}>
+      <StyledListItem
+        onClick={this._handleCardClick}
+        color={DataColor.getCatColor(this.props.ev.category)}
+        cursorPointer={this.props.ev.description && !this.state.descriptionVisible}
+      >
         <StyledContentWrapper>
           <TimeBox
-            eventDate={this.props.ev.date}
-            eventStartTime={this.props.ev.starttime}
-            eventEndTime={this.props.ev.endtime}
+            eventTime={getEventTime(this.props.ev)}
           />
           <DetailBox
-            eventTitle={this.props.ev.title}
-            eventLocation={this.props.ev.location}
-            eventCategory={this.props.ev.category}
-            eventDescription={this.props.ev.description}
+            eventDetail={getEventDetail(this.props.ev)}
+            isDescriptionExpanded={this.state.descriptionVisible}
+            onCollapseClick={this._handleCollapseClick}
           />
         </StyledContentWrapper>
         {
@@ -62,6 +84,7 @@ class EventItem extends Component {
 }
 
 EventItem.propTypes = {
+  similarEvents: PropTypes.func.isRequired,
   ev: PropTypes.shape({
     date: PropTypes.string,
     day_of_week: PropTypes.string,
@@ -71,7 +94,7 @@ EventItem.propTypes = {
     description: PropTypes.string,
     location: PropTypes.string,
     room: PropTypes.string,
-    event_id: PropTypes.number,
+    event_id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     url: PropTypes.string,
     student: PropTypes.string,
     privacy: PropTypes.string,

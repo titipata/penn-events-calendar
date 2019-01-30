@@ -5,7 +5,7 @@ import requests
 import json
 import time
 from unidecode import unidecode
-from datetime import datetime
+from datetime import datetime, timedelta
 import dateutil.parser
 from itertools import chain
 from lxml import etree, html
@@ -57,7 +57,7 @@ def convert_event_to_dict(event):
             value = datetime.strptime(value, "%H:%M:%S").strftime("%I:%M %p")
         elif key == 'url':
             if len(value) > 0:
-                event_dict['event_id'] = int(value.rsplit('/')[-1])
+                event_dict['event_id'] = str(int(value.rsplit('/')[-1]))
             else:
                 event_dict['event_id'] = ''
         else:
@@ -161,8 +161,10 @@ def fetch_events_english_dept(base_url='https://www.english.upenn.edu/events/cal
     for div in events.xpath('//div[@class="date-time"]'):
         event_time = div.find('span[@class="date-display-single"]')
         if event_time is not None and event_time.find('span[@class="date-display-start"]') is not None:
-            starttimes.append(event_time.find('span[@class="date-display-start"]').text)
-            endtimes.append(event_time.find('span[@class="date-display-end"]').text)
+            starttime = event_time.find('span[@class="date-display-start"]').text
+            endtime = event_time.find('span[@class="date-display-end"]').text
+            starttimes.append(starttime)
+            endtimes.append(endtime)
         else:
             starttimes.append(event_time.text or '')
             endtimes.append(event_time.text or '')
@@ -1535,6 +1537,45 @@ def fetch_event_penn_today(base_url='https://penntoday.upenn.edu'):
             'owner': 'Penn Today Events'
         })
     return events_list
+
+
+def calculate_document_similarity(n_documents=6, days=21):
+    """
+    Calculate similarity between talks, 
+    only calculate for recent one
+    """
+    import numpy as np
+    import spacy
+    nlp = spacy.load('en_core_web_sm')
+    events = read_json('events.json')
+
+    # filter only next 21 days
+    date_retrieve = datetime.today() + timedelta(days=days)
+    events = list(filter(lambda x: dateutil.parser.parse(x['date']) >= datetime.today() and dateutil.parser.parse(x['date']) <= date_retrieve,
+                        events))
+
+    # transforming description to spacy tokens 
+    docs = []
+    for event in events:
+        description = '{} {}'.format(event.get('title', ''), event.get('description'))
+        docs.append(nlp(description))
+    
+    # dates
+    dates = [dateutil.parser.parse(event['date']) for event in events]
+
+    similar_events = {}
+    for i, event in enumerate(events):
+        document_similarities = np.array([docs[i].similarity(doc) for doc in docs])
+
+        # looking for future documents only
+        date_filter = np.array([d >= dates[i] for d in dates])
+        document_similarities[np.logical_not(date_filter)] = 0
+        
+        similar_events_idx = np.argsort(document_similarities)[::-1][1: n_documents + 1]
+        top_similar_events = [events[idx] for idx in similar_events_idx]    
+        similar_events[event['event_id']] = top_similar_events
+    
+    json.dump(similar_events, open(PATH_SIMILAR_EVENTS, 'w'))
 
 
 if __name__ == '__main__':

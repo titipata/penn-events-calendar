@@ -6,3 +6,6 @@ beautifulsoup4
 flask-cors
 webargs
 lxml
+spacy
+requests
+uwsgi
