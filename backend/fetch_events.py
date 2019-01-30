@@ -129,12 +129,12 @@ def fetch_events_cni(base_url='https://cni.upenn.edu/events'):
                 title = event_details[1]
                 title = title.text if title is not None else ''
             events.append({
-                'title': title, 
+                'title': title,
                 'date': date,
-                'location': location, 
-                'description': description.replace('A pizza lunch will be served.', '').replace(speaker, ''), 
+                'location': location,
+                'description': description.replace('A pizza lunch will be served.', '').replace(speaker, ''),
                 'speaker': speaker,
-                'owner': 'Computational Neuroscience Initiative (CNI)', 
+                'owner': 'Computational Neuroscience Initiative (CNI)',
                 'url': event_url
             })
         except:
@@ -166,9 +166,9 @@ def fetch_events_english_dept(base_url='https://www.english.upenn.edu/events/cal
             starttimes.append(event_time.text or '')
             endtimes.append(event_time.text or '')
 
-    titles = [span.find('a').text for span in events.xpath('//span[@class="field-content"]') 
+    titles = [span.find('a').text for span in events.xpath('//span[@class="field-content"]')
             if span.find('a') is not None]
-    urls = [span.find('a').attrib.get('href') for span in events.xpath('//span[@class="field-content"]') 
+    urls = [span.find('a').attrib.get('href') for span in events.xpath('//span[@class="field-content"]')
             if span.find('a') is not None]
     descriptions = [stringify_children(e).strip() for e in events.xpath('//div[@class="span10"]')]
 
@@ -216,9 +216,9 @@ def fetch_events_crim(base_url='https://crim.sas.upenn.edu'):
             description = description.find('p').text if description is not None else ''
             events.append({
                 'title': title,
-                'date': date, 
-                'location': location, 
-                'description': description, 
+                'date': date,
+                'location': location,
+                'description': description,
                 'url': event_url,
                 'owner': 'Dapartment of Criminology'
             })
@@ -245,10 +245,10 @@ def fetch_events_mec(base_url='https://www.sas.upenn.edu'):
         except:
             pass
         events.append({
-            'title': title, 
-            'date': date, 
-            'description': description, 
-            'owner': 'Middle East Center', 
+            'title': title,
+            'date': date,
+            'description': description,
+            'owner': 'Middle East Center',
             'url': event_url,
             'location': '',
             'speaker': '',
@@ -280,11 +280,11 @@ def fetch_events_biology(base_url='http://www.bio.upenn.edu'):
         description = event_soup.find('div', attrs={'class': 'node-inner'})
         description = description.find('div', attrs={'class': 'content'}).find('p').text if description is not None else ''
         events.append({
-            'title': title, 
+            'title': title,
             'date': date,
-            'location': location, 
-            'description': description, 
-            'owner': 'Department of Biology', 
+            'location': location,
+            'description': description,
+            'owner': 'Department of Biology',
             'url': event_url
         })
     return events
@@ -293,7 +293,7 @@ def fetch_events_biology(base_url='http://www.bio.upenn.edu'):
 def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
     """
     Fetch events from Economics department https://economics.sas.upenn.edu/events
-    
+
     Note that we still have problem with when parsing the description
     """
     events = []
@@ -322,10 +322,10 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
             events.append({
                 'title': title,
                 'date': start_time,
-                'starttime': start_time, 
-                'endtime': end_time, 
+                'starttime': start_time,
+                'endtime': end_time,
                 'description': description,
-                'location': location, 
+                'location': location,
                 'url': event_url,
                 'owner': 'Department of Economics'
             })
@@ -348,7 +348,7 @@ def fetch_events_math(base_url='https://www.math.upenn.edu'):
         all_event_page = requests.get(all_event_url)
         all_event_soup = BeautifulSoup(all_event_page.content, 'html.parser')
 
-        event_urls = [base_url + header.find('a')['href'] for header in all_event_soup.find_all('h3') 
+        event_urls = [base_url + header.find('a')['href'] for header in all_event_soup.find_all('h3')
            if 'events' in header.find('a')['href']]
 
         for event_url in event_urls:
@@ -367,11 +367,11 @@ def fetch_events_math(base_url='https://www.math.upenn.edu'):
                 else:
                     description = ''
                 events.append({
-                    'title': title, 
+                    'title': title,
                     'date': date,
-                    'speaker': speaker + ', ' + speaker_affil, 
-                    'location': location, 
-                    'description': description, 
+                    'speaker': speaker + ', ' + speaker_affil,
+                    'location': location,
+                    'description': description,
                     'url': event_url,
                     'owner': 'Math Department',
                     'starttime': date,
@@ -408,9 +408,9 @@ def fetch_events_philosophy(base_url='https://philosophy.sas.upenn.edu'):
 
             events.append({
                 'title': title,
-                'date': date, 
-                'location': location, 
-                'description': description, 
+                'date': date,
+                'location': location,
+                'description': description,
                 'url': event_url
             })
     return events
@@ -447,9 +447,9 @@ def fetch_events_classical_studies(base_url='https://www.classics.upenn.edu'):
                 description = ''
             events.append({
                 'title': title,
-                'date': date, 
-                'location': location, 
-                'description': description, 
+                'date': date,
+                'location': location,
+                'description': description,
                 'url': event_url
             })
     return events
@@ -485,9 +485,9 @@ def fetch_events_linguistic(base_url='https://www.ling.upenn.edu'):
 
             events.append({
                 'title': title,
-                'date': date, 
-                'location': location, 
-                'description': description, 
+                'date': date,
+                'location': location,
+                'description': description,
                 'url': event_url
             })
     return events
@@ -521,7 +521,7 @@ def fetch_events_earth_enviromental_science(base_url='https://www.sas.upenn.edu'
             'description': description,
             'speaker': presenter,
             'starttime': date,
-            'url': event_url, 
+            'url': event_url,
             'owner': 'Earth and Environmental Science'
         })
     return events
@@ -533,7 +533,7 @@ def fetch_events_art_history(base_url='https://www.sas.upenn.edu'):
     """
     page = requests.get(base_url + '/arthistory/events')
     page_soup = BeautifulSoup(page.content, 'html.parser')
-    range_pages = max([int(n_page.text) for n_page in page_soup.find('div', 
+    range_pages = max([int(n_page.text) for n_page in page_soup.find('div',
                                                                      attrs={'class': 'pagination pagination-centered'}).find_all('li') if n_page.text.isdigit()])
 
     events = []
@@ -562,7 +562,7 @@ def fetch_events_art_history(base_url='https://www.sas.upenn.edu'):
                 'description': description,
                 'starttime': starttime,
                 'endtime': '',
-                'url': event_url, 
+                'url': event_url,
                 'owner': 'Art History'
             })
     return events
@@ -576,7 +576,7 @@ def fetch_events_sociology(base_url='https://sociology.sas.upenn.edu'):
     html_page = requests.get(base_url + '/events')
     page_soup = BeautifulSoup(html_page.content, 'html.parser')
 
-    range_pages = max([int(n_page.text) for n_page in 
+    range_pages = max([int(n_page.text) for n_page in
                        page_soup.find('div', attrs={'class': 'item-list'}).find_all('li') if n_page.text.isdigit()])
 
     for n_page in range(range_pages):
@@ -605,7 +605,7 @@ def fetch_events_sociology(base_url='https://sociology.sas.upenn.edu'):
                 'date': date,
                 'location': location,
                 'description': description,
-                'url': event_url, 
+                'url': event_url,
                 'owner': 'Sociology Department'
             })
     return events
@@ -625,6 +625,12 @@ def fetch_events_cceb(base_url='https://www.cceb.med.upenn.edu/events'):
         event_url = event.find('a')['href']
         title = event.find('a').text.strip()
         event_id = event_url.split('/')[-1]
+
+        # skip conferences by filtering event_id
+        # seminars' event_id contain only number
+        if not re.match(r'^\d{1,9}$', event_id):
+            continue
+
         text = """https://events.med.upenn.edu/live/calendar/view/event/event_id/{}?user_tz=IT&synta
         x=%3Cwidget%20type%3D%22events_calendar%22%3E%3Carg%20id%3D%22mini_cal_heat_map%22%3Etrue%3C%2Fa
         rg%3E%3Carg%20id%3D%22thumb_width%22%3E200%3C%2Farg%3E%3Carg%20id%3D%22thumb_height%22%3E200%3C%
@@ -645,11 +651,11 @@ def fetch_events_cceb(base_url='https://www.cceb.med.upenn.edu/events'):
             location = event_json['event']['location']
             description = BeautifulSoup(event_json['event']['description'] or '').text.strip()
             events.append({
-                'title': title, 
+                'title': title,
                 'date': date,
                 'location': location,
                 'description': description,
-                'url': event_url, 
+                'url': event_url,
                 'owner': 'Clinical Epidemiology and Biostatistics (CCEB)'
             })
     return events
@@ -669,7 +675,7 @@ def fetch_events_cis(base_url="http://www.cis.upenn.edu/about-cis/events/index.p
                 'title': title,
                 'description': description,
                 'speaker': speaker,
-                'url': base_url, 
+                'url': base_url,
                 'owner': 'CIS'
             })
             title, date, description = '', '', ''
@@ -704,14 +710,14 @@ def fetch_events_dsl(base_url='http://dsl.cis.upenn.edu/seminar/'):
             title = description
             description = description
         events.append({
-            'title': title, 
-            'description': description, 
-            'date': date, 
-            'url': base_url, 
+            'title': title,
+            'description': description,
+            'date': date,
+            'url': base_url,
             'speaker': speaker,
-            'owner': 'DSL', 
+            'owner': 'DSL',
             'location': 'DSL Conference Room',
-            'starttime': '12 PM', 
+            'starttime': '12 PM',
             'endtime': '1 PM'
         })
     return events
@@ -731,7 +737,7 @@ def fetch_events_CURF(base_url='https://www.curf.upenn.edu'):
         event_url = base_url + event.find('a')['href']
         date = event.find('span', attrs={'class': 'date-display-single'}).text
         description = event.find('td', attrs={'class': 'eventbody'}).text.strip()
-        
+
         # scrape description directly from ``event_url``
         event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
         event_details = event_soup.find('div', attrs={'class': 'eventdetails'})
@@ -739,12 +745,12 @@ def fetch_events_CURF(base_url='https://www.curf.upenn.edu'):
             event_description = event_details.find('div', attrs={'class': 'eventdescription'})
             if event_description is not None:
                 description = event_description.text.replace('Description:', '').strip()
-        
+
         events.append({
-            'title': title, 
+            'title': title,
             'description': description,
-            'url': event_url, 
-            'date': date, 
+            'url': event_url,
+            'date': date,
             'owner': 'Center for Undergrad Research and Fellowship (CURF)'
         })
     return events
@@ -753,12 +759,12 @@ def fetch_events_CURF(base_url='https://www.curf.upenn.edu'):
 def fetch_events_upibi(base_url='http://upibi.org/events/'):
     """
     Fetch events from Institute for Biomedical Informatics, http://upibi.org/events/
-    
+
     TO DO: scrape event's description from URL, fix try and except
     """
     events = []
     page_soup = BeautifulSoup(requests.get(base_url).content, 'html.parser')
-    all_events = page_soup.find_all('div', 
+    all_events = page_soup.find_all('div',
                                     attrs={'class': 'type-tribe_events'})
     events = []
     for event in all_events:
@@ -769,11 +775,11 @@ def fetch_events_upibi(base_url='http://upibi.org/events/'):
             description = event.find('div', attrs={'class': 'tribe-events-list-event-description tribe-events-content description entry-summary'}).text.strip()
             event_url = event.find('a')['href']
             events.append({
-                'title': title, 
+                'title': title,
                 'description': description,
-                'url': event_url, 
-                'date': date, 
-                'location': location, 
+                'url': event_url,
+                'date': date,
+                'location': location,
                 'owner': 'Institute for Biomedical Informatics (UPIBI)'
             })
         except:
@@ -795,7 +801,7 @@ def fetch_events_ldi(base_url='https://ldi.upenn.edu'):
         n_pages = 1
 
     for n_page in range(n_pages):
-        event_page_url = base_url + '/events?page={}'.format(n_page) 
+        event_page_url = base_url + '/events?page={}'.format(n_page)
         page_soup = BeautifulSoup(requests.get(event_page_url).content, 'html.parser')
         all_events = page_soup.find_all('div', attrs={'class': 'views-row'})
         for event in all_events:
@@ -810,11 +816,11 @@ def fetch_events_ldi(base_url='https://ldi.upenn.edu'):
             title = title + ' ({})'.format(subtitle.text.strip()) if subtitle is not None else title
 
             try:
-                event_url = event.find('h2').find('a')['href'] 
+                event_url = event.find('h2').find('a')['href']
                 event_url = base_url + event_url
                 event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
                 description = event_soup.find('div', attrs={'class': 'event-body'}).text.strip()
-                
+
                 speaker = event_soup.find('div', attrs={'class': 'field-name-field-persons-name'})
                 speaker = speaker.text.strip() if speaker is not None else ''
                 speaker_affil = event_soup.find('div', attrs={'class': 'field-name-field-title'})
@@ -825,12 +831,12 @@ def fetch_events_ldi(base_url='https://ldi.upenn.edu'):
                 speaker = ''
 
             events.append({
-                'title': title, 
+                'title': title,
                 'description': description,
                 'date': date,
-                'location': location, 
+                'location': location,
                 'speaker': speaker,
-                'url': event_url, 
+                'url': event_url,
                 'owner': 'Leonard & Davis Institute (LDI)'
             })
     return events
@@ -858,11 +864,11 @@ def fetch_events_korean_studies(base_url='https://www.sas.upenn.edu'):
         event_speaker = event_soup.find('div', attrs={'class': 'fieldset-wrapper'})
         event_speaker = event_speaker.text.strip() if event_speaker is not None else ''
         events.append({
-            'title': title, 
+            'title': title,
             'description': description,
-            'url': event_url, 
+            'url': event_url,
             'date': date,
-            'speaker': event_speaker, 
+            'speaker': event_speaker,
             'owner': 'Korean Studies'
         })
     return events
@@ -896,12 +902,12 @@ def fetch_events_cscc(base_url='https://cscc.sas.upenn.edu/'):
             description = event_soup.find('div', attrs={'class': 'events-page'}).find('div', attrs={'class': 'body'})
             description = description.text.strip() if description is not None else ''
             events.append({
-                'title': title, 
+                'title': title,
                 'location': location,
                 'date': date,
                 'speaker': speaker,
-                'url': event_url, 
-                'description': description, 
+                'url': event_url,
+                'description': description,
                 'owner': 'Center for the Study of Contemporary China'
             })
         except:
@@ -917,7 +923,7 @@ def fetch_events_fels(base_url='https://www.fels.upenn.edu'):
     page_soup = BeautifulSoup(requests.get(base_url + '/events').content, 'html.parser')
     all_events = page_soup.find('div', attrs={'class': 'view-content'})
     event_urls = [base_url + a['href'] for a in all_events.find_all('a') if a is not None]
-    
+
     for event_url in event_urls:
         event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
         title = event_soup.find('h1', attrs={'id': 'page-title'}).text.strip()
@@ -931,12 +937,12 @@ def fetch_events_fels(base_url='https://www.fels.upenn.edu'):
         speaker = event_soup.find('div', attrs={'class': 'breadcrumb-top'})
         speaker = speaker.text.replace('Home\xa0 // \xa0', '').strip() if speaker is not None else ''
         events.append({
-            'title': title, 
-            'location': location, 
-            'date': date, 
-            'description': description, 
-            'speaker': speaker, 
-            'url': event_url, 
+            'title': title,
+            'location': location,
+            'date': date,
+            'description': description,
+            'speaker': speaker,
+            'url': event_url,
             'owner': 'Fels institute'
         })
     return events
@@ -967,11 +973,11 @@ def fetch_events_sciencehistory(base_url='https://www.sciencehistory.org'):
             descriptions = ' '.join([p.text.strip() for p in descriptions])
 
         events.append({
-            'title': title, 
+            'title': title,
             'description': descriptions,
-            'date': date, 
+            'date': date,
             'location': location,
-            'url': event_url, 
+            'url': event_url,
             'owner': 'Science History Institute'
         })
     return events
@@ -996,7 +1002,7 @@ def fetch_events_HIP(base_url='https://www.impact.upenn.edu/'):
         events.append({
             'title': title,
             'description': details,
-            'url': event_url, 
+            'url': event_url,
             'owner': "Center for High Impact Philanthropy"
         })
     return events
@@ -1019,7 +1025,7 @@ def fetch_events_italian_studies(base_url='https://www.sas.upenn.edu'):
         date = event_soup.find('span', attrs={'class': 'date-display-single'}).text.strip()
         time = event_soup.find('div', attrs={'class': 'field field-type-datetime field-field-event-time'})
         time = time.text.replace('Time:', '').strip() if time is not None else ''
-        
+
         page_details = [t.text.strip() for t in event_soup.find_all('div', attrs={'class': 'field-items'})]
         location, speaker = '', ''
         for detail in page_details:
@@ -1033,10 +1039,10 @@ def fetch_events_italian_studies(base_url='https://www.sas.upenn.edu'):
         events.append({
             'title': title,
             'starttime': time,
-            'url': event_url, 
+            'url': event_url,
             'date': date,
-            'location': location, 
-            'description': description, 
+            'location': location,
+            'description': description,
             'speaker': speaker,
             'owner': 'Italian Studies'
         })
@@ -1063,7 +1069,7 @@ def fetch_events_CEMB(base_url='https://cemb.upenn.edu'):
         events.append({
             'title': title,
             'date': date,
-            'url': event_url, 
+            'url': event_url,
             'description': details,
             'owner': 'Center for Engineering MechanoBiology'
         })
@@ -1089,8 +1095,8 @@ def fetch_events_CEAS(base_url='https://ceas.sas.upenn.edu'):
         events.append({
             'title': title,
             'date': date,
-            'url': event_url, 
-            'description': details, 
+            'url': event_url,
+            'description': details,
             'owner': 'Center for East Asian Studies'
         })
     return events
@@ -1150,7 +1156,7 @@ def fetch_events_african_studies(base_url='https://africana.sas.upenn.edu'):
             'speaker': speaker,
             'date': date,
             'description': details,
-            'url': event_url, 
+            'url': event_url,
             'owner': 'African Studies'
         })
     return events
@@ -1158,7 +1164,7 @@ def fetch_events_african_studies(base_url='https://africana.sas.upenn.edu'):
 
 def fetch_events_business_ethics(base_url='https://zicklincenter.wharton.upenn.edu'):
     """
-    Penn Events for Carol and Lawrence Zicklin Center for Business Ethics Research: 
+    Penn Events for Carol and Lawrence Zicklin Center for Business Ethics Research:
     """
     page_soup = BeautifulSoup(requests.get(base_url + '/upcoming-events/').content, 'html.parser')
 
@@ -1178,7 +1184,7 @@ def fetch_events_business_ethics(base_url='https://zicklincenter.wharton.upenn.e
             'title': title,
             'date': date,
             'description': details,
-            'url': event_url, 
+            'url': event_url,
             'owner': 'Zicklincenter Center for Business Ethics'
         })
     return events
@@ -1198,14 +1204,14 @@ def fetch_events_law(base_url='https://www.law.upenn.edu/institutes/legalhistory
         '''.strip().format(event_id)
         event_detail = requests.get(url=event_url).json()
         events.append({
-            'date': event_detail['title'], 
+            'date': event_detail['title'],
             'title': event_detail['event']['title'],
-            'event_id': event_id, 
-            'summary': BeautifulSoup(event_detail['event'].get('summary', ''), 'html.parser').text.strip(), 
+            'event_id': event_id,
+            'summary': BeautifulSoup(event_detail['event'].get('summary', ''), 'html.parser').text.strip(),
             'location': event_detail['event']['location'],
-            'description': BeautifulSoup(event_detail['event'].get('description', ''), 'html.parser').text.strip(), 
+            'description': BeautifulSoup(event_detail['event'].get('description', ''), 'html.parser').text.strip(),
             'url': 'https://www.law.upenn.edu/newsevents/calendar.php#event_id/{}/view/event'.format(event_id),
-            'owner': 'Penn Law School' 
+            'owner': 'Penn Law School'
         })
     return events
 
@@ -1238,7 +1244,7 @@ def fetch_events_penn_SAS(base_url='https://www.sas.upenn.edu'):
             'location': location,
             'speaker': speaker,
             'description': details,
-            'url': event_url, 
+            'url': event_url,
             'owner': 'Penn SAS'
         })
     return events
@@ -1268,7 +1274,7 @@ def fetch_events_physics_astronomy(base_url='https://www.physics.upenn.edu'):
             'date': date,
             'speaker': speaker,
             'description': description,
-            'url': event_url, 
+            'url': event_url,
             'owner': 'Penn Physics and Astronomy Department'
         })
     return events
@@ -1299,7 +1305,7 @@ def fetch_events_wolf_humanities(base_url='http://wolfhumanities.upenn.edu'):
             'date': date,
             'location': location,
             'description': details,
-            'url': event_url, 
+            'url': event_url,
             'owner': 'Wolf Humanities Center Events'
         })
     return events
@@ -1396,7 +1402,7 @@ def fetch_events_religious_studies(base_url='https://www.sas.upenn.edu'):
             'date': date,
             'location': location,
             'description': details,
-            'url': event_url, 
+            'url': event_url,
             'owner': 'Department of Religious Studies'
         })
     return events
@@ -1404,7 +1410,7 @@ def fetch_events_religious_studies(base_url='https://www.sas.upenn.edu'):
 
 def fetch_events_AHEAD(base_url='http://www.ahead-penn.org'):
     """
-    Penn Events for Penn AHEAD 
+    Penn Events for Penn AHEAD
     """
     page_soup = BeautifulSoup(requests.get(base_url + '/events').content, 'html.parser')
 
@@ -1427,7 +1433,7 @@ def fetch_events_AHEAD(base_url='http://www.ahead-penn.org'):
             'date': date,
             'location': location,
             'description': details,
-            'url': event_url, 
+            'url': event_url,
             'owner': 'Penn AHEAD'
         })
     return events
@@ -1458,7 +1464,7 @@ def fetch_events_SPP(base_url='https://www.sp2.upenn.edu'):
             'date': date,
             'starttime': time,
             'description': details,
-            'url': event_url, 
+            'url': event_url,
             'owner': 'Penn Social Policy & Practice'
         })
     return events
@@ -1486,7 +1492,7 @@ def fetch_events_ortner_center(base_url='http://ortnercenter.org'):
             'title': title,
             'date': date,
             'description': details,
-            'url': event_url, 
+            'url': event_url,
             'owner': 'Ortner Center for Violence and Abuse in Relationships'
         })
     return events
@@ -1506,7 +1512,7 @@ def fetch_event_penn_today(base_url='https://penntoday.upenn.edu'):
             'date' : event['start'],
             'starttime': event['starttime'],
             'location': event['location'],
-            'url': base_url+ event['path'], 
+            'url': base_url+ event['path'],
             'owner': 'Penn Today Events'
         })
     return events_list
