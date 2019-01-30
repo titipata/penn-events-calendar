@@ -14,6 +14,7 @@ from urllib.parse import urljoin
 
 
 PATH_JSON = 'events.json'
+GROBID_URL = 'http://localhost:8070'
 
 
 def read_json(file_path):
@@ -293,7 +294,7 @@ def fetch_events_biology(base_url='http://www.bio.upenn.edu'):
 def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
     """
     Fetch events from Economics department https://economics.sas.upenn.edu/events
-
+    
     Note that we still have problem with when parsing the description
     """
     events = []
@@ -317,15 +318,33 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
             end_time = end_time.text.strip() if end_time is not None else ''
             event_page = requests.get(event_url)
             event_soup = BeautifulSoup(event_page.content, 'html.parser')
-            description = event_soup.find('div', attrs={'class': 'col-sm-8 bs-region bs-region--left'}).text.strip()
+            
+            speaker = event_soup.find('div', attrs={'class': 'col-sm-4 bs-region bs-region--right'})
+            speaker = speaker.text.replace('Download Paper', '').strip() if speaker is not None else ''
+
+            try:
+                url = '%s/api/processFulltextDocument' % GROBID_URL
+                pdf_path = event_soup.find('a', attrs={'class': 'btn btn-lg btn-primary btn-download'})['href']
+                pdf_url = urljoin('https://economics.sas.upenn.edu/', pdf_path)
+                parsed_article = requests.post(url, files={'input': requests.get(pdf_url).content}).text
+                pdf_soup = BeautifulSoup(parsed_article)
+                title = pdf_soup.find('title')
+                title = title.text if title is not None else ''
+                description = pdf_soup.find('abstract')
+                description = description.text.strip() if description is not None else ''
+            except:
+                title = ''
+                description = ''
+
             location = event_soup.find('p', attrs={'class': 'address'}).text.strip()
             events.append({
                 'title': title,
-                'date': start_time,
-                'starttime': start_time,
-                'endtime': end_time,
                 'description': description,
-                'location': location,
+                'speaker': speaker,
+                'date': start_time,
+                'starttime': start_time, 
+                'endtime': end_time, 
+                'location': location, 
                 'url': event_url,
                 'owner': 'Department of Economics'
             })
