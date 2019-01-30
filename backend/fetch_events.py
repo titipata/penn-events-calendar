@@ -1157,7 +1157,7 @@ def fetch_events_CASI(base_url='https://casi.ssc.upenn.edu'):
     event_table = page_soup.find('div', attrs={'class': 'main-container container'})
     all_events = event_table.find_all('div', attrs = {'class': 'views-row'})
     for event in all_events:
-        event_url = base_url+event.find('a')['href']
+        event_url = base_url + event.find('a')['href']
         event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
         title = event_soup.find('h1', attrs={'class': 'page-header'})
         title = title.text.strip() if title is not None else ''
@@ -1186,7 +1186,7 @@ def fetch_events_african_studies(base_url='https://africana.sas.upenn.edu'):
     event_table = page_soup.find('div', attrs={'class': 'body-content'})
     all_events = event_table.find_all('div', attrs = {'class': 'views-row'})
     for event in all_events:
-        event_url = base_url+event.find('a')['href']
+        event_url = base_url + event.find('a')['href']
         event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
         title = event_soup.find('h1', attrs={'class': 'page-header'})
         title = title.text.strip() if title is not None else ''
@@ -1271,7 +1271,7 @@ def fetch_events_penn_SAS(base_url='https://www.sas.upenn.edu'):
     event_table = page_soup.find('div', attrs={'class': 'field-basic-page-content'})
     all_events = event_table.find_all('div', attrs = {'class': 'flex-event-desc'})
     for event in all_events:
-        event_url = base_url+event.find('a')['href']
+        event_url = base_url + event.find('a')['href']
         event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
         title = event_soup.find('h3', attrs={'class': 'event-title'})
         title = title.text.strip() if title is not None else ''
@@ -1304,7 +1304,7 @@ def fetch_events_physics_astronomy(base_url='https://www.physics.upenn.edu'):
     events = []
     all_events = page_soup.find_all('h3')
     for event in all_events:
-        event_url = base_url+event.find('a')['href']
+        event_url = base_url + event.find('a')['href']
         event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
         title = event_soup.find('h1', attrs={'class': 'title'})
         title = title.text.strip() if title is not None else ''
@@ -1335,7 +1335,7 @@ def fetch_events_wolf_humanities(base_url='http://wolfhumanities.upenn.edu'):
     event_table = page_soup.find('div', attrs={'class': 'event-list'})
     all_events = event_table.find_all('li', attrs = {'class': 'clearfix'})
     for event in all_events:
-        event_url = base_url+event.find('a')['href']
+        event_url = base_url + event.find('a')['href']
         event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
         title = event_soup.find('h1')
         title = title.text.strip() if title is not None else ''
@@ -1366,7 +1366,7 @@ def fetch_events_music_dept(base_url='https://www.sas.upenn.edu'):
     event_table = page_soup.find('div', attrs={'class': 'view-content'})
     all_events = event_table.find_all('li', attrs={'class': 'group'})
     for event in all_events:
-        event_url = base_url+event.find('a')['href']
+        event_url = base_url + event.find('a')['href']
         event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
         title = event_soup.find('h1', attrs={'class': 'title'})
         title = title.text.strip() if title is not None else ''
@@ -1463,7 +1463,7 @@ def fetch_events_AHEAD(base_url='http://www.ahead-penn.org'):
     event_table = page_soup.find('div', attrs={'id': 'main-content'})
     all_events = event_table.find_all('div', attrs = {'class': 'views-row'})
     for event in all_events:
-        event_url = base_url+event.find('a')['href']
+        event_url = base_url + event.find('a')['href']
         event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
         title = event_soup.find('h1', attrs={'class': 'title'})
         title = title.text.strip() if title is not None else ''
@@ -1525,7 +1525,7 @@ def fetch_events_ortner_center(base_url='http://ortnercenter.org'):
     event_table = page_soup.find('div', attrs={'class': 'block content columnBlog--left'})
     all_events = event_table.find_all('div', attrs = {'class': 'blog-title'})
     for event in all_events:
-        event_url = base_url+event.find('a')['href']
+        event_url = base_url + event.find('a')['href']
         event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
         title = event_soup.find('h6')
         title = title.text.strip() if title is not None else ''
@@ -1557,49 +1557,10 @@ def fetch_event_penn_today(base_url='https://penntoday.upenn.edu'):
             'date' : event['start'],
             'starttime': event['starttime'],
             'location': event['location'],
-            'url': base_url+ event['path'],
+            'url': base_url + event['path'],
             'owner': 'Penn Today Events'
         })
     return events_list
-
-
-def calculate_document_similarity(n_documents=6, days=21):
-    """
-    Calculate similarity between talks, 
-    only calculate for recent one
-    """
-    import numpy as np
-    import spacy
-    nlp = spacy.load('en_core_web_sm')
-    events = read_json('events.json')
-
-    # filter only next 21 days
-    date_retrieve = datetime.today() + timedelta(days=days)
-    events = list(filter(lambda x: dateutil.parser.parse(x['date']) >= datetime.today() and dateutil.parser.parse(x['date']) <= date_retrieve,
-                        events))
-
-    # transforming description to spacy tokens 
-    docs = []
-    for event in events:
-        description = '{} {}'.format(event.get('title', ''), event.get('description'))
-        docs.append(nlp(description))
-    
-    # dates
-    dates = [dateutil.parser.parse(event['date']) for event in events]
-
-    similar_events = {}
-    for i, event in enumerate(events):
-        document_similarities = np.array([docs[i].similarity(doc) for doc in docs])
-
-        # looking for future documents only
-        date_filter = np.array([d >= dates[i] for d in dates])
-        document_similarities[np.logical_not(date_filter)] = 0
-        
-        similar_events_idx = np.argsort(document_similarities)[::-1][1: n_documents + 1]
-        top_similar_events = [events[idx] for idx in similar_events_idx]    
-        similar_events[event['event_id']] = top_similar_events
-    
-    json.dump(similar_events, open(PATH_SIMILAR_EVENTS, 'w'))
 
 
 if __name__ == '__main__':
