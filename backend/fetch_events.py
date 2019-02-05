@@ -1119,15 +1119,20 @@ def fetch_events_CEMB(base_url='https://cemb.upenn.edu'):
     all_events = event_table.find_all('div', attrs = {'class': 'event-details'})
     for event in all_events:
         event_url = event.find('a')['href']
+        date = event.find('li', attrs={'class': 'event-meta-date'})
+        date = date.text.strip() if date is not None else ''
+        location = event.find('li', attrs={'class': 'event-meta-location'})
+        location = location.text.strip() if location is not None else ''
+
         event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
         title = event_soup.find('h1')
         title = title.text.strip() if title is not None else ''
-        date = event_soup.find('div', attrs={'class': 'event-meta'}).text.strip()
         details = event_soup.find('div', attrs={'class': 'event-details'})
         details = details.text if details is not None else ''
         events.append({
             'title': title,
             'date': date,
+            'location': location,
             'url': event_url,
             'description': details,
             'owner': 'Center for Engineering MechanoBiology'
