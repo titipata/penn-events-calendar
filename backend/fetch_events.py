@@ -18,6 +18,37 @@ PATH_JSON = 'events.json'
 GROBID_URL = 'http://localhost:8070'
 
 
+PATTERNS = [
+    r'^[a-zA-Z]+, ([a-zA-Z]+ [0-9]{1,2}, [0-9]{4}).*',
+    r'^([a-zA-Z]+ [0-9]{1,2}, [0-9]{4}) .*',
+    r'^([a-zA-Z]+ [0-9]{1,2}) @.*',
+    r'^([a-zA-Z]{3}\.? [0-9]{1,2}, [0-9]{4}) .*',
+    r'^([a-zA-Z]{3} [0-9]{1,2} [0-9]{4})[0-9]{1,2}:[0-9]{2}.*',
+    r'^[a-zA-Z]{3}, ([0-9\/]{10}) .*',
+    r'^[a-zA-Z]+, ([0-9]{1,2} [a-zA-Z]+ [0-9]{4})[— ]-?.*',
+    r'^([0-9]{1,2} [a-zA-Z]{3} [0-9]{4}) .*'   
+]
+PATS = [re.compile(pattern) for pattern in PATTERNS]
+
+
+def clean_date_format(d):
+    """
+    Clean date in string
+    e.g. 'Tuesday, October 30, 2018 - 11:30am', '02/06/2019', '1.3.18'
+    to string in 'DD-MM-YYYY' format
+    """
+    d = d.replace('Date TBD', '')
+    d = d.replace('\n', ' ')
+    if d is not '':
+        for pat in PATS:
+            if pat.match(d):
+                d = pat.sub(r"\1", d)
+                return parser.parse(d).strftime('%d-%m-%Y')
+        return parser.parse(d).strftime('%d-%m-%Y')
+    else:
+        return ''
+
+
 def read_json(file_path):
     """
     Read collected file from path
@@ -1583,6 +1614,7 @@ def fetch_event_penn_today(base_url='https://penntoday.upenn.edu'):
 
 
 if __name__ == '__main__':
+    import pandas as pd
     events = []
     fetch_fns = [
         fetch_events_cni, fetch_events_english_dept, fetch_events_crim, 
@@ -1601,3 +1633,6 @@ if __name__ == '__main__':
     ]
     for f in tqdm(fetch_fns):
         events.extend(f())
+    events_df = pd.DateFrame(events)
+    events_df['date_dt'] = events_df['date'].map(lambda x: clean_date_format(x))
+    events_df.to_csv('events.csv', index=False)
