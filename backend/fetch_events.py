@@ -486,7 +486,7 @@ def fetch_events_philosophy(base_url='https://philosophy.sas.upenn.edu'):
             try:
                 endtime = starttime + timedelta(hours=1)
             except:
-                endtime = 'N/A'
+                endtime = ''
             description = event_soup.find('div', attrs={'class': 'field-body'})
             if description is not None:
                 description = description.text.strip()
@@ -537,11 +537,11 @@ def fetch_events_classical_studies(base_url='https://www.classics.upenn.edu'):
             try:
                 starttime = event_soup.find('span', attrs={'class': 'date-display-start'}).text.strip()
             except:
-                startime = 'N/A'
+                startime = ''
             try:
                 endtime = event_soup.find('span', attrs={'class': 'date-display-end'}).text.strip()
             except:
-                endtime = 'N/A'
+                endtime = ''
             events.append({
                 'title': title,
                 'date': date,
@@ -571,16 +571,16 @@ def fetch_events_linguistic(base_url='https://www.ling.upenn.edu'):
             try:
                 location = event.find('div', attrs={'class': 'field field-type-text field-field-event-location'})
             except:
-                location = 'TBD'
+                location = ''
             date = event_soup.find('span', attrs={'class': 'date-display-single'})
             try:
                 starttime = event_soup.find('span', attrs={'class': 'date-display-start'}).text.strip()
             except:
-                starttime = 'N/a'
+                starttime = ''
             try: 
                 endtime = event_soup.find('span', attrs={'class': 'date-display-end'}).text.strip()
             except:
-                endtime = 'N/A'
+                endtime = ''
             description = event_soup.find('div', attrs={'id': 'content-area'}).find('div', attrs={'class': 'content'}).text.strip()
             events.append({
                 'title': title,
