@@ -698,18 +698,27 @@ def fetch_events_sociology(base_url='https://sociology.sas.upenn.edu'):
 
             if len(event_url) != 0:
                 event_page = BeautifulSoup(requests.get(event_url).content, 'html.parser')
-                description = event_page.find('div', attrs={'id': 'content-area'})
-                description = description.find('div', attrs={'class': 'content'}) if description is not None else ''
-                description = ' '.join([p.text.strip() for p in description.find_all('p')])
-                subtitle = event_page.find('div', attrs={'class': 'field-items'})
-                subtitle = subtitle.text.strip() if subtitle is not None else ''
+                try:
+                    description = event_page.find('div', attrs{'class': 'field field-type-text field-field-event-title'}).text.strip()
+                except:
+                    description = ''
+                try:
+                    starttime = event_page.find('span', attrs={'class': 'date-display-start'}).text.strip()
+                except:
+                    starttime = ''
+                try:
+                    endtime = event_page.find('span', attrs={'class': 'date-display-end'}).text.strip()
+                except:
+                    endtime = ''
             events.append({
-                'title': title + ' ' + subtitle,
+                'title': title,
                 'date': date,
                 'location': location,
                 'description': description,
                 'url': event_url,
-                'owner': 'Sociology Department'
+                'owner': 'Sociology Department',
+                'starttime': starttime,
+                'endtime': endtime
             })
     return events
 
