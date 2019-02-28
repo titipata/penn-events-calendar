@@ -534,12 +534,22 @@ def fetch_events_classical_studies(base_url='https://www.classics.upenn.edu'):
                 description = description.text
             else:
                 description = ''
+            try:
+                starttime = event_soup.find('span', attrs={'class': 'date-display-start'}).text.strip()
+            except:
+                startime = 'N/A'
+            try:
+                endtime = event_soup.find('span', attrs={'class': 'date-display-end'}).text.strip()
+            except:
+                endtime = 'N/A'
             events.append({
                 'title': title,
                 'date': date,
                 'location': location,
                 'description': description,
-                'url': event_url
+                'url': event_url,
+                'starttime': starttime,
+                'endtime': endtime
             })
     return events
 
