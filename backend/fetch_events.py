@@ -261,7 +261,7 @@ def fetch_events_crim(base_url='https://crim.sas.upenn.edu'):
             try:
                 dt = dateutil.parser.parse(date)
                 starttime = dt.strftime('%I:%M %p')
-                endtime = dt.strftime('%I:%M %P') + timedelta(hours = 1)
+                endtime = (dt + timedelta(hours=1)).strftime('%I:%M %p')
             except:
                 starttime = ''
                 endtime = ''
