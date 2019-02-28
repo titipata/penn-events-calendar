@@ -550,6 +550,7 @@ def fetch_events_classical_studies(base_url='https://www.classics.upenn.edu'):
                 'url': event_url,
                 'starttime': starttime,
                 'endtime': endtime
+                'department': 'Department of Classical Studies'
             })
     return events
 
