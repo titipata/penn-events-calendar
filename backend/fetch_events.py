@@ -565,30 +565,32 @@ def fetch_events_linguistic(base_url='https://www.ling.upenn.edu'):
     for event in page_soup.find('div', attrs={'class': 'view-content'}).find_all('li'):
         if event.find('a') is not None:
             event_url = base_url + event.find('a')['href']
-            title = event.find('h3').text.strip()
-            date = event.find('span', attrs={'class': 'date-display-single'})
-            if date is not None:
-                date = date.text
-            location = event.find('div', attrs={'class': 'where-label'})
-            if location is not None:
-                location = location.text.replace('Where:', '').strip()
-            else:
-                location = ''
             event_page = requests.get(event_url)
             event_soup = BeautifulSoup(event_page.content, 'html.parser')
-            description = event_soup.find('div', attrs={'id': 'content-area'}).find('div', attrs={'class': 'content'}).text.strip()
+            title = event_soup.find('h1', attrs={'class': 'title'}).text.strip()
+            try:
+                location = event.find('div', attrs={'class': 'field field-type-text field-field-event-location'})
+            except:
+                location = 'TBD'
             date = event_soup.find('span', attrs={'class': 'date-display-single'})
-            if date is not None:
-                date = date.text.strip()
-            else:
-                date = ''
-
+            try:
+                starttime = event_soup.find('span', attrs={'class': 'date-display-start'}).text.strip()
+            except:
+                starttime = 'N/a'
+            try: 
+                endtime = event_soup.find('span', attrs={'class': 'date-display-end'}).text.strip()
+            except:
+                endtime = 'N/A'
+            description = event_soup.find('div', attrs={'id': 'content-area'}).find('div', attrs={'class': 'content'}).text.strip()
             events.append({
                 'title': title,
                 'date': date,
                 'location': location,
                 'description': description,
-                'url': event_url
+                'url': event_url,
+                'starttime': starttime,
+                'endtime': endtime,
+                'department': 'Department of Linguistics'
             })
     return events
 
