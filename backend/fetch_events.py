@@ -853,11 +853,20 @@ def fetch_events_CURF(base_url='https://www.curf.upenn.edu'):
     for event in all_events[1::]:
         title = event.find('div').text
         event_url = base_url + event.find('a')['href']
-        date = event.find('span', attrs={'class': 'date-display-single'}).text
+        date = event.find('span', attrs={'class': 'date-display-single'})
         description = event.find('td', attrs={'class': 'eventbody'}).text.strip()
 
         # scrape description directly from ``event_url``
         event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+        location = event_soup.find('span', attrs={'class': 'date-display-start'}).text.strip()
+        try:
+            starttime = event_soup.find('span', attrs={'class': 'date-display-start'}).text.strip()
+        except:
+            starttime = ''
+        try:
+            endtime = event_soup.find('span', attrs={'class': 'date-display-end'}).text.strip()
+        except:
+            endtime = ''
         event_details = event_soup.find('div', attrs={'class': 'eventdetails'})
         if event_details is not None:
             event_description = event_details.find('div', attrs={'class': 'eventdescription'})
@@ -869,7 +878,10 @@ def fetch_events_CURF(base_url='https://www.curf.upenn.edu'):
             'description': description,
             'url': event_url,
             'date': date,
-            'owner': 'Center for Undergrad Research and Fellowship (CURF)'
+            'owner': 'Center for Undergrad Research and Fellowship (CURF)',
+            'location': location,
+            'starttime': starttime,
+            'endtime': endtime
         })
     return events
 
