@@ -475,9 +475,18 @@ def fetch_events_philosophy(base_url='https://philosophy.sas.upenn.edu'):
             title = li.find('h3').text.strip()
             date = li.find('p', attrs={'class': 'dateline'}).text
             location = li.find('div', attrs={'class': 'location'}).text
+            department = 'Department of Philosophy'
 
             event_page = requests.get(event_url)
             event_soup = BeautifulSoup(event_page.content, 'html.parser')
+            try:
+                starttime = event_soup.find('div', attrs={'class': 'field-date'})
+            except:
+                starttime = ''
+            try:
+                endtime = starttime + timedelta(hours=1)
+            except:
+                endtime = 'N/A'
             description = event_soup.find('div', attrs={'class': 'field-body'})
             if description is not None:
                 description = description.text.strip()
@@ -489,7 +498,9 @@ def fetch_events_philosophy(base_url='https://philosophy.sas.upenn.edu'):
                 'date': date,
                 'location': location,
                 'description': description,
-                'url': event_url
+                'url': event_url,
+                'starttime': starttime,
+                'endtime': endtime
             })
     return events
 
