@@ -300,8 +300,10 @@ def fetch_events_mec(base_url='https://www.sas.upenn.edu'):
         try:
             dt = dateutil.parser.parse(date)
             starttime = dt.strftime('%I:%M %p')
+            endtime = endtime = (dt + timedelta(hours=1)).strftime('%I:%M %p')
         except:
             starttime = ''
+            endtime = ''
         events.append({
             'title': title,
             'date': date,
@@ -311,7 +313,7 @@ def fetch_events_mec(base_url='https://www.sas.upenn.edu'):
             'location': '',
             'speaker': '',
             'starttime': starttime,
-            'endtime': ''
+            'endtime': endtime
         })
     return events
 
