@@ -792,7 +792,9 @@ def fetch_events_cis(base_url="http://www.cis.upenn.edu/about-cis/events/index.p
                 'description': description,
                 'speaker': speaker,
                 'url': base_url,
-                'owner': 'CIS'
+                'owner': 'CIS',
+                'starttime': '3:00 PM',
+                'endtime' : '4:00 PM'
             })
             title, date, description = '', '', ''
         else:
