@@ -261,8 +261,10 @@ def fetch_events_crim(base_url='https://crim.sas.upenn.edu'):
             try:
                 dt = dateutil.parser.parse(date)
                 starttime = dt.strftime('%I:%M %p')
+                endtime = dt.strftime('%I:%M %P') + timedelta(hours = 1)
             except:
                 starttime = ''
+                endtime = ''
             events.append({
                 'title': title,
                 'date': date,
@@ -270,7 +272,8 @@ def fetch_events_crim(base_url='https://crim.sas.upenn.edu'):
                 'location': location,
                 'description': description,
                 'url': event_url,
-                'owner': 'Dapartment of Criminology'
+                'owner': 'Dapartment of Criminology',
+                'endtime': endtime
             })
     return events
 
