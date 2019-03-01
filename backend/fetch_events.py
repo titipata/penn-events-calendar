@@ -965,7 +965,8 @@ def fetch_events_ldi(base_url='https://ldi.upenn.edu'):
             title = event.find('h2').text.strip() if event.find('h2') is not None else ''
             subtitle = event.find('div', attrs={'class': 'field-name-field-subhead'})
             title = title + ' ({})'.format(subtitle.text.strip()) if subtitle is not None else title
-
+            starttime = page_soup.find('span', attrs={'class': 'date-display-start'}).text.strip()
+            endtime = page_soup.find('span', attrs={'class': 'date-display-end'}).text.strip()
             try:
                 event_url = event.find('h2').find('a')['href']
                 event_url = base_url + event_url
@@ -988,7 +989,9 @@ def fetch_events_ldi(base_url='https://ldi.upenn.edu'):
                 'location': location,
                 'speaker': speaker,
                 'url': event_url,
-                'owner': 'Leonard & Davis Institute (LDI)'
+                'owner': 'Leonard & Davis Institute (LDI)',
+                'starttime': starttime,
+                'endtime': endtime
             })
     return events
 
