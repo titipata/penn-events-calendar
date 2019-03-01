@@ -18,6 +18,52 @@ PATH_JSON = 'events.json'
 GROBID_URL = 'http://localhost:8070'
 
 
+PATTERNS = [
+    r'^[a-zA-Z]+, ([a-zA-Z]+ [0-9]{1,2}, [0-9]{4}).*',
+    r'^([a-zA-Z]+ [0-9]{1,2}, [0-9]{4}) .*',
+    r'^([a-zA-Z]+ [0-9]{1,2}) @.*',
+    r'^([a-zA-Z]{3}\.? [0-9]{1,2}, [0-9]{4}) .*',
+    r'^([a-zA-Z]{3} [0-9]{1,2} [0-9]{4})[0-9]{1,2}:[0-9]{2}.*',
+    r'^[a-zA-Z]{3}, ([0-9\/]{10}) .*',
+    r'^[a-zA-Z]+, ([0-9]{1,2} [a-zA-Z]+ [0-9]{4})[— ]-?.*',
+    r'^([0-9]{1,2} [a-zA-Z]{3} [0-9]{4}) .*'   
+]
+PATS = [re.compile(pattern) for pattern in PATTERNS]
+
+
+def clean_date_format(d):
+    """
+    Clean date in string
+    e.g. 'Tuesday, October 30, 2018 - 11:30am', '02/06/2019', '1.3.18'
+    to string in 'DD-MM-YYYY' format
+    """
+    d = d.replace('Date TBD', '')
+    d = d.replace('\n', ' ')
+    if d is not '':
+        for pat in PATS:
+            if pat.match(d):
+                d = pat.sub(r"\1", d)
+                return parser.parse(d).strftime('%d-%m-%Y')
+        return parser.parse(d).strftime('%d-%m-%Y')
+    else:
+        return ''
+
+
+def find_startend_time(s):
+    """
+    Find starttime and endtime from a given string
+    """
+    starttime, endtime = '', ''
+    ts = re.findall(r'(\d+\:\d+\s?(?:AM|PM|am|pm|A.M.|P.M.|a.m.|p.m.))', s)
+    if len(ts) == 1:
+        starttime = ts[0]
+        endtime = ''
+    elif len(ts) == 2:
+        starttime = ts[0]
+        endtime = ts[1]
+    return starttime, endtime
+
+
 def read_json(file_path):
     """
     Read collected file from path
@@ -230,8 +276,10 @@ def fetch_events_crim(base_url='https://crim.sas.upenn.edu'):
             try:
                 dt = dateutil.parser.parse(date)
                 starttime = dt.strftime('%I:%M %p')
+                endtime = (dt + timedelta(hours=1)).strftime('%I:%M %p')
             except:
                 starttime = ''
+                endtime = ''
             events.append({
                 'title': title,
                 'date': date,
@@ -239,7 +287,8 @@ def fetch_events_crim(base_url='https://crim.sas.upenn.edu'):
                 'location': location,
                 'description': description,
                 'url': event_url,
-                'owner': 'Dapartment of Criminology'
+                'owner': 'Dapartment of Criminology',
+                'endtime': endtime
             })
     return events
 
@@ -266,8 +315,10 @@ def fetch_events_mec(base_url='https://www.sas.upenn.edu'):
         try:
             dt = dateutil.parser.parse(date)
             starttime = dt.strftime('%I:%M %p')
+            endtime = endtime = (dt + timedelta(hours=1)).strftime('%I:%M %p')
         except:
             starttime = ''
+            endtime = ''
         events.append({
             'title': title,
             'date': date,
@@ -277,7 +328,7 @@ def fetch_events_mec(base_url='https://www.sas.upenn.edu'):
             'location': '',
             'speaker': '',
             'starttime': starttime,
-            'endtime': ''
+            'endtime': endtime
         })
     return events
 
@@ -439,9 +490,18 @@ def fetch_events_philosophy(base_url='https://philosophy.sas.upenn.edu'):
             title = li.find('h3').text.strip()
             date = li.find('p', attrs={'class': 'dateline'}).text
             location = li.find('div', attrs={'class': 'location'}).text
+            department = 'Department of Philosophy'
 
             event_page = requests.get(event_url)
             event_soup = BeautifulSoup(event_page.content, 'html.parser')
+            try:
+                starttime = event_soup.find('div', attrs={'class': 'field-date'})
+            except:
+                starttime = ''
+            try:
+                endtime = starttime + timedelta(hours=1)
+            except:
+                endtime = ''
             description = event_soup.find('div', attrs={'class': 'field-body'})
             if description is not None:
                 description = description.text.strip()
@@ -453,7 +513,9 @@ def fetch_events_philosophy(base_url='https://philosophy.sas.upenn.edu'):
                 'date': date,
                 'location': location,
                 'description': description,
-                'url': event_url
+                'url': event_url,
+                'starttime': starttime,
+                'endtime': endtime
             })
     return events
 
@@ -487,12 +549,23 @@ def fetch_events_classical_studies(base_url='https://www.classics.upenn.edu'):
                 description = description.text
             else:
                 description = ''
+            try:
+                starttime = event_soup.find('span', attrs={'class': 'date-display-start'}).text.strip()
+            except:
+                startime = ''
+            try:
+                endtime = event_soup.find('span', attrs={'class': 'date-display-end'}).text.strip()
+            except:
+                endtime = ''
             events.append({
                 'title': title,
                 'date': date,
                 'location': location,
                 'description': description,
-                'url': event_url
+                'url': event_url,
+                'starttime': starttime,
+                'endtime': endtime,
+                'department': 'Department of Classical Studies'
             })
     return events
 
@@ -507,30 +580,32 @@ def fetch_events_linguistic(base_url='https://www.ling.upenn.edu'):
     for event in page_soup.find('div', attrs={'class': 'view-content'}).find_all('li'):
         if event.find('a') is not None:
             event_url = base_url + event.find('a')['href']
-            title = event.find('h3').text.strip()
-            date = event.find('span', attrs={'class': 'date-display-single'})
-            if date is not None:
-                date = date.text
-            location = event.find('div', attrs={'class': 'where-label'})
-            if location is not None:
-                location = location.text.replace('Where:', '').strip()
-            else:
-                location = ''
             event_page = requests.get(event_url)
             event_soup = BeautifulSoup(event_page.content, 'html.parser')
-            description = event_soup.find('div', attrs={'id': 'content-area'}).find('div', attrs={'class': 'content'}).text.strip()
+            title = event_soup.find('h1', attrs={'class': 'title'}).text.strip()
+            try:
+                location = event.find('div', attrs={'class': 'field field-type-text field-field-event-location'})
+            except:
+                location = ''
             date = event_soup.find('span', attrs={'class': 'date-display-single'})
-            if date is not None:
-                date = date.text.strip()
-            else:
-                date = ''
-
+            try:
+                starttime = event_soup.find('span', attrs={'class': 'date-display-start'}).text.strip()
+            except:
+                starttime = ''
+            try: 
+                endtime = event_soup.find('span', attrs={'class': 'date-display-end'}).text.strip()
+            except:
+                endtime = ''
+            description = event_soup.find('div', attrs={'id': 'content-area'}).find('div', attrs={'class': 'content'}).text.strip()
             events.append({
                 'title': title,
                 'date': date,
                 'location': location,
                 'description': description,
-                'url': event_url
+                'url': event_url,
+                'starttime': starttime,
+                'endtime': endtime,
+                'department': 'Department of Linguistics'
             })
     return events
 
@@ -556,13 +631,15 @@ def fetch_events_earth_enviromental_science(base_url='https://www.sas.upenn.edu'
         event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
         date = event_soup.find('span', attrs={'class': 'date-display-single'})
         date = date.text if date is not None else ''
+        starttime, endtime = find_startend_time(date)
         events.append({
             'title': title,
             'date': date,
             'location': location,
             'description': description,
             'speaker': presenter,
-            'starttime': date,
+            'starttime': starttime,
+            'endtime': endtime,
             'url': event_url,
             'owner': 'Earth and Environmental Science'
         })
@@ -638,14 +715,23 @@ def fetch_events_sociology(base_url='https://sociology.sas.upenn.edu'):
 
             if len(event_url) != 0:
                 event_page = BeautifulSoup(requests.get(event_url).content, 'html.parser')
-                description = event_page.find('div', attrs={'id': 'content-area'})
-                description = description.find('div', attrs={'class': 'content'}) if description is not None else ''
-                description = ' '.join([p.text.strip() for p in description.find_all('p')])
-                subtitle = event_page.find('div', attrs={'class': 'field-items'})
-                subtitle = subtitle.text.strip() if subtitle is not None else ''
+                try:
+                    description = event_page.find('div', attrs={'class': 'field field-type-text field-field-event-title'}).text.strip()
+                except:
+                    description = ''
+                try:
+                    starttime = event_page.find('span', attrs={'class': 'date-display-start'}).text.strip()
+                except:
+                    starttime = ''
+                try:
+                    endtime = event_page.find('span', attrs={'class': 'date-display-end'}).text.strip()
+                except:
+                    endtime = ''
             events.append({
-                'title': title + ' ' + subtitle,
+                'title': title,
                 'date': date,
+                'starttime': starttime,
+                'endtime': endtime,
                 'location': location,
                 'description': description,
                 'url': event_url,
@@ -723,7 +809,9 @@ def fetch_events_cis(base_url="http://www.cis.upenn.edu/about-cis/events/index.p
                 'description': description,
                 'speaker': speaker,
                 'url': base_url,
-                'owner': 'CIS'
+                'owner': 'CIS',
+                'starttime': '3:00 PM',
+                'endtime' : '4:00 PM'
             })
             title, date, description = '', '', ''
         else:
@@ -782,11 +870,20 @@ def fetch_events_CURF(base_url='https://www.curf.upenn.edu'):
     for event in all_events[1::]:
         title = event.find('div').text
         event_url = base_url + event.find('a')['href']
-        date = event.find('span', attrs={'class': 'date-display-single'}).text
+        date = event.find('span', attrs={'class': 'date-display-single'})
         description = event.find('td', attrs={'class': 'eventbody'}).text.strip()
 
         # scrape description directly from ``event_url``
         event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+        location = event_soup.find('span', attrs={'class': 'date-display-start'}).text.strip()
+        try:
+            starttime = event_soup.find('span', attrs={'class': 'date-display-start'}).text.strip()
+        except:
+            starttime = ''
+        try:
+            endtime = event_soup.find('span', attrs={'class': 'date-display-end'}).text.strip()
+        except:
+            endtime = ''
         event_details = event_soup.find('div', attrs={'class': 'eventdetails'})
         if event_details is not None:
             event_description = event_details.find('div', attrs={'class': 'eventdescription'})
@@ -798,12 +895,15 @@ def fetch_events_CURF(base_url='https://www.curf.upenn.edu'):
             'description': description,
             'url': event_url,
             'date': date,
-            'owner': 'Center for Undergrad Research and Fellowship (CURF)'
+            'owner': 'Center for Undergrad Research and Fellowship (CURF)',
+            'location': location,
+            'starttime': starttime,
+            'endtime': endtime
         })
     return events
 
 
-def fetch_events_upibi(base_url='http://upibi.org/events/'):
+def fetch_events_upibi(base_url='http://upibi.org/events/list/?tribe_paged=1&tribe_event_display=past'):
     """
     Fetch events from Institute for Biomedical Informatics, http://upibi.org/events/
 
@@ -818,6 +918,7 @@ def fetch_events_upibi(base_url='http://upibi.org/events/'):
         try:
             title = event.find('h3').text.strip()
             date = event.find('div', attrs={'class': 'tribe-event-schedule-details'}).text.strip()
+            starttime, endtime = find_startend_time(date)
             location = event.find('div', attrs={'class': 'tribe-events-venue-details'}).text.replace('+ Google Map', '').strip()
             description = event.find('div', attrs={'class': 'tribe-events-list-event-description tribe-events-content description entry-summary'}).text.strip()
             event_url = event.find('a')['href']
@@ -827,6 +928,8 @@ def fetch_events_upibi(base_url='http://upibi.org/events/'):
                 'url': event_url,
                 'date': date,
                 'location': location,
+                'startime': starttime,
+                'endtime': endtime,
                 'owner': 'Institute for Biomedical Informatics (UPIBI)'
             })
         except:
@@ -861,7 +964,8 @@ def fetch_events_ldi(base_url='https://ldi.upenn.edu'):
             title = event.find('h2').text.strip() if event.find('h2') is not None else ''
             subtitle = event.find('div', attrs={'class': 'field-name-field-subhead'})
             title = title + ' ({})'.format(subtitle.text.strip()) if subtitle is not None else title
-
+            starttime = page_soup.find('span', attrs={'class': 'date-display-start'}).text.strip()
+            endtime = page_soup.find('span', attrs={'class': 'date-display-end'}).text.strip()
             try:
                 event_url = event.find('h2').find('a')['href']
                 event_url = base_url + event_url
@@ -884,7 +988,9 @@ def fetch_events_ldi(base_url='https://ldi.upenn.edu'):
                 'location': location,
                 'speaker': speaker,
                 'url': event_url,
-                'owner': 'Leonard & Davis Institute (LDI)'
+                'owner': 'Leonard & Davis Institute (LDI)',
+                'starttime': starttime,
+                'endtime': endtime
             })
     return events
 
@@ -906,6 +1012,7 @@ def fetch_events_korean_studies(base_url='https://www.sas.upenn.edu'):
         title = title.text.strip() if title is not None else ''
         date = event_soup.find('div', attrs={'class': 'field-date'})
         date = date.text.strip() if date is not None else ''
+        starttime, endtime = find_startend_time(date)
         description = event_soup.find('div', attrs={'class': 'field-body'})
         description = description.text.strip() if description is not None else ''
         event_speaker = event_soup.find('div', attrs={'class': 'fieldset-wrapper'})
@@ -915,6 +1022,8 @@ def fetch_events_korean_studies(base_url='https://www.sas.upenn.edu'):
             'description': description,
             'url': event_url,
             'date': date,
+            'starttime': starttime,
+            'endtime': endtime,
             'speaker': event_speaker,
             'owner': 'Korean Studies'
         })
@@ -942,7 +1051,7 @@ def fetch_events_cscc(base_url='https://cscc.sas.upenn.edu/'):
             event_time = div.find('span', attrs={'class': 'news-date'}).text.replace('\n', ' ').replace(location, '').strip()
             event_date = div.find('div', attrs={'class': 'event-date'})
             event_date = ' '.join([t.text for t in event_date.find_all('time')])
-            date = event_date + event_time
+            starttime, endtime = find_startend_time(event_time)
             speaker = div.find_all('h5')[-1].text
             event_url = base_url + div.find('a')['href']
             event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
@@ -951,7 +1060,9 @@ def fetch_events_cscc(base_url='https://cscc.sas.upenn.edu/'):
             events.append({
                 'title': title,
                 'location': location,
-                'date': date,
+                'date': event_date,
+                'starttime': starttime,
+                'endtime': endtime,
                 'speaker': speaker,
                 'url': event_url,
                 'description': description,
@@ -980,6 +1091,7 @@ def fetch_events_fels(base_url='https://www.fels.upenn.edu'):
         room = event_soup.find('div', attrs={'class': 'field-name-field-event-location-name'})
         room = room.text.replace('Location Name:', '').strip() if room is not None else ''
         date = event_soup.find('span', attrs={'class': 'date-display-single'}).text.strip()
+        starttime, endtime = find_startend_time(date)
         location = (location + ' ' + room).strip()
         speaker = event_soup.find('div', attrs={'class': 'breadcrumb-top'})
         speaker = speaker.text.replace('Home\xa0 // \xa0', '').strip() if speaker is not None else ''
@@ -987,6 +1099,8 @@ def fetch_events_fels(base_url='https://www.fels.upenn.edu'):
             'title': title,
             'location': location,
             'date': date,
+            'starttime': starttime,
+            'endtime': endtime,
             'description': description,
             'speaker': speaker,
             'url': event_url,
@@ -1012,6 +1126,9 @@ def fetch_events_sciencehistory(base_url='https://www.sciencehistory.org'):
         event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
         location = event_soup.find('div', attrs={'class': 'event-location'})
         location = ', '.join([div.text.strip() for div in location.find_all('div') if div is not None])
+        event_time = event_soup.find('div', attrs={'class': 'event-time'})
+        event_time = event_time.text.strip() if event_time is not None else '' 
+        starttime, endtime = find_startend_time(event_time)
 
         descriptions = event_soup.find_all('p')
         if len(descriptions) >= 5:
@@ -1023,6 +1140,8 @@ def fetch_events_sciencehistory(base_url='https://www.sciencehistory.org'):
             'title': title,
             'description': descriptions,
             'date': date,
+            'starttime': starttime,
+            'endtime': endtime,
             'location': location,
             'url': event_url,
             'owner': 'Science History Institute'
@@ -1082,8 +1201,15 @@ def fetch_events_italian_studies(base_url='https://www.sas.upenn.edu'):
         title = event_soup.find('h1', attrs={'class': 'title'})
         title = title.text.strip() if title is not None else ''
         date = event_soup.find('span', attrs={'class': 'date-display-single'}).text.strip()
-        time = event_soup.find('div', attrs={'class': 'field field-type-datetime field-field-event-time'})
-        time = time.text.replace('Time:', '').strip() if time is not None else ''
+
+        starttime = event_soup.find('div', attrs={'class': 'field field-type-datetime field-field-event-time'})
+        starttime = starttime.text.replace('Time:', '').strip() if starttime is not None else ''
+        if starttime is '':
+            starttime = event_soup.find('span', attrs={'class': 'date-display-start'}).text.strip()
+            endtime = event_soup.find('span', attrs={'class': 'date-display-end'})
+            endtime = endtime.text.strip() if endtime is not None else ''
+        else:
+            starttime, endtime = find_startend_time(starttime)
 
         page_details = [t.text.strip() for t in event_soup.find_all('div', attrs={'class': 'field-items'})]
         location, speaker = '', ''
@@ -1097,9 +1223,10 @@ def fetch_events_italian_studies(base_url='https://www.sas.upenn.edu'):
         description = '\n'.join([t.text for t in description.find_all('p')]) if description is not None else ''
         events.append({
             'title': title,
-            'starttime': time,
             'url': event_url,
             'date': date,
+            'starttime': starttime,
+            'endtime': endtime,
             'location': location,
             'description': description,
             'speaker': speaker,
@@ -1119,15 +1246,37 @@ def fetch_events_CEMB(base_url='https://cemb.upenn.edu'):
     all_events = event_table.find_all('div', attrs = {'class': 'event-details'})
     for event in all_events:
         event_url = event.find('a')['href']
+        date = event.find('li', attrs={'class': 'event-meta-date'})
+        date = date.text.strip() if date is not None else ''
+        location = event.find('li', attrs={'class': 'event-meta-location'})
+        location = location.text.strip() if location is not None else ''
+
         event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
         title = event_soup.find('h1')
         title = title.text.strip() if title is not None else ''
-        date = event_soup.find('div', attrs={'class': 'event-meta'}).text.strip()
         details = event_soup.find('div', attrs={'class': 'event-details'})
-        details = details.text if details is not None else ''
+        details = details.text.strip() if details is not None else ''
+
+        starttime, endtime = '', ''
+        try:
+            ts = date.split('•')[-1].strip()
+            ts = ts.split('–')
+            if len(ts) == 1:
+                starttime, endtime = ts[0], ''
+            elif len(ts) == 2:
+                starttime, endtime = ts[0], ts[1]
+            else:
+                starttime, endtime = '', ''
+        except:
+            pass
+        starttime, endtime = starttime.strip(), endtime.strip()
+
         events.append({
             'title': title,
             'date': date,
+            'starttime': starttime,
+            'endtime': endtime,
+            'location': location,
             'url': event_url,
             'description': details,
             'owner': 'Center for Engineering MechanoBiology'
@@ -1149,11 +1298,14 @@ def fetch_events_CEAS(base_url='https://ceas.sas.upenn.edu'):
         title = event_soup.find('h1', attrs={'class':'page-header'})
         title = title.text.strip() if title is not None else ''
         date = event_soup.find('span', attrs={'class': 'date-display-single'}).text.strip()
+        starttime, endtime = find_startend_time(date)
         details = event_soup.find('div', attrs={'class': 'field field-name-body field-type-text-with-summary field-label-hidden'})
         details = details.text if details is not None else ''
         events.append({
             'title': title,
             'date': date,
+            'starttime': starttime,
+            'endtime': endtime,
             'url': event_url,
             'description': details,
             'owner': 'Center for East Asian Studies'
@@ -1177,11 +1329,14 @@ def fetch_events_CASI(base_url='https://casi.ssc.upenn.edu'):
         title = title.text.strip() if title is not None else ''
         date = event_soup.find('span', attrs={'class': 'date-display-single'})
         date = date.text.strip() if date is not None else ''
+        starttime, endtime = find_startend_time(date)
         details = event_soup.find('div', attrs={'class': 'field field-name-body field-type-text-with-summary field-label-hidden'})
         details = details.text.strip() if details is not None else ''
         events.append({
             'title': title,
             'date': date,
+            'starttime': starttime,
+            'endtime': endtime,
             'description': details,
             'url': event_url,
             'owner': 'Center for the Advanced Study of India'
@@ -1208,12 +1363,18 @@ def fetch_events_african_studies(base_url='https://africana.sas.upenn.edu'):
         speaker = speaker.text.strip() if speaker is not None else ''
         date = event_soup.find('div', attrs={'class': 'container-date-wrapper'})
         date = date.text.strip() if date is not None else ''
+        event_time = event_soup.find('span', attrs={'class': 'date-display-single'})
+        event_time = event_time.text.strip() if event_time is not None else ''
+        starttime, endtime = find_startend_time(event_time)
+
         details = event_soup.find('div', attrs={'class': 'field-body'})
         details = details.text.strip() if details is not None else ''
         events.append({
             'title': title,
             'speaker': speaker,
             'date': date,
+            'starttime': starttime,
+            'endtime': endtime,
             'description': details,
             'url': event_url,
             'owner': 'African Studies'
@@ -1237,11 +1398,16 @@ def fetch_events_business_ethics(base_url='https://zicklincenter.wharton.upenn.e
         title = title.text.strip() if title is not None else ''
         date = event_soup.find('p', attrs={'class': 'gamma mobile-date'})
         date = date.text.strip() if date is not None else ''
+        event_time = event_soup.find('h3').text if event_soup.find('h3') is not None else ''
+        starttime, endtime = find_startend_time(event_time)
+
         details = event_soup.find('div', attrs={'class': 'tribe-events-content-wrapper'})
         details = details.text.strip() if details is not None else ''
         events.append({
             'title': title,
             'date': date,
+            'starttime': starttime,
+            'endtime': endtime,
             'description': details,
             'url': event_url,
             'owner': 'Zicklincenter Center for Business Ethics'
@@ -1262,9 +1428,13 @@ def fetch_events_law(base_url='https://www.law.upenn.edu/institutes/legalhistory
         https://www.law.upenn.edu/live/calendar/view/event/event_id/{}?user_tz=IT&syntax=%3Cwidget%20type%3D%22events_calendar%22%20priority%3D%22high%22%3E%3Carg%20id%3D%22mini_cal_heat_map%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22exclude_tag%22%3ELibrary%20Hours%3C%2Farg%3E%3Carg%20id%3D%22exclude_tag%22%3ELibrary%20Event%20Private%3C%2Farg%3E%3Carg%20id%3D%22exclude_tag%22%3ECareers%20Calendar%20ONLY%3C%2Farg%3E%3Carg%20id%3D%22exclude_tag%22%3EDocs%20Only%20Event%3C%2Farg%3E%3Carg%20id%3D%22exclude_tag%22%3EPending%20Event%3C%2Farg%3E%3Carg%20id%3D%22exclude_tag%22%3EPrivate%20Event%3C%2Farg%3E%3Carg%20id%3D%22exclude_tag%22%3EOffcampus%3C%2Farg%3E%3Carg%20id%3D%22exclude_group%22%3ERegistrar%3C%2Farg%3E%3Carg%20id%3D%22exclude_group%22%3EAdmitted%20JD%3C%2Farg%3E%3Carg%20id%3D%22placeholder%22%3ESearch%20Calendar%3C%2Farg%3E%3Carg%20id%3D%22disable_timezone%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22thumb_width%22%3E144%3C%2Farg%3E%3Carg%20id%3D%22thumb_height%22%3E144%3C%2Farg%3E%3Carg%20id%3D%22modular%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22default_view%22%3Eweek%3C%2Farg%3E%3C%2Fwidget%3E
         '''.strip().format(event_id)
         event_detail = requests.get(url=event_url).json()
+        event_time = BeautifulSoup(event_detail['event']['date_time']).text
+        starttime, endtime = find_startend_time(event_time)
         events.append({
             'date': event_detail['title'],
             'title': event_detail['event']['title'],
+            'starttime': starttime,
+            'endtime': endtime,
             'event_id': event_id,
             'summary': BeautifulSoup(event_detail['event'].get('summary', ''), 'html.parser').text.strip(),
             'location': event_detail['event']['location'],
@@ -1291,6 +1461,7 @@ def fetch_events_penn_SAS(base_url='https://www.sas.upenn.edu'):
         title = title.text.strip() if title is not None else ''
         date = event_soup.find('div', attrs={'class': 'field-event-start-date'})
         date = date.text.strip() if date is not None else ''
+        starttime, endtime = find_startend_time(date)
         location = event_soup.find('div', attrs={'class':'event-sub-info'})
         location = location.text.strip() if location is not None else ''
         speaker = event_soup.find('div', attrs={'class':'field-event-speaker'})
@@ -1300,6 +1471,8 @@ def fetch_events_penn_SAS(base_url='https://www.sas.upenn.edu'):
         events.append({
             'title': title,
             'date': date,
+            'starttime': starttime,
+            'endtime': endtime,
             'location': location,
             'speaker': speaker,
             'description': details,
@@ -1324,6 +1497,15 @@ def fetch_events_physics_astronomy(base_url='https://www.physics.upenn.edu'):
         title = title.text.strip() if title is not None else ''
         date = event_soup.find('span', attrs={'class': 'date-display-single'})
         date = date.text.strip() if date is not None else ''
+        starttime, endtime = '', ''
+        ts = re.findall(r'(\d+\:\d+\s?)', date)
+        if len(ts) == 1:
+            starttime = ts[0]
+            endtime = ''
+        elif len(ts) == 2:
+            starttime = ts[0]
+            endtime = ts[1]
+        
         speaker = event_soup.find('div', attrs={'class':'field field-type-text field-field-event-speaker'})
         speaker = speaker.text.strip() if speaker is not None else ''
         description = event_soup.find('p')
@@ -1331,6 +1513,8 @@ def fetch_events_physics_astronomy(base_url='https://www.physics.upenn.edu'):
         events.append({
             'title': title,
             'date': date,
+            'starttime': starttime,
+            'endtime': endtime,
             'speaker': speaker,
             'description': description,
             'url': event_url,
@@ -1341,7 +1525,7 @@ def fetch_events_physics_astronomy(base_url='https://www.physics.upenn.edu'):
 
 def fetch_events_wolf_humanities(base_url='http://wolfhumanities.upenn.edu'):
     """
-    Wolf Humanities Center Events
+    Wolf Humanities Center Events, http://wolfhumanities.upenn.edu/events/color
     """
     page_soup = BeautifulSoup(requests.get(base_url + '/events/color').content, 'html.parser')
 
@@ -1355,6 +1539,7 @@ def fetch_events_wolf_humanities(base_url='http://wolfhumanities.upenn.edu'):
         title = title.text.strip() if title is not None else ''
         date = event_soup.find('p', attrs={'class': 'field-date'})
         date = date.text.strip() if date is not None else ''
+        starttime, endtime = find_startend_time(date)
         location = event_soup.find('div', attrs={'class':'field-location'})
         location = location.text.strip() if location is not None else ''
         details = event_soup.find('div', attrs={'class': 'field-body'})
@@ -1362,6 +1547,8 @@ def fetch_events_wolf_humanities(base_url='http://wolfhumanities.upenn.edu'):
         events.append({
             'title': title,
             'date': date,
+            'starttime': starttime,
+            'endtime': endtime,
             'location': location,
             'description': details,
             'url': event_url,
@@ -1388,16 +1575,18 @@ def fetch_events_music_dept(base_url='https://www.sas.upenn.edu'):
         date = date.text.strip() if date is not None else ''
         details = event_soup.find('div', attrs={'class': 'content'})
         details = '\n'.join([p.text.strip() for p in details.find_all('p')]) if details is not None else ''
+        starttime, endtime = find_startend_time(date)
         events.append({
             'title': title,
             'date': date,
-            'starttime': date,
-            'endtime': date,
+            'starttime': starttime,
+            'endtime': endtime,
             'description': details.strip(),
             'url': event_url,
             'owner': 'Department of Music'
         })
     return events
+
 
 def fetch_events_annenberg(base_url='https://www.asc.upenn.edu'):
     """
@@ -1416,6 +1605,7 @@ def fetch_events_annenberg(base_url='https://www.asc.upenn.edu'):
             title = title.text.strip() if title is not None else ''
             date = event_soup.find('span', attrs={'class': 'date-display-single'})
             date = date.text.strip() if date is not None else ''
+            starttime, endtime = find_startend_time(date)
             location = event_soup.find('div', attrs={'class':'field field-name-field-event-location field-type-text field-label-inline clearfix'})
             location = location.text.strip() if location is not None else ''
             details = event_soup.find('div', attrs={'class': 'field field-name-body field-type-text-with-summary field-label-hidden'})
@@ -1427,8 +1617,8 @@ def fetch_events_annenberg(base_url='https://www.asc.upenn.edu'):
                 'description': details,
                 'url': event_url,
                 'speaker': '',
-                'starttime': '',
-                'endtime': '',
+                'starttime': starttime,
+                'endtime': endtime,
                 'owner': 'Annenberg School of Communication'
             })
         except:
@@ -1452,6 +1642,7 @@ def fetch_events_religious_studies(base_url='https://www.sas.upenn.edu'):
         title = title.text.strip() if title is not None else ''
         date = event_soup.find('span', attrs={'class': 'date-display-single'})
         date = date.text.strip() if date is not None else ''
+        starttime, endtime = find_startend_time(date)
         location = event_soup.find('div', attrs={'class':'field field-type-text field-field-event-location'})
         location = location.text.strip() if location is not None else ''
         details = event_soup.find('div', attrs={'class': 'content'})
@@ -1462,6 +1653,8 @@ def fetch_events_religious_studies(base_url='https://www.sas.upenn.edu'):
             'location': location,
             'description': details,
             'url': event_url,
+            'starttime': starttime, 
+            'endtime': endtime,
             'owner': 'Department of Religious Studies'
         })
     return events
@@ -1483,6 +1676,7 @@ def fetch_events_AHEAD(base_url='http://www.ahead-penn.org'):
         title = title.text.strip() if title is not None else ''
         date = event_soup.find('span', attrs={'class': 'date-display-single'})
         date = date.text.strip() if date is not None else ''
+        starttime, endtime = find_startend_time(date)
         location = event_soup.find('div', attrs={'class':'field field-name-field-location field-type-text field-label-hidden'})
         location = location.text.strip() if location is not None else ''
         details = event_soup.find('div', attrs={'class': 'field field-name-body field-type-text-with-summary field-label-hidden'})
@@ -1493,7 +1687,9 @@ def fetch_events_AHEAD(base_url='http://www.ahead-penn.org'):
             'location': location,
             'description': details,
             'url': event_url,
-            'owner': 'Penn AHEAD'
+            'starttime': starttime, 
+            'endtime': endtime,
+            'owner': 'Penn AHEAD', 
         })
     return events
 
@@ -1516,12 +1712,15 @@ def fetch_events_SPP(base_url='https://www.sp2.upenn.edu'):
         date = date.text.strip() if date is not None else ''
         time = event_soup.find('p', attrs={'class':'event-time-detail'})
         time = time.text.strip() if time is not None else ''
+        starttime, endtime = find_startend_time(time)
+
         details = event_soup.find('div', attrs={'class': 'tribe-events-single-event-description tribe-events-content entry-content description'})
         details = details.text.strip() if details is not None else ''
         events.append({
             'title': title,
             'date': date,
-            'starttime': time,
+            'starttime': starttime,
+            'endtime': endtime,
             'description': details,
             'url': event_url,
             'owner': 'Penn Social Policy & Practice'
@@ -1531,7 +1730,8 @@ def fetch_events_SPP(base_url='https://www.sp2.upenn.edu'):
 
 def fetch_events_ortner_center(base_url='http://ortnercenter.org'):
     """
-    Penn Events for Ortner Center for Violence and Abuse in Relationships
+    Penn Events for Ortner Center for Violence and Abuse in Relationships, 
+    ref: http://ortnercenter.org/updates?tag=events
     """
     page_soup = BeautifulSoup(requests.get(base_url + '/updates?tag=events').content, 'html.parser')
 
@@ -1550,6 +1750,8 @@ def fetch_events_ortner_center(base_url='http://ortnercenter.org'):
         events.append({
             'title': title,
             'date': date,
+            'starttime': '',
+            'endtime': '',
             'description': details,
             'url': event_url,
             'owner': 'Ortner Center for Violence and Abuse in Relationships'
@@ -1570,6 +1772,7 @@ def fetch_event_penn_today(base_url='https://penntoday.upenn.edu'):
             'description': BeautifulSoup(event['body'], 'html.parser').text.strip(),
             'date' : event['start'],
             'starttime': event['starttime'],
+            'endtime': event['endtime'],
             'location': event['location'],
             'url': base_url + event['path'],
             'owner': 'Penn Today Events'
@@ -1578,6 +1781,7 @@ def fetch_event_penn_today(base_url='https://penntoday.upenn.edu'):
 
 
 if __name__ == '__main__':
+    import pandas as pd
     events = []
     fetch_fns = [
         fetch_events_cni, fetch_events_english_dept, fetch_events_crim, 
@@ -1596,3 +1800,6 @@ if __name__ == '__main__':
     ]
     for f in tqdm(fetch_fns):
         events.extend(f())
+    events_df = pd.DateFrame(events)
+    events_df['date_dt'] = events_df['date'].map(lambda x: clean_date_format(x))
+    events_df.to_csv('events.csv', index=False)
