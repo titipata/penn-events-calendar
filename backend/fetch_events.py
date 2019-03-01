@@ -38,13 +38,18 @@ def clean_date_format(d):
     to string in 'DD-MM-YYYY' format
     """
     d = d.replace('Date TBD', '')
+    d = d.replace('EDT', '').replace('Special time:', '')
+    d = d.replace('Wu & Chen Auditorium', '')
+    d = d.replace('-', '')
     d = d.replace('\n', ' ')
+    d = re.sub(r'(\d+\:\d+\s?(?:AM|PM|am|pm|A.M.|P.M.|a.m.|p.m.))', '', d)
+    d = d.replace('-', '').strip()
     if d is not '':
         for pat in PATS:
             if pat.match(d):
                 d = pat.sub(r"\1", d)
-                return parser.parse(d).strftime('%d-%m-%Y')
-        return parser.parse(d).strftime('%d-%m-%Y')
+                return dateutil.parser.parse(d).strftime('%d-%m-%Y')
+        return dateutil.parser.parse(d).strftime('%d-%m-%Y')
     else:
         return ''
 
@@ -565,7 +570,7 @@ def fetch_events_classical_studies(base_url='https://www.classics.upenn.edu'):
                 'url': event_url,
                 'starttime': starttime,
                 'endtime': endtime,
-                'department': 'Department of Classical Studies'
+                'owner': 'Department of Classical Studies'
             })
     return events
 
@@ -585,9 +590,11 @@ def fetch_events_linguistic(base_url='https://www.ling.upenn.edu'):
             title = event_soup.find('h1', attrs={'class': 'title'}).text.strip()
             try:
                 location = event.find('div', attrs={'class': 'field field-type-text field-field-event-location'})
+                location = location.text.strip() if location is not None else ''
             except:
                 location = ''
             date = event_soup.find('span', attrs={'class': 'date-display-single'})
+            date = date.text.strip() if date is not None else ''
             try:
                 starttime = event_soup.find('span', attrs={'class': 'date-display-start'}).text.strip()
             except:
@@ -605,7 +612,7 @@ def fetch_events_linguistic(base_url='https://www.ling.upenn.edu'):
                 'url': event_url,
                 'starttime': starttime,
                 'endtime': endtime,
-                'department': 'Department of Linguistics'
+                'owner': 'Department of Linguistics'
             })
     return events
 
@@ -871,6 +878,7 @@ def fetch_events_CURF(base_url='https://www.curf.upenn.edu'):
         title = event.find('div').text
         event_url = base_url + event.find('a')['href']
         date = event.find('span', attrs={'class': 'date-display-single'})
+        date = date.text.strip() if date is not None else ''
         description = event.find('td', attrs={'class': 'eventbody'}).text.strip()
 
         # scrape description directly from ``event_url``
@@ -1428,7 +1436,7 @@ def fetch_events_law(base_url='https://www.law.upenn.edu/institutes/legalhistory
         https://www.law.upenn.edu/live/calendar/view/event/event_id/{}?user_tz=IT&syntax=%3Cwidget%20type%3D%22events_calendar%22%20priority%3D%22high%22%3E%3Carg%20id%3D%22mini_cal_heat_map%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22exclude_tag%22%3ELibrary%20Hours%3C%2Farg%3E%3Carg%20id%3D%22exclude_tag%22%3ELibrary%20Event%20Private%3C%2Farg%3E%3Carg%20id%3D%22exclude_tag%22%3ECareers%20Calendar%20ONLY%3C%2Farg%3E%3Carg%20id%3D%22exclude_tag%22%3EDocs%20Only%20Event%3C%2Farg%3E%3Carg%20id%3D%22exclude_tag%22%3EPending%20Event%3C%2Farg%3E%3Carg%20id%3D%22exclude_tag%22%3EPrivate%20Event%3C%2Farg%3E%3Carg%20id%3D%22exclude_tag%22%3EOffcampus%3C%2Farg%3E%3Carg%20id%3D%22exclude_group%22%3ERegistrar%3C%2Farg%3E%3Carg%20id%3D%22exclude_group%22%3EAdmitted%20JD%3C%2Farg%3E%3Carg%20id%3D%22placeholder%22%3ESearch%20Calendar%3C%2Farg%3E%3Carg%20id%3D%22disable_timezone%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22thumb_width%22%3E144%3C%2Farg%3E%3Carg%20id%3D%22thumb_height%22%3E144%3C%2Farg%3E%3Carg%20id%3D%22modular%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22default_view%22%3Eweek%3C%2Farg%3E%3C%2Fwidget%3E
         '''.strip().format(event_id)
         event_detail = requests.get(url=event_url).json()
-        event_time = BeautifulSoup(event_detail['event']['date_time']).text
+        event_time = BeautifulSoup(event_detail['event']['date_time'], 'html.parser').text
         starttime, endtime = find_startend_time(event_time)
         events.append({
             'date': event_detail['title'],
@@ -1800,6 +1808,6 @@ if __name__ == '__main__':
     ]
     for f in tqdm(fetch_fns):
         events.extend(f())
-    events_df = pd.DateFrame(events)
+    events_df = pd.DataFrame(events).fillna('')
     events_df['date_dt'] = events_df['date'].map(lambda x: clean_date_format(x))
     events_df.to_csv('events.csv', index=False)
