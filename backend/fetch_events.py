@@ -936,7 +936,7 @@ def fetch_events_upibi(base_url='http://upibi.org/events/list/?tribe_paged=1&tri
                 'url': event_url,
                 'date': date,
                 'location': location,
-                'startime': starttime,
+                'starttime': starttime,
                 'endtime': endtime,
                 'owner': 'Institute for Biomedical Informatics (UPIBI)'
             })
