@@ -493,25 +493,18 @@ def fetch_events_philosophy(base_url='https://philosophy.sas.upenn.edu'):
         for li in events_list:
             event_url = base_url + li.find('a')['href']
             title = li.find('h3').text.strip()
-            date = li.find('p', attrs={'class': 'dateline'}).text
-            location = li.find('div', attrs={'class': 'location'}).text
-            department = 'Department of Philosophy'
-
+            date = li.find('p', attrs={'class': 'dateline'})
+            date = date.text.strip() if date is not None else ''
+            location = li.find('div', attrs={'class': 'location'})
+            location = location.text.strip() if location is not None else ''
+            
             event_page = requests.get(event_url)
             event_soup = BeautifulSoup(event_page.content, 'html.parser')
-            try:
-                starttime = event_soup.find('div', attrs={'class': 'field-date'})
-            except:
-                starttime = ''
-            try:
-                endtime = starttime + timedelta(hours=1)
-            except:
-                endtime = ''
+            event_time = event_soup.find('div', attrs={'class': 'field-date'})
+            event_time = event_time.text.strip() if event_time is not None else ''
+            starttime, endtime = find_startend_time(event_time)
             description = event_soup.find('div', attrs={'class': 'field-body'})
-            if description is not None:
-                description = description.text.strip()
-            else:
-                description = ''
+            description = description.text.strip() if description is not None else ''
 
             events.append({
                 'title': title,
@@ -520,7 +513,8 @@ def fetch_events_philosophy(base_url='https://philosophy.sas.upenn.edu'):
                 'description': description,
                 'url': event_url,
                 'starttime': starttime,
-                'endtime': endtime
+                'endtime': endtime, 
+                'owner': 'Department of Philosophy'
             })
     return events
 
