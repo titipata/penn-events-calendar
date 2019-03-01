@@ -564,7 +564,7 @@ def fetch_events_classical_studies(base_url='https://www.classics.upenn.edu'):
                 'description': description,
                 'url': event_url,
                 'starttime': starttime,
-                'endtime': endtime
+                'endtime': endtime,
                 'department': 'Department of Classical Studies'
             })
     return events
@@ -716,7 +716,7 @@ def fetch_events_sociology(base_url='https://sociology.sas.upenn.edu'):
             if len(event_url) != 0:
                 event_page = BeautifulSoup(requests.get(event_url).content, 'html.parser')
                 try:
-                    description = event_page.find('div', attrs{'class': 'field field-type-text field-field-event-title'}).text.strip()
+                    description = event_page.find('div', attrs={'class': 'field field-type-text field-field-event-title'}).text.strip()
                 except:
                     description = ''
                 try:
@@ -730,12 +730,12 @@ def fetch_events_sociology(base_url='https://sociology.sas.upenn.edu'):
             events.append({
                 'title': title,
                 'date': date,
+                'starttime': starttime,
+                'endtime': endtime,
                 'location': location,
                 'description': description,
                 'url': event_url,
-                'owner': 'Sociology Department',
-                'starttime': starttime,
-                'endtime': endtime
+                'owner': 'Sociology Department'
             })
     return events
 
