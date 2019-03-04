@@ -52,6 +52,7 @@ class GetEvent(Resource):
 
         # add school query, parse datetime
         events_query = []
+
         for event in events:
             event['owner_query'] = '-'.join(event['owner'].lower().replace('/', ' ').split())
             try:
@@ -60,10 +61,19 @@ class GetEvent(Resource):
                 event['date_dt'] = datetime.today()
             events_query.append(event)
 
+        # filter days
         if args['days'] is not None:
             date_retrieve = datetime.today() + timedelta(days=args['days'])
             events_query = list(filter(lambda x: x['date_dt'] >= datetime.today() and x['date_dt'] <= date_retrieve,
                                 events_query))
+
+        # filter owners
+        if args['owner'] is not None:
+            events_query = list(filter(lambda x: x['category'].lower() == args['category'],
+                                events_query))
+
+        for event in events_query:
+            event['date_dt'] = event['date_dt'].strftime("%A, %d %B")
 
         # remove
         for event in events_query:

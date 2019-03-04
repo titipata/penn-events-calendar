@@ -70,7 +70,7 @@ const DetailBox = ({
 
 DetailBox.propTypes = {
   eventDetail: PropTypes.shape({
-    category: PropTypes.string.isRequired,
+    // category: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
     location: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,

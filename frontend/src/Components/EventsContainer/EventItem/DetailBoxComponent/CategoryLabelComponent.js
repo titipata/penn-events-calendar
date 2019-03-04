@@ -43,7 +43,7 @@ const CategoryLabel = ({
       <StyledCat color={DataColor.getSchoolColor(eventCategoryData.school)}>
         {eventCategoryData.school}
       </StyledCat>
-      {
+      {/* {
         !eventCategoryData.school.includes(eventCategoryData.category.split(/ |,\\\//)[0]) ?
         (
           <StyledCat color={DataColor.getCatColor(eventCategoryData.category)}>
@@ -51,7 +51,7 @@ const CategoryLabel = ({
           </StyledCat>
         ) :
         null
-      }
+      } */}
     </StyledGroup>
     {
       eventCategoryData.description && !isDescriptionExpanded ?
@@ -77,9 +77,9 @@ const CategoryLabel = ({
 
 CategoryLabel.propTypes = {
   eventCategoryData: PropTypes.shape({
-    category: PropTypes.string.isRequired,
+    // category: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
-    school: PropTypes.string.isRequired,
+    // school: PropTypes.string.isRequired,
   }).isRequired,
   isDescriptionExpanded: PropTypes.bool.isRequired,
   onCollapseClick: PropTypes.func.isRequired,
