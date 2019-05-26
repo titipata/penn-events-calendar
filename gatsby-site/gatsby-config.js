@@ -16,5 +16,13 @@ module.exports = {
       },
     },
     'gatsby-plugin-eslint',
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        name: `data`,
+        path: `${__dirname}/data/`,
+      },
+    },
+    `gatsby-transformer-csv`,
   ],
 };
