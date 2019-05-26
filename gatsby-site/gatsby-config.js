@@ -1,4 +1,7 @@
 module.exports = {
+  siteMetadata: {
+    title: 'Penn Event Calendar',
+  },
   plugins: [
     {
       resolve: `gatsby-plugin-typography`,

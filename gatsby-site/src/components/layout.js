@@ -4,16 +4,10 @@ import { Link } from 'gatsby';
 import PropTypes from 'prop-types';
 
 import { rhythm } from '../utils/typography';
+import Container from './BaseComponents/container';
 
 const Layout = ({ children }) => (
-  <div
-    css={css`
-      margin: 0 auto;
-      max-width: 700px;
-      padding: ${rhythm(2)};
-      padding-top: ${rhythm(1.5)};
-    `}
-  >
+  <Container>
     <Link to="/">
       <h3
         css={css`
@@ -34,7 +28,7 @@ const Layout = ({ children }) => (
       About
     </Link>
     {children}
-  </div>
+  </Container>
 );
 
 Layout.propTypes = {
