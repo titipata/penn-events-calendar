@@ -19,10 +19,12 @@
     "gatsby-plugin-typography": "^2.2.13",
     "gatsby-source-filesystem": "^2.0.37",
     "gatsby-transformer-csv": "^2.0.8",
+    "moment": "^2.24.0",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-typography": "^0.16.19",
+    "shortid": "^2.2.14",
     "styled-components": "^4.2.0",
     "typography": "^0.16.19",
     "typography-theme-moraga": "^0.16.19"
