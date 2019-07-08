@@ -88,16 +88,15 @@ class EventItem extends Component {
             location={location}
             owner={owner}
             url={url}
-            // when expanded
-            description={description}
-            speaker={speaker}
           />
         </StyledContentWrapper>
         {
           descriptionVisible && description
             ? (
               <DescriptionBox
-                eventDescription={this.props.ev.description}
+                // when expanded
+                description={description}
+                speaker={speaker}
               />
             )
             : null
