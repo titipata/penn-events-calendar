@@ -7,7 +7,7 @@ export default ({ data }) => (
   <Layout>
     <h1>Upcoming Events</h1>
     <EventsContainer
-      events={data.allEventsCsv.edges}
+      allEvents={data.allEventsCsv.edges}
     />
     {/* <div>
       {

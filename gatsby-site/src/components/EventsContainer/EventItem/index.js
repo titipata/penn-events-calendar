@@ -2,9 +2,9 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import styled from 'styled-components';
 // import { DataColor } from '../../../Data';
-// import DetailBox from './DetailBoxComponent';
-// import TimeBox from './TimeBoxComponent';
-// import DescriptionBox from './DescriptionBoxComponent';
+import ContentBox from './Components/ContentBox';
+import TimeBox from './Components/TimeBox';
+import DescriptionBox from './Components/DescriptionBox';
 
 const StyledListItem = styled.li`
   margin-bottom: 5px;
@@ -57,7 +57,7 @@ class EventItem extends Component {
     //   category, description, location, title, school, url,
     // });
     const { descriptionVisible } = this.state;
-    const { eventDetail } = this.props;
+    const { eventData } = this.props;
     const {
       // id,
       // date_dt,
@@ -69,20 +69,21 @@ class EventItem extends Component {
       owner,
       location,
       url,
-    } = eventDetail;
+    } = eventData;
 
     return (
-      <StyledListItem
-        // onClick={this._handleCardClick}
-        // color={DataColor.getCatColor(this.props.ev.category)}
-        // cursorPointer={this.props.ev.description && !this.state.descriptionVisible}
-      >
+      // <StyledListItem
+      // onClick={this._handleCardClick}
+      // color={DataColor.getCatColor(this.props.ev.category)}
+      // cursorPointer={this.props.ev.description && !this.state.descriptionVisible}
+      // >
+      <StyledListItem>
         <StyledContentWrapper>
           <TimeBox
             starttime={starttime}
             endtime={endtime}
           />
-          <DetailBox
+          <ContentBox
             // show by default
             title={title}
             location={location}
@@ -107,7 +108,7 @@ class EventItem extends Component {
 }
 
 EventItem.propTypes = {
-  eventDetail: PropTypes.shape({
+  eventData: PropTypes.shape({
     id: PropTypes.string,
     date_dt: PropTypes.string,
     title: PropTypes.string,

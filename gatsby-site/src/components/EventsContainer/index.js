@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 import { Events as evUtil, Key } from '../../utils';
-// import EventsList from './EventsList';
+import EventList from './EventList';
 
 const StyledSectionText = styled.div`
   font-family: 'Source Code Pro';
@@ -14,8 +14,8 @@ const StyledSectionText = styled.div`
   /* text-align: center; */
 `;
 
-const EventsContainer = ({ events }) => {
-  const groupedByDates = evUtil.groupByDate(events);
+const EventsContainer = ({ allEvents }) => {
+  const groupedByDates = evUtil.groupByDate(allEvents);
 
   return groupedByDates.map(grp => (
     <React.Fragment key={Key.getShortKey()}>
@@ -24,16 +24,15 @@ const EventsContainer = ({ events }) => {
         &nbsp;
         <h2>{grp.dateFormatted}</h2>
       </StyledSectionText>
-      {/* <EventsList
-        events={grp.events}
-        similarEvents={getSimilarEvents}
-      /> */}
+      <EventList
+        groupedEvents={grp.events}
+      />
     </React.Fragment>
   ));
 };
 
 EventsContainer.propTypes = {
-  events: PropTypes.arrayOf(Object).isRequired,
+  allEvents: PropTypes.arrayOf(Object).isRequired,
 };
 
 export default EventsContainer;
