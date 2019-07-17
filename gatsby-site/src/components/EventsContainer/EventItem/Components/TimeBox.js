@@ -36,8 +36,13 @@ const TimeBox = ({ starttime, endtime }) => (
 );
 
 TimeBox.propTypes = {
-  starttime: PropTypes.string.isRequired,
-  endtime: PropTypes.string.isRequired,
+  starttime: PropTypes.string,
+  endtime: PropTypes.string,
+};
+
+TimeBox.defaultProps = {
+  starttime: null,
+  endtime: null,
 };
 
 export default TimeBox;

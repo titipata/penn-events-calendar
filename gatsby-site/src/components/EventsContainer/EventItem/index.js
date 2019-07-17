@@ -69,7 +69,7 @@ class EventItem extends Component {
       owner,
       location,
       url,
-    } = eventData;
+    } = eventData.node;
 
     return (
       // <StyledListItem
