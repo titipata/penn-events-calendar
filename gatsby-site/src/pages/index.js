@@ -62,8 +62,8 @@ export const query = graphql`
           date_dt
           title
           description
-          starttime
-          endtime
+          starttime_dt
+          endtime_dt
           speaker
           owner
           location

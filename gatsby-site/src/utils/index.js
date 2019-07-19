@@ -13,8 +13,13 @@ class Datetime {
   }
 
   static getTime(timeStr) {
-    // console.log(moment(timeStr, 'HH:mm:ss').format('LT'));
-    return moment(timeStr, 'HH:mm:ss').format('HH:MM A');
+    if (!timeStr) {
+      return '';
+    }
+    if (timeStr === 'allday') {
+      return 'All day';
+    }
+    return moment(timeStr, 'HH:mm:ss').format('LT');
   }
 
   static getDayMonthDate(timeStr) {

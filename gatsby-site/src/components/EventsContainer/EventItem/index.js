@@ -58,13 +58,14 @@ class EventItem extends Component {
     // });
     const { descriptionVisible } = this.state;
     const { eventData } = this.props;
+    const { node } = eventData;
     const {
       // id,
       // date_dt,
       title,
       description,
-      starttime,
-      endtime,
+      // starttime_dt,
+      // endtime_dt,
       speaker,
       owner,
       location,
@@ -80,8 +81,8 @@ class EventItem extends Component {
       <StyledListItem>
         <StyledContentWrapper>
           <TimeBox
-            starttime={starttime}
-            endtime={endtime}
+            starttime={node.starttime_dt}
+            endtime={node.endtime_dt}
           />
           <ContentBox
             // show by default
@@ -113,8 +114,8 @@ EventItem.propTypes = {
     date_dt: PropTypes.string,
     title: PropTypes.string,
     description: PropTypes.string,
-    starttime: PropTypes.string,
-    endtime: PropTypes.string,
+    starttime_dt: PropTypes.string,
+    endtime_dt: PropTypes.string,
     speaker: PropTypes.string,
     owner: PropTypes.string,
     location: PropTypes.string,
