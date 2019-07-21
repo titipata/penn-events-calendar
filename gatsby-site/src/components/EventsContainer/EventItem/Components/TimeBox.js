@@ -7,9 +7,11 @@ const DatetimeWrapper = styled.div`
   font-size: 2rem;
   align-items: center;
   justify-content: center;
-  padding: 0 20px;
+  padding-left: 15px;
   display: flex;
   flex-direction: column;
+  width: 4.65rem;
+  min-width: 4.65rem;
 `;
 
 // const StyledDate = styled.div`
@@ -23,17 +25,38 @@ const StyledTime = styled.div`
   display: inline-flex;
 `;
 
-const TimeBox = ({ starttime, endtime }) => (
-  <DatetimeWrapper>
-    <StyledTime>
-      {dtutil.getTime(starttime)}
-      <br />
-      -
-      <br />
-      {dtutil.getTime(endtime)}
-    </StyledTime>
-  </DatetimeWrapper>
-);
+const TimeBox = ({ starttime, endtime }) => {
+  let singleTime = null;
+  let plusTime = null;
+  if (starttime === endtime) {
+    if (!starttime || !endtime) {
+      singleTime = '-';
+    } else if (starttime.includes('allday')) {
+      singleTime = 'All day';
+    } else {
+      plusTime = dtutil.getAssumedEndtime(endtime);
+    }
+  }
+
+  return (
+    <DatetimeWrapper>
+      {
+        !singleTime
+          ? (
+            <React.Fragment>
+              <StyledTime>
+                {dtutil.getTime(starttime)}
+              </StyledTime>
+              <StyledTime>
+                {plusTime || dtutil.getTime(endtime)}
+              </StyledTime>
+            </React.Fragment>
+          )
+          : <StyledTime>{singleTime}</StyledTime>
+      }
+    </DatetimeWrapper>
+  );
+};
 
 TimeBox.propTypes = {
   starttime: PropTypes.string,

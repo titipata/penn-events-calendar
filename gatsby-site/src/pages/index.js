@@ -1,7 +1,21 @@
+import { library } from '@fortawesome/fontawesome-svg-core';
+import {
+  faBookmark, faCalendarAlt, faChevronCircleDown,
+  faChevronCircleUp, faClock, faCopy, faExternalLinkAlt,
+  faFileAlt, faMapMarkerAlt, faSchool, faUniversity, faUserTie,
+} from '@fortawesome/free-solid-svg-icons';
 import { graphql } from 'gatsby';
 import React from 'react';
-import Layout from '../components/layout';
 import EventsContainer from '../components/EventsContainer';
+import Layout from '../components/layout';
+
+// add fa font to use
+library.add(
+  faCalendarAlt, faMapMarkerAlt, faClock, faFileAlt,
+  faExternalLinkAlt, faUserTie, faSchool, faUniversity,
+  faBookmark, faChevronCircleDown, faChevronCircleUp,
+  faCopy,
+);
 
 export default ({ data }) => (
   <Layout>

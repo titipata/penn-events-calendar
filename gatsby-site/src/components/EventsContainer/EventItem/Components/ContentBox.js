@@ -1,4 +1,4 @@
-// import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
+import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
 import React from 'react';
 // import renderHTML from 'react-render-html';
@@ -7,7 +7,7 @@ import styled from 'styled-components';
 
 const DetailWrapper = styled.div`
   padding: 0 15px;
-  flex: 1;
+  /* flex: 1; */
 `;
 
 const StyledTitle = styled.div`
@@ -53,8 +53,7 @@ const DetailBox = ({
         url
           ? (
             <StyledLinkIcon href={url}>
-              test
-              {/* <Fa icon="external-link-alt" /> */}
+              <Fa icon="external-link-alt" />
             </StyledLinkIcon>
           )
           : null
