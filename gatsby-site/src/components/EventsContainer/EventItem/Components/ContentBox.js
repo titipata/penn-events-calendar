@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 // import renderHTML from 'react-render-html';
 import styled from 'styled-components';
-// import CategoryLabel from './CategoryLabel';
+import CategoryLabel from './CategoryLabel';
 
 const DetailWrapper = styled.div`
   padding: 0 15px;
@@ -26,23 +26,21 @@ const StyledLinkIcon = styled.a.attrs({
 })`
   font-weight: lighter;
   font-size: 1rem;
-  padding-left: 8px;
+  margin-left: 8px;
   color: #555;
   cursor: pointer;
 `;
 
-// // https://stackoverflow.com/a/39333479/4010864
-// // pick only keys that are used in category
-// const getEventCategoryData = ({
-//   category, description, school,
-// }) => ({
-//   category, description, school,
-// });
+const StyledMarkerIcon = styled(Fa).attrs({
+  icon: 'map-marker-alt',
+})`
+  margin-right: 8px;
+`;
 
 const DetailBox = ({
   title,
   location,
-  // owner,
+  owner,
   url,
 }) => (
   <DetailWrapper>
@@ -60,30 +58,29 @@ const DetailBox = ({
       }
     </StyledTitle>
     <StyledLocation>
-      {/* <Fa icon="map-marker-alt" /> */}
-      test
+      <StyledMarkerIcon />
       {/* {renderHTML(eventDetail.location)} */}
       {location}
     </StyledLocation>
-    {/* <CategoryLabel
-      eventCategoryData={getEventCategoryData(eventDetail)}
-      isDescriptionExpanded={isDescriptionExpanded}
-      onCollapseClick={onCollapseClick}
-    /> */}
+    <CategoryLabel
+      owner={owner}
+      // isDescriptionExpanded={isDescriptionExpanded}
+      // onCollapseClick={onCollapseClick}
+    />
   </DetailWrapper>
 );
 
 DetailBox.propTypes = {
   title: PropTypes.string,
   location: PropTypes.string,
-  // owner: PropTypes.string,
+  owner: PropTypes.string,
   url: PropTypes.string,
 };
 
 DetailBox.defaultProps = {
   title: null,
   location: null,
-  // owner: null,
+  owner: null,
   url: null,
 };
 

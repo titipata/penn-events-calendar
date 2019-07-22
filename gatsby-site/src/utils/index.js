@@ -54,4 +54,23 @@ class Events {
   }
 }
 
-export { Events, Datetime, Key };
+// get a random hex from input text
+const getRandomColorFromText = (text) => {
+  if (!text) {
+    return '#000000';
+  }
+
+  const hex = text
+    .split('')
+    .map(x => (
+      Number(x.charCodeAt(0))
+    ).toString(16))
+    .join('')
+    .substring(1, 7);
+
+  return `#${hex}`;
+};
+
+export {
+  Events, Datetime, Key, getRandomColorFromText,
+};

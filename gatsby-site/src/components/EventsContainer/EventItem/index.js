@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import styled from 'styled-components';
-// import { DataColor } from '../../../Data';
 import ContentBox from './Components/ContentBox';
 import TimeBox from './Components/TimeBox';
 import DescriptionBox from './Components/DescriptionBox';
+import { getRandomColorFromText } from '../../../utils';
 
 const StyledListItem = styled.li`
   margin-bottom: 5px;
@@ -78,7 +78,10 @@ class EventItem extends Component {
       // color={DataColor.getCatColor(this.props.ev.category)}
       // cursorPointer={this.props.ev.description && !this.state.descriptionVisible}
       // >
-      <StyledListItem>
+      <StyledListItem
+        color={getRandomColorFromText(owner)}
+        cursorPointer
+      >
         <StyledContentWrapper>
           <TimeBox
             starttime={node.starttime_dt}
