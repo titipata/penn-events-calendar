@@ -27,20 +27,21 @@ class EventItem extends Component {
       descriptionVisible: false,
     };
 
-    // this._handleCardClick = this._handleCardClick.bind(this);
+    this._handleCardClick = this._handleCardClick.bind(this);
     // this._handleCollapseClick = this._handleCollapseClick.bind(this);
   }
 
-  // _handleCardClick() {
-  //   // dispatch event id to get similar events on click
-  //   this.props.similarEvents(this.props.ev.event_id);
+  _handleCardClick() {
+    // const { similarEvents, ev } = this.props;
+    // const { descriptionVisible } = this.state;
 
-  //   if (!this.state.descriptionVisible) {
-  //     this.setState({
-  //       descriptionVisible: true,
-  //     });
-  //   }
-  // }
+    // dispatch event id to get similar events on click
+    // similarEvents(ev.event_id);
+
+    this.setState(prev => ({
+      descriptionVisible: !prev.descriptionVisible,
+    }));
+  }
 
   // _handleCollapseClick() {
   //   this.setState({
@@ -80,7 +81,8 @@ class EventItem extends Component {
       // >
       <StyledListItem
         color={getRandomColorFromText(owner)}
-        cursorPointer
+        cursorPointer={description}
+        onClick={this._handleCardClick}
       >
         <StyledContentWrapper>
           <TimeBox
@@ -93,6 +95,8 @@ class EventItem extends Component {
             location={location}
             owner={owner}
             url={url}
+            description={description}
+            isDescriptionExpanded={descriptionVisible}
           />
         </StyledContentWrapper>
         {

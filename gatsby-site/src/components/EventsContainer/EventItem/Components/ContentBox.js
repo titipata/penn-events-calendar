@@ -7,7 +7,7 @@ import CategoryLabel from './CategoryLabel';
 
 const DetailWrapper = styled.div`
   padding: 0 15px;
-  /* flex: 1; */
+  flex: 1;
 `;
 
 const StyledTitle = styled.div`
@@ -42,6 +42,8 @@ const DetailBox = ({
   location,
   owner,
   url,
+  description,
+  isDescriptionExpanded,
 }) => (
   <DetailWrapper>
     <StyledTitle>
@@ -64,7 +66,8 @@ const DetailBox = ({
     </StyledLocation>
     <CategoryLabel
       owner={owner}
-      // isDescriptionExpanded={isDescriptionExpanded}
+      description={description}
+      isDescriptionExpanded={isDescriptionExpanded}
       // onCollapseClick={onCollapseClick}
     />
   </DetailWrapper>
@@ -75,6 +78,8 @@ DetailBox.propTypes = {
   location: PropTypes.string,
   owner: PropTypes.string,
   url: PropTypes.string,
+  description: PropTypes.string,
+  isDescriptionExpanded: PropTypes.bool.isRequired,
 };
 
 DetailBox.defaultProps = {
@@ -82,6 +87,7 @@ DetailBox.defaultProps = {
   location: null,
   owner: null,
   url: null,
+  description: null,
 };
 
 export default DetailBox;

@@ -19,19 +19,28 @@ const StyledHeader = styled.div`
 const StyledContent = styled.div`
   color: #222;
   text-indent: 1.15rem;
-  padding: 0 1.15rem;
-  padding-top: 0.75rem;
+  padding: 0.5rem 1.15rem;
+  /* padding-top: 0.75rem; */
   line-height: 1.3rem;
+  margin-bottom: 5px;
 `;
 
 const DescriptionBox = ({ description, speaker }) => (
   <StyledDescriptionBox>
-    <StyledHeader>
-      Speaker:
-    </StyledHeader>
-    <StyledContent>
-      {speaker}
-    </StyledContent>
+    {
+      speaker
+        ? (
+          <React.Fragment>
+            <StyledHeader>
+              Speaker:
+            </StyledHeader>
+            <StyledContent>
+              {speaker}
+            </StyledContent>
+          </React.Fragment>
+        )
+        : null
+    }
     <StyledHeader>
       Description:
     </StyledHeader>

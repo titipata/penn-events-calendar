@@ -1,4 +1,4 @@
-// import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
+import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
@@ -22,10 +22,10 @@ const StyledCat = styled.div`
   margin-right: 5px;
 `;
 
-// const StyledSpan = styled.span`
-//   cursor: pointer;
-//   color: ${props => `${props.color}A6`};
-// `;
+const StyledSpan = styled.span`
+  cursor: pointer;
+  color: ${props => `${props.color}A6`};
+`;
 
 const StyledGroup = styled.div`
   display: inline-flex;
@@ -35,7 +35,8 @@ const StyledGroup = styled.div`
 
 const CategoryLabel = ({
   owner,
-  // isDescriptionExpanded,
+  description,
+  isDescriptionExpanded,
   // onCollapseClick,
 }) => (
   <CatContainer>
@@ -43,59 +44,38 @@ const CategoryLabel = ({
       <StyledCat color={getRandomColorFromText(owner)}>
         {owner}
       </StyledCat>
-      {/* {
-        !owner.includes(owner.split(/ |,\\\//)[0])
-          ? (
-            <StyledCat color={getRandomColorFromText(owner)}>
-              {owner}
-            </StyledCat>
-          )
-          : null
-      } */}
     </StyledGroup>
-    {/* {
-      eventCategoryData.description && !isDescriptionExpanded
+    {
+      description
         ? (
           <StyledSpan
-            color={getRandomColorFromText(eventCategoryData.category)}
+            color={getRandomColorFromText(owner)}
           >
           See Details
             {' '}
-            <Fa icon="chevron-circle-down" />
+            <Fa icon={`chevron-circle-${isDescriptionExpanded ? 'up' : 'down'}`} />
           </StyledSpan>
         )
         : null
-    } */}
-    {/* {
-      eventCategoryData.description && isDescriptionExpanded
-        ? (
-          <StyledSpan
-            color={getRandomColorFromText(eventCategoryData.category)}
-            onClick={onCollapseClick}
-          >
-          Collapse
-            {' '}
-            <Fa icon="chevron-circle-up" />
-          </StyledSpan>
-        )
-        : null
-    } */}
+    }
   </CatContainer>
 );
 
 CategoryLabel.propTypes = {
   owner: PropTypes.string,
+  description: PropTypes.string,
   // eventCategoryData: PropTypes.shape({
   //   category: PropTypes.string.isRequired,
   //   description: PropTypes.string.isRequired,
   //   school: PropTypes.string.isRequired,
   // }).isRequired,
-  // isDescriptionExpanded: PropTypes.bool.isRequired,
+  isDescriptionExpanded: PropTypes.bool.isRequired,
   // onCollapseClick: PropTypes.func.isRequired,
 };
 
 CategoryLabel.defaultProps = {
   owner: null,
+  description: null,
 };
 
 export default CategoryLabel;
