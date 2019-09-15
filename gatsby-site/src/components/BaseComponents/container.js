@@ -41,4 +41,8 @@ const Container = styled.div`
   `}
 `;
 
-export default Container;
+const NavContainer = styled(Container)`
+  padding: 0 ${rhythm(2)};
+`;
+
+export { Container, NavContainer };

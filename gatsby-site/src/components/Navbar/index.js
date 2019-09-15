@@ -1,72 +1,57 @@
-import PropTypes from 'prop-types';
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Container } from '../BaseComponents';
+import { NavContainer } from '../BaseComponents/container';
 
-const pennLogo = require('../../images/penn-logo.png');
+// get logo image using require
+const pennLogoURI = require('../../images/penn-logo.png');
 
-const navHeight = '3.75rem';
+// variables
+const navHeight = 60;
 
-const StyledNavBar = styled.div`
-  font-family: 'Open Sans';
-  height: auto;
-  color: white;
-  /* background-color: #1E303C; */
-  background-color: white;
-
-  display: flex;
-  align-items: center;
-
-  padding-top: 15px;
-  padding-bottom: 5px;
-`;
-
-const NavContainer = Container.extend`
-  /* https://stackoverflow.com/a/30426639/4010864 */
-  flex-basis: auto; /* default value */
-  flex-grow: 0;
-  display: flex;
-  flex-direction: column;
-  /* justify-content: space-between; */
-`;
-
-const StyledBrandText = styled.div`
-  align-items: center;
-  color: #1E303C;
-  /* display: flex; */
-  font-size: 1.05rem;
-  font-weight: bold;
-  padding-top: 5px;
-  text-align: center;
-`;
-
-const LogoWrapper = styled.div`
-  padding: 0 15px;
-  display: flex;
-  align-items: center;
+// navbar component
+const Navbar = styled.nav`
+  background-color: #fff;
+  height: ${navHeight}px;
   justify-content: center;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.19);
 `;
 
-const StyledLogo = styled.img`
-  height: ${navHeight};
+// nav is fixed, so it needs padder underneath
+const NavPadder = styled.div`
+  height: ${navHeight}px;
+`;
+
+const StyledImg = styled.img`
+  margin: 0;
+  height: ${navHeight}px;
+  width: auto;
+  justify-self: flex-start;
   mix-blend-mode: multiply;
+  padding: 6px 0;
 `;
 
-const NavBar = ({ brandname }) => (
-  <StyledNavBar>
-    <NavContainer>
-      <LogoWrapper>
-        <StyledLogo src={pennLogo} alt="Logo" />
-      </LogoWrapper>
-      <StyledBrandText>
-        { brandname }
-      </StyledBrandText>
-    </NavContainer>
-  </StyledNavBar>
+const NavbarComponent = ({ children }) => (
+  <React.Fragment>
+    <Navbar>
+      <NavContainer>
+        <StyledImg src={pennLogoURI} alt="Penn Logo" />
+        { children }
+      </NavContainer>
+    </Navbar>
+    <NavPadder />
+  </React.Fragment>
 );
 
-NavBar.propTypes = {
-  brandname: PropTypes.string.isRequired,
+NavbarComponent.propTypes = {
+  children: PropTypes.node,
 };
 
-export default NavBar;
+NavbarComponent.defaultProps = {
+  children: null,
+};
+
+export default NavbarComponent;
