@@ -1,9 +1,7 @@
 import React from 'react';
-import { css } from 'styled-components';
 import { Link } from 'gatsby';
 import PropTypes from 'prop-types';
 
-// import { rhythm } from '../utils/typography';
 import { Container } from './BaseComponents/container';
 import NavBar from './Navbar';
 
@@ -13,13 +11,13 @@ const Layout = ({ children }) => (
       <Link to="/">
         Home
       </Link>
+      <Link to="/">
+        Selected Events
+      </Link>
       <Link
         to="/about/"
-        css={css`
-          float: right;
-        `}
       >
-        About
+        Recommendations
       </Link>
     </NavBar>
     <Container>

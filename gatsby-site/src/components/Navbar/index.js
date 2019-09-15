@@ -11,9 +11,8 @@ const navHeight = 60;
 
 // navbar component
 const Navbar = styled.nav`
-  background-color: #fff;
+  background-color: #fefefe;
   height: ${navHeight}px;
-  justify-content: center;
   position: fixed;
   top: 0;
   width: 100%;
@@ -25,21 +24,63 @@ const NavPadder = styled.div`
   height: ${navHeight}px;
 `;
 
-const StyledImg = styled.img`
+// nav items container using ul/li
+const NavList = styled.ul`
+  /* flex 1 makes it a flex 1 to its parent */
+  flex: 1;
+  /* display flex makes its children has flex effect */
+  display: flex;
+  flex-direction: row;
+  list-style-type: none;
   margin: 0;
+  padding: 0;
+  /* put all children items to the right */
+  justify-content: flex-end;
+`;
+
+const NavItem = styled.li`
+  display: flex;
+  margin: 0;
+  padding: 0 20px;
+  /* control height of this item here */
   height: ${navHeight}px;
   width: auto;
-  justify-self: flex-start;
-  mix-blend-mode: multiply;
+  justify-content: center;
+  align-items: center;
+`;
+
+const LogoWrapper = styled.div`
+  display: flex;
+  /* determine image size here */
+  height: ${navHeight}px;
   padding: 6px 0;
 `;
+
+const StyledImg = styled.img`
+  margin: 0;
+  /* this fix image color by multiplying color of image through bg */
+  mix-blend-mode: multiply;
+  /* grow to fit its wrapper */
+  height: 100%;
+`;
+
 
 const NavbarComponent = ({ children }) => (
   <React.Fragment>
     <Navbar>
       <NavContainer>
-        <StyledImg src={pennLogoURI} alt="Penn Logo" />
-        { children }
+        <LogoWrapper>
+          <StyledImg src={pennLogoURI} alt="Penn Logo" />
+        </LogoWrapper>
+        {
+          children
+            ? (
+              <NavList>
+                { children.map(x => <NavItem>{x}</NavItem>) }
+              </NavList>
+            )
+            : null
+        }
       </NavContainer>
     </Navbar>
     <NavPadder />

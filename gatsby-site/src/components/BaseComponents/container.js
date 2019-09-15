@@ -12,9 +12,7 @@ const bsContainerWidth = {
 };
 
 const Container = styled.div`
-  flex: 1;
   margin: 0 auto;
-  justify-content: center;
   padding: ${rhythm(2)};
   padding-top: ${rhythm(1.5)};
 
@@ -42,7 +40,19 @@ const Container = styled.div`
 `;
 
 const NavContainer = styled(Container)`
+  display: flex;
+  flex-direction: row;
   padding: 0 ${rhythm(2)};
+
+  ${media.small`
+    width: ${bsContainerWidth.small};
+    padding: 0 ${rhythm(0.25)};
+  `}
+
+  ${media.extraSmall`
+    width: 100%;
+    padding: 0 ${rhythm(0.25)};
+  `}
 `;
 
 export { Container, NavContainer };
