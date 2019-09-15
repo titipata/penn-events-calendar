@@ -1,12 +1,22 @@
 import React from 'react';
 import { Link } from 'gatsby';
 import PropTypes from 'prop-types';
+import styled from 'styled-components';
 
 import { Container } from './BaseComponents/container';
 import NavBar from './Navbar';
+import Footer from './Footer';
+
+const StickyFooterWrapper = styled.div`
+  /* sticky footer */
+  display: flex;
+  height: 100%;
+  min-height: 100vh;
+  flex-direction: column;
+`;
 
 const Layout = ({ children }) => (
-  <React.Fragment>
+  <StickyFooterWrapper>
     <NavBar>
       <Link to="/">
         Home
@@ -20,10 +30,13 @@ const Layout = ({ children }) => (
         Recommendations
       </Link>
     </NavBar>
+
     <Container>
       {children}
     </Container>
-  </React.Fragment>
+
+    <Footer />
+  </StickyFooterWrapper>
 );
 
 Layout.propTypes = {

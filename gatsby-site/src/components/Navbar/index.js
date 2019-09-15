@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { NavContainer } from '../BaseComponents/container';
 
+// TODO: responsive menu items => hamburger
+
 // get logo image using require
 const pennLogoURI = require('../../images/penn-logo.png');
 
