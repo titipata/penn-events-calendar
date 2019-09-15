@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { NavContainer } from '../BaseComponents/container';
+import { Key } from '../../utils';
 
 // TODO: responsive menu items => hamburger
 
@@ -78,7 +79,13 @@ const NavbarComponent = ({ children }) => (
           children
             ? (
               <NavList>
-                { children.map(x => <NavItem>{x}</NavItem>) }
+                {
+                  children.map(child => (
+                    <NavItem key={Key.getShortKey()}>
+                      {child}
+                    </NavItem>
+                  ))
+                }
               </NavList>
             )
             : null
