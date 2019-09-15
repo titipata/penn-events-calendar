@@ -62,7 +62,7 @@ const DetailBox = ({
     <StyledLocation>
       <StyledMarkerIcon />
       {/* {renderHTML(eventDetail.location)} */}
-      {location}
+      {location || 'unknown'}
     </StyledLocation>
     <CategoryLabel
       owner={owner}

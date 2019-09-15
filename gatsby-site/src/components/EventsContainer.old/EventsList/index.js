@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
-import { Key } from '../../../Utils';
+import { Key } from '../../../utils';
 import EventItem from '../EventItem';
 
 const StyledEventsList = styled.ul`
@@ -12,8 +12,8 @@ const StyledEventsList = styled.ul`
 
 const EventsList = ({ events, similarEvents }) => (
   <StyledEventsList>
-    { events.map(ev =>
-      (
+    {
+      events.map(ev => (
         <EventItem
           key={Key.getShortKey()}
           ev={ev}

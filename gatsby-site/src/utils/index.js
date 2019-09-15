@@ -32,6 +32,7 @@ class Events {
   static groupByDate(eventArr) {
     // get all dates from events
     const allDates = eventArr
+      .filter(ev => ev.node.title) // filter events with no title out
       .map(ev => ev.node.date_dt)
       .filter(x => x) // filter blank dates out
       .sort((a, b) => (moment(a, 'DD-MM-YYYY') - moment(b, 'DD-MM-YYYY'))) // sort dates
@@ -45,7 +46,8 @@ class Events {
         ...acc,
         {
           dateFormatted: Datetime.getDayMonthDate(cur),
-          events: eventArr.filter(ev => ev.node.date_dt === cur),
+          // group events with the current date and also has title
+          events: eventArr.filter(ev => ev.node.date_dt === cur && ev.node.title),
         },
       ]
     ), []);
