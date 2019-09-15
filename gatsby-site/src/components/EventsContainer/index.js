@@ -1,33 +1,42 @@
-// import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
+import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
 import React from 'react';
 import styled from 'styled-components';
 import { Events as evUtil, Key } from '../../utils';
 import EventList from './EventList';
 
+const StyledContainer = styled.div`
+  margin-bottom: 2rem;
+`;
+
 const StyledSectionText = styled.div`
-  font-family: 'Source Code Pro';
-  font-size: 1.75rem;
-  font-weight: bold;
-  color: #222;
   padding-left: 1rem;
   /* text-align: center; */
+`;
+
+const StyledH2 = styled.h2`
+  font-size: 1.75rem;
+  font-weight: normal;
+  color: #333;
+  margin: 1rem 0;
 `;
 
 const EventsContainer = ({ allEvents }) => {
   const groupedByDates = evUtil.groupByDate(allEvents);
 
   return groupedByDates.map(grp => (
-    <React.Fragment key={Key.getShortKey()}>
+    <StyledContainer key={Key.getShortKey()}>
       <StyledSectionText>
-        {/* <Fa icon="calendar-alt" /> */}
-        &nbsp;
-        <h2>{grp.dateFormatted}</h2>
+        <StyledH2>
+          <Fa icon="calendar-alt" />
+          &nbsp;&nbsp;
+          {grp.dateFormatted}
+        </StyledH2>
       </StyledSectionText>
       <EventList
         groupedEvents={grp.events}
       />
-    </React.Fragment>
+    </StyledContainer>
   ));
 };
 
