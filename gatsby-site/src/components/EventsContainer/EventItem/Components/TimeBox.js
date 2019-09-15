@@ -5,7 +5,7 @@ import { Datetime as dtutil } from '../../../../utils';
 
 const DatetimeWrapper = styled.div`
   font-size: 2rem;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   padding-left: 15px;
   display: flex;
@@ -21,7 +21,7 @@ const DatetimeWrapper = styled.div`
 
 const StyledTime = styled.div`
   text-align: center;
-  font-size: 0.75rem;
+  font-size: 1rem;
   display: inline-flex;
 `;
 

@@ -32,10 +32,12 @@ const Container = styled.div`
 
   ${media.small`
     width: ${bsContainerWidth.small};
+    padding: ${rhythm(0.25)};
   `}
 
   ${media.extraSmall`
     width: 100%;
+    padding: ${rhythm(0.25)};
   `}
 `;
 
