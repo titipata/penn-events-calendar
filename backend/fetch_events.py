@@ -37,21 +37,24 @@ def clean_date_format(d):
     e.g. 'Tuesday, October 30, 2018 - 11:30am', '02/06/2019', '1.3.18'
     to string in 'DD-MM-YYYY' format
     """
-    d = d.replace('Date TBD', '')
-    d = d.replace('EDT', '').replace('Special time:', '')
-    d = d.replace('Wu & Chen Auditorium', '')
-    d = d.replace('-', '')
-    d = d.replace('\n', ' ')
-    d = re.sub(r'(\d+\:\d+\s?(?:AM|PM|am|pm|A.M.|P.M.|a.m.|p.m.))', '', d)
-    d = d.replace('-', '').strip()
-    if d is not '':
-        for pat in PATS:
-            if pat.match(d):
-                d = pat.sub(r"\1", d)
-                return dateutil.parser.parse(d).strftime('%d-%m-%Y')
+    try:
         return dateutil.parser.parse(d).strftime('%d-%m-%Y')
-    else:
-        return ''
+    except:
+        d = d.replace('Date TBD', '')
+        d = d.replace('EDT', '').replace('Special time:', '')
+        d = d.replace('Wu & Chen Auditorium', '')
+        d = d.replace('-', '')
+        d = d.replace('\n', ' ')
+        d = re.sub(r'(\d+\:\d+\s?(?:AM|PM|am|pm|A.M.|P.M.|a.m.|p.m.))', '', d)
+        d = d.replace('-', '').strip()
+        if d is not '':
+            for pat in PATS:
+                if pat.match(d):
+                    d = pat.sub(r"\1", d)
+                    return dateutil.parser.parse(d).strftime('%d-%m-%Y')
+            return dateutil.parser.parse(d).strftime('%d-%m-%Y')
+        else:
+            return ''
 
 
 def find_startend_time(s):
@@ -1782,6 +1785,42 @@ def fetch_event_penn_today(base_url='https://penntoday.upenn.edu'):
     return events_list
 
 
+def fetch_events_mins(base_url='http://go.activecalendar.com/handlers/query.ashx?tenant=UPennMINS&site=&get=eventlist&page=0&pageSize=-1&total=-1&view=list2.xslt&callback=jQuery19108584306856037709_1568648511516&_=1568648511517'):
+    """
+    Fetch events from Mahoney Institute for Neuroscience (MINS)
+
+    TO DO: fetch individual description from detail site
+        e.g. http://go.activecalendar.com/UPennMINS/event/mahoney-institute-for-neurosciences-seminar---47th-annual-flexner-lecture/
+    """
+    events = []
+    data = requests.get(url=base_url)
+    data = json.loads(data.content.decode('ascii').replace('jQuery19108584306856037709_1568648511516(', '')[:-1])
+    event_soup = BeautifulSoup(data['html'], 'html.parser')
+
+    dates = []
+    event_date_time = [p.text.strip() for p in event_soup.find_all('p')]
+    for e in event_date_time:
+        date = dateutil.parser.parse(e.split(', ')[0]).strftime('%d-%m-%Y')
+        starttime, endtime = e.split(', ')[1].split('-')
+        starttime, endtime = ' '.join(starttime.split()), ' '.join(endtime.split())
+        dates.append([date, starttime, endtime])
+    urls = [h4.find('a').attrs['href'] for h4 in event_soup.find_all('h4')]
+    titles = [h4.find('a').text for h4 in event_soup.find_all('h4')]
+    
+    for title, date, url in zip(titles, dates, urls):
+        events.append({
+            'title': title,
+            'description': '',
+            'date': date[0],
+            'starttime': date[1],
+            'endtime': date[2],
+            'location': '',
+            'url': url, 
+            'owner': 'Mahoney Institute for Neuroscience (MINS)'
+        })
+    return events
+
+
 if __name__ == '__main__':
     import pandas as pd
     events = []
@@ -1798,10 +1837,15 @@ if __name__ == '__main__':
         fetch_events_business_ethics, fetch_events_law, fetch_events_penn_SAS, 
         fetch_events_physics_astronomy, fetch_events_wolf_humanities, fetch_events_music_dept, 
         fetch_events_annenberg, fetch_events_religious_studies, fetch_events_AHEAD, 
-        fetch_events_SPP, fetch_events_ortner_center, fetch_event_penn_today
+        fetch_events_SPP, fetch_events_ortner_center, fetch_event_penn_today,
+        fetch_events_mins
     ]
     for f in tqdm(fetch_fns):
-        events.extend(f())
+        try:
+            events.extend(f())
+        except:
+            pass
     events_df = pd.DataFrame(events).fillna('')
     events_df['date_dt'] = events_df['date'].map(lambda x: clean_date_format(x))
-    events_df.to_csv('events.csv', index=False)
+    events_df.to_csv('data/events.csv', index=False)
+    events_df.to_json('data/events.json', orient='records', lines=True)
