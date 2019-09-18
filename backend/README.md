@@ -1,9 +1,16 @@
 # Flask back-end for Penn event
 
+## Fetch events
+
+`fetch_events.py` contains functions to fetch events from Penn. We fetch and update data in `data/events.json` file
+
+```sh
+python fetch_events.py
+```
 
 ## Running CRON to fetch event daily
 
-We use CRON to constantly fetch Penn events. Change `username` in `cron_fetch_events.py`
+We use CRON to make `fetch_events.py` constantly fetch Penn events. Change `username` in `cron_fetch_events.py`
 then run cron job by using the following script
 
 ```sh
