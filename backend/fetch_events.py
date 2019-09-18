@@ -4,6 +4,8 @@ import re
 import requests
 import json
 import time
+import numpy as np
+import pandas as pd
 from unidecode import unidecode
 from datetime import datetime, timedelta
 import dateutil.parser
@@ -14,7 +16,7 @@ from urllib.parse import urljoin
 from tqdm import tqdm
 
 
-PATH_JSON = 'events.json'
+PATH_DATA = os.path.join('data', 'events.json') # path to save events
 GROBID_URL = 'http://localhost:8070'
 
 
@@ -1834,7 +1836,6 @@ def fetch_events_mins(base_url='http://go.activecalendar.com/handlers/query.ashx
 
 
 if __name__ == '__main__':
-    import pandas as pd
     events = []
     fetch_fns = [
         fetch_events_cni, fetch_events_english_dept, fetch_events_crim, 
@@ -1859,5 +1860,18 @@ if __name__ == '__main__':
             pass
     events_df = pd.DataFrame(events).fillna('')
     events_df['date_dt'] = events_df['date'].map(lambda x: clean_date_format(x))
-    events_df.to_csv('data/events.csv', index=False)
-    events_df.to_json('data/events.json', orient='records', lines=True)
+
+    # save data
+    if not os.path.exists(PATH_DATA):
+        events_df = events_df.drop_duplicates(subset=['starttime', 'owner', 'location', 'title', 'description', 'url'], keep='first')
+        events_df['event_index'] = np.arange(len(events_df))
+        events_df.to_json(PATH_DATA, orient='records', lines=True)
+    else:
+        events_former_df = pd.read_json(PATH_DATA, orient='record', lines=True)
+        events_df = pd.concat((events_former_df, events_df), axis=0, sort=False)
+        events_df = events_df.drop_duplicates(subset=['starttime', 'owner', 'location', 'title', 'description', 'url'], keep='first')
+        event_idx_begin = events_former_df['event_index'].max() + 1
+        event_idx_end = event_idx_begin + events_df.event_index.isnull().sum()
+        events_df.loc[pd.isnull(events_df.event_index), 'event_index'] = np.arange(event_idx_begin, event_idx_end)
+        events_df['event_index'] = events_df['event_index'].astype(int)
+        events_df.to_json(PATH_DATA, orient='records', lines=True)
