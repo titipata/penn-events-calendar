@@ -5,13 +5,13 @@ import { Datetime as dtutil } from '../../../../utils';
 
 const DatetimeWrapper = styled.div`
   font-size: 2rem;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
   padding-left: 15px;
   display: flex;
   flex-direction: column;
-  width: 4.65rem;
-  min-width: 4.65rem;
+  width: 5.5rem;
+  min-width: 5.5rem;
 `;
 
 // const StyledDate = styled.div`

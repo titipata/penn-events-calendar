@@ -16,11 +16,11 @@ class Datetime {
     // console.log(timeStr);
     // console.log(moment(timeStr, 'HH:mm:ss'));
 
-    return moment(timeStr, 'HH:mm:ss').format('LT');
+    return moment(timeStr, 'HH:mm:ss').format('hh:mm A');
   }
 
   static getAssumedEndtime(timeStr) {
-    return moment(timeStr, 'HH:mm:ss').add(1, 'hour').format('LT');
+    return moment(timeStr, 'HH:mm:ss').add(1, 'hour').format('hh:mm A');
   }
 
   static getDayMonthDate(timeStr) {
