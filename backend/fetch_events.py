@@ -1788,9 +1788,6 @@ def fetch_event_penn_today(base_url='https://penntoday.upenn.edu'):
 def fetch_events_mins(base_url='http://go.activecalendar.com/handlers/query.ashx?tenant=UPennMINS&site=&get=eventlist&page=0&pageSize=-1&total=-1&view=list2.xslt&callback=jQuery19108584306856037709_1568648511516&_=1568648511517'):
     """
     Fetch events from Mahoney Institute for Neuroscience (MINS)
-
-    TO DO: fetch individual description from detail site
-        e.g. http://go.activecalendar.com/UPennMINS/event/mahoney-institute-for-neurosciences-seminar---47th-annual-flexner-lecture/
     """
     events = []
     data = requests.get(url=base_url)
@@ -1805,16 +1802,31 @@ def fetch_events_mins(base_url='http://go.activecalendar.com/handlers/query.ashx
         starttime, endtime = ' '.join(starttime.split()), ' '.join(endtime.split())
         dates.append([date, starttime, endtime])
     urls = [h4.find('a').attrs['href'] for h4 in event_soup.find_all('h4')]
-    titles = [h4.find('a').text for h4 in event_soup.find_all('h4')]
     
-    for title, date, url in zip(titles, dates, urls):
+    events_descriptions, locations = [], []
+    for url in urls:
+        event_slug = url.strip('/').split('/')[-1]
+        event_url = 'http://go.activecalendar.com/handlers/query.ashx?tenant=UPennMINS&site=&get=eventdetails&route={}&view=detail.xslt'.format(event_slug)
+        event_page = requests.get(url=event_url)
+        event_detail_html = json.loads(event_page.content.decode('ascii').strip('(').strip(')'))['html']
+        event_soup = BeautifulSoup(event_detail_html, 'html.parser')
+        event_description = event_soup.find('div', attrs={'itemprop': 'description'}).text
+        location = event_soup.find('span', attrs={'itemprop': 'name'}).get_text() + \
+            ', ' + event_soup.find('span', attrs={'itemprop': 'streetAddress'}).get_text()
+        events_descriptions.append(event_description)
+        locations.append(location)
+    
+    titles = [h4.find('a').text if h4.find('a') is not None else '' 
+              for h4 in event_soup.find_all('h4')]
+
+    for title, date, url, description, location in zip(titles, dates, urls, events_descriptions, locations):
         events.append({
             'title': title,
-            'description': '',
+            'description': description,
             'date': date[0],
             'starttime': date[1],
             'endtime': date[2],
-            'location': '',
+            'location': location,
             'url': url, 
             'owner': 'Mahoney Institute for Neuroscience (MINS)'
         })
