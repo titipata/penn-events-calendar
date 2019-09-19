@@ -660,33 +660,40 @@ def fetch_events_art_history(base_url='https://www.sas.upenn.edu'):
     page_soup = BeautifulSoup(page.content, 'html.parser')
     range_pages = max([int(n_page.text) for n_page in page_soup.find('div',
                                                                      attrs={'class': 'pagination pagination-centered'}).find_all('li') if n_page.text.isdigit()])
-
     events = []
     for n_page in range(1, range_pages):
         page = requests.get((base_url + '/arthistory/events?&page={}').format(n_page))
         page_soup = BeautifulSoup(page.content, 'html.parser')
-        all_events = page_soup.find('section', attrs={'class': 'main-content is-sidebar'}).find_all('li')
+        all_events = page_soup.find('div', attrs={'class': 'item-list'}).find_all('li')
         for event in all_events:
             event_url = base_url + event.find('a')['href']
             title = event.find('h3').text if event.find('h3') is not None else ''
             # event_type = event.find('strong').text if event.find('strong') is not None else ''
-            date = event.find('p', attrs={'class': 'dateline'}).text if event.find('p', attrs={'class': 'dateline'}) is not None else ''
-            location = event.find('div', attrs={'class': 'location'}).text if event.find('div', attrs={'class': 'location'}) is not None else ''
+            date = event.find('span', attrs={'class':'date-display-single'})
+            if date is not None:
+                date, event_time = date.attrs.get('content').split('T')
+                if '-' in event_time:
+                    starttime, endtime = event_time.split('-')
+                    try:
+                        starttime, endtime = dateutil.parser.parse(starttime).strftime("%I:%M %p"), dateutil.parser.parse(endtime).strftime("%I:%M %p")
+                    except:
+                        pass
+                else:
+                    starttime, endtime = event_time, ''
+            else:
+                date, starttime, endtime = '', '', ''
+            location = event.find('div', attrs={'class': 'location'}) 
+            location = location.text.strip() if location is not None else ''
             event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
             description = event_soup.find('div', attrs={'class': 'field-body'})
-            starttime = event_soup.find('p', attrs={'class': 'field-date'})
-            starttime =  starttime.text.strip() if starttime is not None else ''
-            if description is not None:
-                description = description.text.strip()
-            else:
-                description = ''
+            description = description.text.strip() if description is not None else ''
             events.append({
                 'title': title,
                 'date': date,
                 'location': location,
                 'description': description,
                 'starttime': starttime,
-                'endtime': '',
+                'endtime': endtime,
                 'url': event_url,
                 'owner': 'Art History'
             })
@@ -988,17 +995,18 @@ def fetch_events_ldi(base_url='https://ldi.upenn.edu'):
                 description = ''
                 speaker = ''
 
-            events.append({
-                'title': title,
-                'description': description,
-                'date': date,
-                'location': location,
-                'speaker': speaker,
-                'url': event_url,
-                'owner': 'Leonard & Davis Institute (LDI)',
-                'starttime': starttime,
-                'endtime': endtime
-            })
+            if title != '' and description != '':
+                events.append({
+                    'title': title,
+                    'description': description,
+                    'date': date,
+                    'location': location,
+                    'speaker': speaker,
+                    'url': event_url,
+                    'owner': 'Leonard & Davis Institute (LDI)',
+                    'starttime': starttime,
+                    'endtime': endtime
+                })
     return events
 
 
@@ -1494,39 +1502,39 @@ def fetch_events_physics_astronomy(base_url='https://www.physics.upenn.edu'):
     Penn Events Penn Physics and Astronomy Department
     """
     page_soup = BeautifulSoup(requests.get(base_url + '/events/').content, 'html.parser')
-
+    try:
+        pagination = page_soup.find('ul', attrs={'class': 'pagination'})
+        pagination_max = max([a.attrs.get('href') for a in pagination.find_all('a')])
+        pagination_max = int(pagination_max[-1])
+    except:
+        pagination_max = 1
+    
     events = []
-    all_events = page_soup.find_all('h3')
-    for event in all_events:
-        event_url = base_url + event.find('a')['href']
-        event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
-        title = event_soup.find('h1', attrs={'class': 'title'})
-        title = title.text.strip() if title is not None else ''
-        date = event_soup.find('span', attrs={'class': 'date-display-single'})
-        date = date.text.strip() if date is not None else ''
-        starttime, endtime = '', ''
-        ts = re.findall(r'(\d+\:\d+\s?)', date)
-        if len(ts) == 1:
-            starttime = ts[0]
-            endtime = ''
-        elif len(ts) == 2:
-            starttime = ts[0]
-            endtime = ts[1]
-        
-        speaker = event_soup.find('div', attrs={'class':'field field-type-text field-field-event-speaker'})
-        speaker = speaker.text.strip() if speaker is not None else ''
-        description = event_soup.find('p')
-        description = description.text.strip() if description is not None else ''
-        events.append({
-            'title': title,
-            'date': date,
-            'starttime': starttime,
-            'endtime': endtime,
-            'speaker': speaker,
-            'description': description,
-            'url': event_url,
-            'owner': 'Penn Physics and Astronomy Department'
-        })
+    for pagination in range(0, pagination_max):
+        page_soup = BeautifulSoup(requests.get(base_url + '/events/' + '?page={}'.format(pagination)).content, 'html.parser')
+        all_events = page_soup.find_all('div', attrs={'class': 'events-listing'})
+        for event in all_events:
+            event_url = base_url + event.find('a')['href']
+            event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+            title = event.find('a')
+            title = title.text.strip() if title is not None else ''
+            event_time = event.find('span', attrs={'class': 'news-date'})
+            starttime, endtime = event_time.find_all('time')
+            starttime, endtime = starttime.text or '', endtime.text or ''
+            speaker = ' '.join([h5.text.strip() if h5.text is not None else '' 
+                               for h5 in all_events[0].find_all('h5')]).strip()
+            description = event_soup.find('p')
+            description = description.text.strip() if description is not None else ''
+            events.append({
+                'title': title,
+                'date': date,
+                'starttime': starttime,
+                'endtime': endtime,
+                'speaker': speaker,
+                'description': description,
+                'url': event_url,
+                'owner': 'Department of Physics and Astronomy'
+            })
     return events
 
 

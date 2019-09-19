@@ -2,9 +2,11 @@
 
 ## Fetch events
 
-`fetch_events.py` contains functions to fetch events from Penn. We fetch and update data in `data/events.json` file
+`fetch_events.py` contains functions to fetch Penn events. We can run GROBID and fetch to update data in `data/events.json` file 
+as follows
 
 ```sh
+bash serve_grobid.sh
 python fetch_events.py
 ```
 
