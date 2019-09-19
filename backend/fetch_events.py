@@ -18,6 +18,40 @@ from tqdm import tqdm
 
 PATH_DATA = os.path.join('data', 'events.json') # path to save events
 GROBID_URL = 'http://localhost:8070'
+PRODUCE_VECTOR = True # if True, produce vector 
+
+if PRODUCE_VECTOR:
+    PATH_VECTOR = os.path.join('data', 'events_vector.json')
+    import string
+    from nltk.stem.porter import PorterStemmer
+    from nltk.tokenize import WhitespaceTokenizer
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.decomposition import TruncatedSVD
+    from sklearn.neighbors import NearestNeighbors
+
+    stemmer = PorterStemmer()
+    w_tokenizer = WhitespaceTokenizer()
+    punct_re = re.compile('[{}]'.format(re.escape(string.punctuation)))
+
+    def preprocess(text, stemming=True):
+        """
+        Apply Snowball stemmer to string
+        Parameters
+        ----------
+        text : str, input abstract of papers/posters string
+        stemming : boolean, apply Porter stemmer if True,
+            default True
+        """
+        text = text or ''
+        text = unidecode(text).lower()
+        text = punct_re.sub(' ', text) # remove punctuation
+        if stemming:
+            words = w_tokenizer.tokenize(text)
+            text_preprocess = ' '.join([stemmer.stem(word) for word in words])
+        else:
+            words = w_tokenizer.tokenize(text)
+            text_preprocess = ' '.join([stemmer.stem(word) for word in words])
+        return text_preprocess
 
 
 PATTERNS = [
@@ -1883,3 +1917,23 @@ if __name__ == '__main__':
         events_df.loc[pd.isnull(events_df.event_index), 'event_index'] = np.arange(event_idx_begin, event_idx_end)
         events_df['event_index'] = events_df['event_index'].astype(int)
         events_df.to_json(PATH_DATA, orient='records', lines=True)
+    
+    # produce vector
+    if PRODUCE_VECTOR:
+        events_df = pd.read_json(PATH_DATA, orient='records', lines=True)
+        events_text = [' '.join([e[1] for e in r.items()]) 
+                       for _, r in events_df[['title', 'description', 'location', 'starttime']].iterrows()]
+        events_preprocessed_text = [preprocess(text) for text in events_text]
+        tfidf_model = TfidfVectorizer(min_df=3, max_df=0.85,
+                                      lowercase=True, norm='l2',
+                                      ngram_range=(1, 2),
+                                      use_idf=True, smooth_idf=True, sublinear_tf=True,
+                                      stop_words='english')
+        X_tfidf = tfidf_model.fit_transform(events_preprocessed_text)
+        lsa_model = TruncatedSVD(n_components=30,
+                                 n_iter=100,
+                                 algorithm='arpack')
+        lsa_vectors = lsa_model.fit_transform(X_tfidf)
+        events_vector = [list(vector) for vector in lsa_vectors]
+        events_df['event_vector'] = events_vector
+        events_df[['event_index', 'event_vector']].to_json(PATH_VECTOR, orient='records', lines=True)

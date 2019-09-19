@@ -7,3 +7,4 @@ fi
 
 # run GROBID
 cd grobid-0.5.5
+./gradlew run
