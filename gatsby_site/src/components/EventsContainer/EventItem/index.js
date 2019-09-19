@@ -5,7 +5,6 @@ import ContentBox from './Components/ContentBox';
 import TimeBox from './Components/TimeBox';
 import DescriptionBox from './Components/DescriptionBox';
 import { getRandomColorFromText } from '../../../utils';
-import useGlobal from '../../../store';
 
 const StyledListItem = styled.li`
   margin-bottom: 5px;
@@ -22,15 +21,13 @@ const StyledContentWrapper = styled.div`
 `;
 
 const EventItem = ({ eventData }) => {
-  // call global state
-  const [, globalActions] = useGlobal();
   // define local hook
-  const [state, setState] = useState({
-    descriptionVisible: false,
-  });
+  const [
+    descriptionVisible,
+    setDescriptionVisible,
+  ] = useState(false);
 
   // destructuring variables to use
-  const { descriptionVisible } = state;
   const {
     id,
     title,
@@ -45,15 +42,8 @@ const EventItem = ({ eventData }) => {
 
   // handle functions
   const _handleCardClick = () => {
-    const { toggleSelectedEvent } = globalActions;
-
-    // set global state
-    toggleSelectedEvent(id);
-
     // set local state to control description visibility
-    setState({
-      descriptionVisible: !descriptionVisible,
-    });
+    setDescriptionVisible(prev => !prev);
   };
 
   return (
@@ -69,6 +59,7 @@ const EventItem = ({ eventData }) => {
     >
       <StyledContentWrapper>
         <TimeBox
+          eventId={id}
           starttime={starttime}
           endtime={endtime}
         />
