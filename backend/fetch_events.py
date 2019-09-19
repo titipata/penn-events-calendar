@@ -1788,7 +1788,7 @@ def fetch_event_penn_today(base_url='https://penntoday.upenn.edu'):
             'date' : event['start'],
             'starttime': event['starttime'],
             'endtime': event['endtime'],
-            'location': event['location'],
+            'location': event['location'] if event['location'] is not False else '',
             'url': base_url + event['path'],
             'owner': 'Penn Today Events'
         })
