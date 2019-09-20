@@ -1,2 +1,4 @@
 hug
 uwsgi
+numpy
+scipy

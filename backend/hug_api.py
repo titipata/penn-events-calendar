@@ -2,7 +2,6 @@ import hug
 import json
 import numpy as np
 from datetime import datetime
-import dateutil
 from scipy.spatial.distance import cosine
 
 # enable CORS
@@ -22,7 +21,7 @@ def get_future_event(date):
     Function return True if the event happens after now
     """
     try:
-        if dateutil.parser.parse(date) > datetime.now():
+        if datetime.strptime(date, '%d-%m-%Y') > datetime.now():
             return True
         else:
             return False
