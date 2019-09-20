@@ -32,8 +32,8 @@ const EventItem = ({ eventData }) => {
     id,
     title,
     description,
-    starttime_dt: starttime,
-    endtime_dt: endtime,
+    starttime,
+    endtime,
     speaker,
     owner,
     location,
@@ -90,16 +90,18 @@ const EventItem = ({ eventData }) => {
 
 EventItem.propTypes = {
   eventData: PropTypes.shape({
-    id: PropTypes.string,
-    date_dt: PropTypes.string,
-    title: PropTypes.string,
-    description: PropTypes.string,
-    starttime_dt: PropTypes.string,
-    endtime_dt: PropTypes.string,
-    speaker: PropTypes.string,
-    owner: PropTypes.string,
-    location: PropTypes.string,
-    url: PropTypes.string,
+    node: PropTypes.shape({
+      id: PropTypes.string,
+      date_dt: PropTypes.string,
+      title: PropTypes.string,
+      description: PropTypes.string,
+      starttime: PropTypes.string,
+      endtime: PropTypes.string,
+      speaker: PropTypes.string,
+      owner: PropTypes.string,
+      location: PropTypes.string,
+      url: PropTypes.string,
+    }),
   }).isRequired,
 };
 

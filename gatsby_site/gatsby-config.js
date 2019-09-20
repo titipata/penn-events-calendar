@@ -4,25 +4,25 @@ module.exports = {
   },
   plugins: [
     {
-      resolve: `gatsby-plugin-typography`,
+      resolve: 'gatsby-plugin-typography',
       options: {
-        pathToConfigModule: `src/utils/typography`,
+        pathToConfigModule: 'src/utils/typography',
       },
     },
     {
-      resolve: `gatsby-plugin-styled-components`,
+      resolve: 'gatsby-plugin-styled-components',
       options: {
         // Add any options here
       },
     },
     'gatsby-plugin-eslint',
     {
-      resolve: `gatsby-source-filesystem`,
+      resolve: 'gatsby-source-filesystem',
       options: {
-        name: `data`,
-        path: `${__dirname}/data/`,
+        name: 'data',
+        path: `${__dirname}/../backend/data/`,
       },
     },
-    `gatsby-transformer-csv`,
+    'gatsby-transformer-json',
   ],
 };

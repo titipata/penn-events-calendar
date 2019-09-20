@@ -22,22 +22,22 @@ export default ({ data }) => (
   <Layout>
     <h1>Upcoming Events</h1>
     <EventsContainer
-      allEvents={data.allEventsCsv.edges}
+      allEvents={data.allEventsJson.edges}
     />
   </Layout>
 );
 
 export const query = graphql`
   query {
-    allEventsCsv {
+    allEventsJson {
       edges {
         node {
           id
           date_dt
           title
           description
-          starttime_dt
-          endtime_dt
+          starttime
+          endtime
           speaker
           owner
           location
