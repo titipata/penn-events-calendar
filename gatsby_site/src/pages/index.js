@@ -6,7 +6,7 @@ import {
   faStar, faUniversity, faUserTie,
 } from '@fortawesome/free-solid-svg-icons';
 import { graphql } from 'gatsby';
-import React, { useEffect } from 'react';
+import React from 'react';
 import EventsContainer from '../components/EventsContainer';
 import Layout from '../components/layout';
 
@@ -18,29 +18,14 @@ library.add(
   faCopy, faStar,
 );
 
-export default ({ data }) => {
-  useEffect(() => {
-    fetch('http://localhost:8888/recommendations', {
-      method: 'POST',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        payload: [1, 2, 3, 4, 5],
-      }),
-    }).then(res => console.log(res.json()));
-  });
-
-  return (
-    <Layout>
-      <h1>Upcoming Events</h1>
-      <EventsContainer
-        allEvents={data.allEventsJson.edges}
-      />
-    </Layout>
-  );
-};
+export default ({ data }) => (
+  <Layout>
+    <h1>Upcoming Events</h1>
+    <EventsContainer
+      allEvents={data.allEventsJson.edges}
+    />
+  </Layout>
+);
 
 export const query = graphql`
   query {

@@ -7,7 +7,7 @@ import useGlobal from '../store';
 export default ({ data }) => {
   const [globalState] = useGlobal();
 
-  // get selected event indexes for global state
+  // get selected event indexes from global state
   const { selectedEvents: selectedEventsIndexes } = globalState;
   // filter only selected event to pass to container
   const selectedEvents = data.allEventsJson.edges.filter(

@@ -24,7 +24,7 @@ const Layout = ({ children }) => (
       <Link to="/selected-events">
         Selected Events
       </Link>
-      <Link to="/">
+      <Link to="/recommendations">
         Recommendations
       </Link>
     </NavBar>
