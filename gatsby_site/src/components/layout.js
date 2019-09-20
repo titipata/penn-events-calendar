@@ -21,12 +21,10 @@ const Layout = ({ children }) => (
       <Link to="/">
         Home
       </Link>
-      <Link to="/">
+      <Link to="/selected-events">
         Selected Events
       </Link>
-      <Link
-        to="/about/"
-      >
+      <Link to="/">
         Recommendations
       </Link>
     </NavBar>

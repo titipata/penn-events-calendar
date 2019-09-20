@@ -2,11 +2,11 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faBookmark, faCalendarAlt, faChevronCircleDown,
   faChevronCircleUp, faClock, faCopy, faExternalLinkAlt,
-  faFileAlt, faMapMarkerAlt, faSchool, faUniversity, faUserTie,
-  faStar,
+  faFileAlt, faMapMarkerAlt, faSchool,
+  faStar, faUniversity, faUserTie,
 } from '@fortawesome/free-solid-svg-icons';
 import { graphql } from 'gatsby';
-import React from 'react';
+import React, { useEffect } from 'react';
 import EventsContainer from '../components/EventsContainer';
 import Layout from '../components/layout';
 
@@ -19,16 +19,18 @@ library.add(
 );
 
 export default ({ data }) => {
-  fetch('http://localhost:8888/recommendations', {
-    method: 'POST',
-    mode: 'cors',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      payload: [1, 2, 3, 4, 5],
-    }),
-  }).then(res => console.log(res.json()));
+  useEffect(() => {
+    fetch('http://localhost:8888/recommendations', {
+      method: 'POST',
+      mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        payload: [1, 2, 3, 4, 5],
+      }),
+    }).then(res => console.log(res.json()));
+  });
 
   return (
     <Layout>
