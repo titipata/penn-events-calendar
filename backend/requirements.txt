@@ -9,3 +9,4 @@ lxml
 spacy
 requests
 uwsgi
+nltk

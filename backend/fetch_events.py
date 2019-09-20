@@ -4,6 +4,8 @@ import re
 import requests
 import json
 import time
+import numpy as np
+import pandas as pd
 from unidecode import unidecode
 from datetime import datetime, timedelta
 import dateutil.parser
@@ -14,8 +16,42 @@ from urllib.parse import urljoin
 from tqdm import tqdm
 
 
-PATH_JSON = 'events.json'
+PATH_DATA = os.path.join('data', 'events.json') # path to save events
 GROBID_URL = 'http://localhost:8070'
+PRODUCE_VECTOR = True # if True, produce vector 
+
+if PRODUCE_VECTOR:
+    PATH_VECTOR = os.path.join('data', 'events_vector.json')
+    import string
+    from nltk.stem.porter import PorterStemmer
+    from nltk.tokenize import WhitespaceTokenizer
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.decomposition import TruncatedSVD
+    from sklearn.neighbors import NearestNeighbors
+
+    stemmer = PorterStemmer()
+    w_tokenizer = WhitespaceTokenizer()
+    punct_re = re.compile('[{}]'.format(re.escape(string.punctuation)))
+
+    def preprocess(text, stemming=True):
+        """
+        Apply Snowball stemmer to string
+        Parameters
+        ----------
+        text : str, input abstract of papers/posters string
+        stemming : boolean, apply Porter stemmer if True,
+            default True
+        """
+        text = text or ''
+        text = unidecode(text).lower()
+        text = punct_re.sub(' ', text) # remove punctuation
+        if stemming:
+            words = w_tokenizer.tokenize(text)
+            text_preprocess = ' '.join([stemmer.stem(word) for word in words])
+        else:
+            words = w_tokenizer.tokenize(text)
+            text_preprocess = ' '.join([stemmer.stem(word) for word in words])
+        return text_preprocess
 
 
 PATTERNS = [
@@ -37,21 +73,24 @@ def clean_date_format(d):
     e.g. 'Tuesday, October 30, 2018 - 11:30am', '02/06/2019', '1.3.18'
     to string in 'DD-MM-YYYY' format
     """
-    d = d.replace('Date TBD', '')
-    d = d.replace('EDT', '').replace('Special time:', '')
-    d = d.replace('Wu & Chen Auditorium', '')
-    d = d.replace('-', '')
-    d = d.replace('\n', ' ')
-    d = re.sub(r'(\d+\:\d+\s?(?:AM|PM|am|pm|A.M.|P.M.|a.m.|p.m.))', '', d)
-    d = d.replace('-', '').strip()
-    if d is not '':
-        for pat in PATS:
-            if pat.match(d):
-                d = pat.sub(r"\1", d)
-                return dateutil.parser.parse(d).strftime('%d-%m-%Y')
+    try:
         return dateutil.parser.parse(d).strftime('%d-%m-%Y')
-    else:
-        return ''
+    except:
+        d = d.replace('Date TBD', '')
+        d = d.replace('EDT', '').replace('Special time:', '')
+        d = d.replace('Wu & Chen Auditorium', '')
+        d = d.replace('-', '')
+        d = d.replace('\n', ' ')
+        d = re.sub(r'(\d+\:\d+\s?(?:AM|PM|am|pm|A.M.|P.M.|a.m.|p.m.))', '', d)
+        d = d.replace('-', '').strip()
+        if d is not '':
+            for pat in PATS:
+                if pat.match(d):
+                    d = pat.sub(r"\1", d)
+                    return dateutil.parser.parse(d).strftime('%d-%m-%Y')
+            return dateutil.parser.parse(d).strftime('%d-%m-%Y')
+        else:
+            return ''
 
 
 def find_startend_time(s):
@@ -87,7 +126,7 @@ def save_json(ls, file_path):
     Save list of dictionary to JSON
     """
     with open(file_path, 'w') as fp:
-        fp.write('\n'.join(json.dumps(i) for i in ls))
+        fp.write('[\n  ' + ',\n  '.join(json.dumps(i) for i in ls) + '\n]')
 
 
 def convert_event_to_dict(event):
@@ -655,33 +694,40 @@ def fetch_events_art_history(base_url='https://www.sas.upenn.edu'):
     page_soup = BeautifulSoup(page.content, 'html.parser')
     range_pages = max([int(n_page.text) for n_page in page_soup.find('div',
                                                                      attrs={'class': 'pagination pagination-centered'}).find_all('li') if n_page.text.isdigit()])
-
     events = []
     for n_page in range(1, range_pages):
         page = requests.get((base_url + '/arthistory/events?&page={}').format(n_page))
         page_soup = BeautifulSoup(page.content, 'html.parser')
-        all_events = page_soup.find('section', attrs={'class': 'main-content is-sidebar'}).find_all('li')
+        all_events = page_soup.find('div', attrs={'class': 'item-list'}).find_all('li')
         for event in all_events:
             event_url = base_url + event.find('a')['href']
             title = event.find('h3').text if event.find('h3') is not None else ''
             # event_type = event.find('strong').text if event.find('strong') is not None else ''
-            date = event.find('p', attrs={'class': 'dateline'}).text if event.find('p', attrs={'class': 'dateline'}) is not None else ''
-            location = event.find('div', attrs={'class': 'location'}).text if event.find('div', attrs={'class': 'location'}) is not None else ''
+            date = event.find('span', attrs={'class':'date-display-single'})
+            if date is not None:
+                date, event_time = date.attrs.get('content').split('T')
+                if '-' in event_time:
+                    starttime, endtime = event_time.split('-')
+                    try:
+                        starttime, endtime = dateutil.parser.parse(starttime).strftime("%I:%M %p"), dateutil.parser.parse(endtime).strftime("%I:%M %p")
+                    except:
+                        pass
+                else:
+                    starttime, endtime = event_time, ''
+            else:
+                date, starttime, endtime = '', '', ''
+            location = event.find('div', attrs={'class': 'location'}) 
+            location = location.text.strip() if location is not None else ''
             event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
             description = event_soup.find('div', attrs={'class': 'field-body'})
-            starttime = event_soup.find('p', attrs={'class': 'field-date'})
-            starttime =  starttime.text.strip() if starttime is not None else ''
-            if description is not None:
-                description = description.text.strip()
-            else:
-                description = ''
+            description = description.text.strip() if description is not None else ''
             events.append({
                 'title': title,
                 'date': date,
                 'location': location,
                 'description': description,
                 'starttime': starttime,
-                'endtime': '',
+                'endtime': endtime,
                 'url': event_url,
                 'owner': 'Art History'
             })
@@ -983,17 +1029,18 @@ def fetch_events_ldi(base_url='https://ldi.upenn.edu'):
                 description = ''
                 speaker = ''
 
-            events.append({
-                'title': title,
-                'description': description,
-                'date': date,
-                'location': location,
-                'speaker': speaker,
-                'url': event_url,
-                'owner': 'Leonard & Davis Institute (LDI)',
-                'starttime': starttime,
-                'endtime': endtime
-            })
+            if title != '' and description != '':
+                events.append({
+                    'title': title,
+                    'description': description,
+                    'date': date,
+                    'location': location,
+                    'speaker': speaker,
+                    'url': event_url,
+                    'owner': 'Leonard & Davis Institute (LDI)',
+                    'starttime': starttime,
+                    'endtime': endtime
+                })
     return events
 
 
@@ -1489,39 +1536,39 @@ def fetch_events_physics_astronomy(base_url='https://www.physics.upenn.edu'):
     Penn Events Penn Physics and Astronomy Department
     """
     page_soup = BeautifulSoup(requests.get(base_url + '/events/').content, 'html.parser')
-
+    try:
+        pagination = page_soup.find('ul', attrs={'class': 'pagination'})
+        pagination_max = max([a.attrs.get('href') for a in pagination.find_all('a')])
+        pagination_max = int(pagination_max[-1])
+    except:
+        pagination_max = 1
+    
     events = []
-    all_events = page_soup.find_all('h3')
-    for event in all_events:
-        event_url = base_url + event.find('a')['href']
-        event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
-        title = event_soup.find('h1', attrs={'class': 'title'})
-        title = title.text.strip() if title is not None else ''
-        date = event_soup.find('span', attrs={'class': 'date-display-single'})
-        date = date.text.strip() if date is not None else ''
-        starttime, endtime = '', ''
-        ts = re.findall(r'(\d+\:\d+\s?)', date)
-        if len(ts) == 1:
-            starttime = ts[0]
-            endtime = ''
-        elif len(ts) == 2:
-            starttime = ts[0]
-            endtime = ts[1]
-        
-        speaker = event_soup.find('div', attrs={'class':'field field-type-text field-field-event-speaker'})
-        speaker = speaker.text.strip() if speaker is not None else ''
-        description = event_soup.find('p')
-        description = description.text.strip() if description is not None else ''
-        events.append({
-            'title': title,
-            'date': date,
-            'starttime': starttime,
-            'endtime': endtime,
-            'speaker': speaker,
-            'description': description,
-            'url': event_url,
-            'owner': 'Penn Physics and Astronomy Department'
-        })
+    for pagination in range(0, pagination_max):
+        page_soup = BeautifulSoup(requests.get(base_url + '/events/' + '?page={}'.format(pagination)).content, 'html.parser')
+        all_events = page_soup.find_all('div', attrs={'class': 'events-listing'})
+        for event in all_events:
+            event_url = base_url + event.find('a')['href']
+            event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+            title = event.find('a')
+            title = title.text.strip() if title is not None else ''
+            event_time = event.find('span', attrs={'class': 'news-date'})
+            starttime, endtime = event_time.find_all('time')
+            starttime, endtime = starttime.text or '', endtime.text or ''
+            speaker = ' '.join([h5.text.strip() if h5.text is not None else '' 
+                               for h5 in all_events[0].find_all('h5')]).strip()
+            description = event_soup.find('p')
+            description = description.text.strip() if description is not None else ''
+            events.append({
+                'title': title,
+                'date': date,
+                'starttime': starttime,
+                'endtime': endtime,
+                'speaker': speaker,
+                'description': description,
+                'url': event_url,
+                'owner': 'Department of Physics and Astronomy'
+            })
     return events
 
 
@@ -1775,15 +1822,62 @@ def fetch_event_penn_today(base_url='https://penntoday.upenn.edu'):
             'date' : event['start'],
             'starttime': event['starttime'],
             'endtime': event['endtime'],
-            'location': event['location'],
+            'location': event['location'] if event['location'] is not False else '',
             'url': base_url + event['path'],
             'owner': 'Penn Today Events'
         })
     return events_list
 
 
+def fetch_events_mins(base_url='http://go.activecalendar.com/handlers/query.ashx?tenant=UPennMINS&site=&get=eventlist&page=0&pageSize=-1&total=-1&view=list2.xslt&callback=jQuery19108584306856037709_1568648511516&_=1568648511517'):
+    """
+    Fetch events from Mahoney Institute for Neuroscience (MINS)
+    """
+    events = []
+    data = requests.get(url=base_url)
+    data = json.loads(data.content.decode('ascii').replace('jQuery19108584306856037709_1568648511516(', '')[:-1])
+    event_soup = BeautifulSoup(data['html'], 'html.parser')
+
+    dates = []
+    event_date_time = [p.text.strip() for p in event_soup.find_all('p')]
+    for e in event_date_time:
+        date = dateutil.parser.parse(e.split(', ')[0]).strftime('%d-%m-%Y')
+        starttime, endtime = e.split(', ')[1].split('-')
+        starttime, endtime = ' '.join(starttime.split()), ' '.join(endtime.split())
+        dates.append([date, starttime, endtime])
+    urls = [h4.find('a').attrs['href'] for h4 in event_soup.find_all('h4')]
+    
+    events_descriptions, locations = [], []
+    for url in urls:
+        event_slug = url.strip('/').split('/')[-1]
+        event_url = 'http://go.activecalendar.com/handlers/query.ashx?tenant=UPennMINS&site=&get=eventdetails&route={}&view=detail.xslt'.format(event_slug)
+        event_page = requests.get(url=event_url)
+        event_detail_html = json.loads(event_page.content.decode('ascii').strip('(').strip(')'))['html']
+        event_soup = BeautifulSoup(event_detail_html, 'html.parser')
+        event_description = event_soup.find('div', attrs={'itemprop': 'description'}).text
+        location = event_soup.find('span', attrs={'itemprop': 'name'}).get_text() + \
+            ', ' + event_soup.find('span', attrs={'itemprop': 'streetAddress'}).get_text()
+        events_descriptions.append(event_description)
+        locations.append(location)
+    
+    titles = [h4.find('a').text if h4.find('a') is not None else '' 
+              for h4 in event_soup.find_all('h4')]
+
+    for title, date, url, description, location in zip(titles, dates, urls, events_descriptions, locations):
+        events.append({
+            'title': title,
+            'description': description,
+            'date': date[0],
+            'starttime': date[1],
+            'endtime': date[2],
+            'location': location,
+            'url': url, 
+            'owner': 'Mahoney Institute for Neuroscience (MINS)'
+        })
+    return events
+
+
 if __name__ == '__main__':
-    import pandas as pd
     events = []
     fetch_fns = [
         fetch_events_cni, fetch_events_english_dept, fetch_events_crim, 
@@ -1798,10 +1892,48 @@ if __name__ == '__main__':
         fetch_events_business_ethics, fetch_events_law, fetch_events_penn_SAS, 
         fetch_events_physics_astronomy, fetch_events_wolf_humanities, fetch_events_music_dept, 
         fetch_events_annenberg, fetch_events_religious_studies, fetch_events_AHEAD, 
-        fetch_events_SPP, fetch_events_ortner_center, fetch_event_penn_today
+        fetch_events_SPP, fetch_events_ortner_center, fetch_event_penn_today,
+        fetch_events_mins
     ]
     for f in tqdm(fetch_fns):
-        events.extend(f())
+        try:
+            events.extend(f())
+        except:
+            pass
     events_df = pd.DataFrame(events).fillna('')
     events_df['date_dt'] = events_df['date'].map(lambda x: clean_date_format(x))
-    events_df.to_csv('events.csv', index=False)
+
+    # save data
+    if not os.path.exists(PATH_DATA):
+        events_df = events_df.drop_duplicates(subset=['starttime', 'owner', 'location', 'title', 'description', 'url'], keep='first')
+        events_df['event_index'] = np.arange(len(events_df))
+        events_df.to_json(PATH_DATA, orient='records', lines=True)
+    else:
+        events_former_df = pd.read_json(PATH_DATA, orient='record', lines=True)
+        events_df = pd.concat((events_former_df, events_df), axis=0, sort=False)
+        events_df = events_df.drop_duplicates(subset=['starttime', 'owner', 'location', 'title', 'description', 'url'], keep='first')
+        event_idx_begin = events_former_df['event_index'].max() + 1
+        event_idx_end = event_idx_begin + events_df.event_index.isnull().sum()
+        events_df.loc[pd.isnull(events_df.event_index), 'event_index'] = np.arange(event_idx_begin, event_idx_end)
+        events_df['event_index'] = events_df['event_index'].astype(int)
+        save_json(events_df.to_dict(orient='records'), PATH_DATA)
+    
+    # produce vector
+    if PRODUCE_VECTOR:
+        events_df = pd.read_json(PATH_DATA, orient='records', lines=True)
+        events_text = [' '.join([e[1] for e in r.items()]) 
+                       for _, r in events_df[['title', 'description', 'location', 'starttime']].iterrows()]
+        events_preprocessed_text = [preprocess(text) for text in events_text]
+        tfidf_model = TfidfVectorizer(min_df=3, max_df=0.85,
+                                      lowercase=True, norm='l2',
+                                      ngram_range=(1, 2),
+                                      use_idf=True, smooth_idf=True, sublinear_tf=True,
+                                      stop_words='english')
+        X_tfidf = tfidf_model.fit_transform(events_preprocessed_text)
+        lsa_model = TruncatedSVD(n_components=30,
+                                 n_iter=100,
+                                 algorithm='arpack')
+        lsa_vectors = lsa_model.fit_transform(X_tfidf)
+        events_vector = [list(vector) for vector in lsa_vectors]
+        events_df['event_vector'] = events_vector
+        save_json(events_df[['event_index', 'event_vector']].to_dict(orient='records'), PATH_VECTOR)
