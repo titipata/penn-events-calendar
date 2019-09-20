@@ -1916,7 +1916,7 @@ if __name__ == '__main__':
         event_idx_end = event_idx_begin + events_df.event_index.isnull().sum()
         events_df.loc[pd.isnull(events_df.event_index), 'event_index'] = np.arange(event_idx_begin, event_idx_end)
         events_df['event_index'] = events_df['event_index'].astype(int)
-        save_json(events_df.to_dict(orient='records'), PATH_VECTOR)
+        save_json(events_df.to_dict(orient='records'), PATH_DATA)
     
     # produce vector
     if PRODUCE_VECTOR:
