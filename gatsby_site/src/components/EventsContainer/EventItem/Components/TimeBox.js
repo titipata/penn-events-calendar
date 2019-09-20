@@ -1,6 +1,6 @@
 import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { Datetime as dtutil } from '../../../../utils';
 import useGlobal from '../../../../store';
@@ -37,8 +37,10 @@ const StyledFavIcon = styled(Fa).attrs(() => ({
 `;
 
 const TimeBox = ({ starttime, endtime, eventIndex }) => {
-  const [, globalActions] = useGlobal();
-  const [checked, setChecked] = useState(false);
+  const [globalState, globalActions] = useGlobal();
+
+  // destructuring state to use
+  const { selectedEvents } = globalState;
 
   // destructuring actions to use
   const { toggleSelectedEvent } = globalActions;
@@ -75,8 +77,6 @@ const TimeBox = ({ starttime, endtime, eventIndex }) => {
         onClick={(e) => {
           // set global state
           toggleSelectedEvent(eventIndex);
-          // set local state
-          setChecked(prev => !prev);
           // block this because if the item has
           // description this will propagate
           // through invoke showing description
@@ -84,7 +84,7 @@ const TimeBox = ({ starttime, endtime, eventIndex }) => {
         }}
       >
         <StyledFavIcon
-          checked={checked}
+          checked={selectedEvents.includes(eventIndex)}
         />
       </SubWrapper>
     </DatetimeWrapper>

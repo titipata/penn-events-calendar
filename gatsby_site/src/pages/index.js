@@ -2,8 +2,8 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import {
   faBookmark, faCalendarAlt, faChevronCircleDown,
   faChevronCircleUp, faClock, faCopy, faExternalLinkAlt,
-  faFileAlt, faMapMarkerAlt, faSchool, faUniversity, faUserTie,
-  faStar,
+  faFileAlt, faMapMarkerAlt, faSchool,
+  faStar, faUniversity, faUserTie,
 } from '@fortawesome/free-solid-svg-icons';
 import { graphql } from 'gatsby';
 import React from 'react';
@@ -18,27 +18,14 @@ library.add(
   faCopy, faStar,
 );
 
-export default ({ data }) => {
-  fetch('http://localhost:8888/recommendations', {
-    method: 'POST',
-    mode: 'cors',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      payload: [1, 2, 3, 4, 5],
-    }),
-  }).then(res => console.log(res.json()));
-
-  return (
-    <Layout>
-      <h1>Upcoming Events</h1>
-      <EventsContainer
-        allEvents={data.allEventsJson.edges}
-      />
-    </Layout>
-  );
-};
+export default ({ data }) => (
+  <Layout>
+    <h1>Upcoming Events</h1>
+    <EventsContainer
+      allEvents={data.allEventsJson.edges}
+    />
+  </Layout>
+);
 
 export const query = graphql`
   query {

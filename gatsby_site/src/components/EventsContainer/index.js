@@ -22,6 +22,16 @@ const StyledH2 = styled.h2`
 `;
 
 const EventsContainer = ({ allEvents }) => {
+  // render no data screen
+  if (allEvents.length === 0) {
+    return (
+      <StyledContainer>
+        <p>No available events!</p>
+      </StyledContainer>
+    );
+  }
+
+  // group event by date before rendering
   const groupedByDates = evUtil.groupByDate(allEvents);
 
   return groupedByDates.map(grp => (

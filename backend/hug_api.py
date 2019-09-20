@@ -2,7 +2,6 @@ import hug
 import json
 import numpy as np
 from datetime import datetime
-import dateutil
 from scipy.spatial.distance import cosine
 
 # enable CORS
@@ -22,7 +21,7 @@ def get_future_event(date):
     Function return True if the event happens after now
     """
     try:
-        if dateutil.parser.parse(date) > datetime.now():
+        if datetime.strptime(date, '%d-%m-%Y') > datetime.now():
             return True
         else:
             return False
@@ -43,6 +42,10 @@ def recommendations(body):
     The body is then passed as an argument to this function, as a dictionary.
     """
     event_indices = body['payload']
+
+    if len(event_indices) == 0:
+        return json.dumps([])
+
     pref_indices = [int(event_idx) for event_idx in event_indices]
     pref_vector = np.mean([np.array(event_vectors_map[idx])
                            for idx in pref_indices], axis=0)
