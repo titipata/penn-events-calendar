@@ -192,7 +192,7 @@ def fetch_events_cni(base_url='https://cni.upenn.edu/events'):
     Fetch events from Computational Neuroscience Initiative (CNI)
     """
     page = requests.get(base_url)
-    event_page = BeautifulSoup(page.content)
+    event_page = BeautifulSoup(page.content, 'html.parser')
     all_events = site.find_all('ul', attrs={'class': 'unstyled'})[1]
 
     events = []
@@ -225,17 +225,16 @@ def fetch_events_cni(base_url='https://cni.upenn.edu/events'):
         try:
             event_page = requests.get(event_url)
             event_soup = BeautifulSoup(event_page.content, 'html.parser')
-            title_soup = event_soup.find('h1', attrs={'class': 'page-header'})
-            if title_soup is not None:
-                title = title_soup.text.strip()
-            details = event_soup.find_all(
-                'div', attrs={'class': 'field-item even'})
-            if len(details) >= 3:
-                description = details[2].text.strip()
-            else:
-                description = ''
+            description = []
+            description_soup = event_soup.find_all('div', attrs={'class': 'field-item even'})
+            for div in description_soup:
+                if div.find('strong') is None:
+                    description.append(div.text)
+                else:
+                    description.append('\n'.join([d.text for d in div.find_all('strong')] + [p.text for p in div.find_all('p')]))
+            description = ' '.join(description)
         except:
-            description, speaker = '', ''
+            description = ''
 
         events.append({
             'title': title,
