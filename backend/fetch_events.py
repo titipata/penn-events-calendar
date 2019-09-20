@@ -2132,7 +2132,7 @@ if __name__ == '__main__':
 
     # produce vector
     if PRODUCE_VECTOR:
-        events_df =  pd.DataFrame(json.loads(open(PATH_DATA, 'r').read()))
+        events_df = pd.DataFrame(json.loads(open(PATH_DATA, 'r').read()))
         events_text = [' '.join([e[1] for e in r.items()])
                        for _, r in events_df[['title', 'description', 'location', 'starttime']].iterrows()]
         events_preprocessed_text = [preprocess(text) for text in events_text]
