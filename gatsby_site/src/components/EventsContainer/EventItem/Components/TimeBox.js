@@ -1,23 +1,27 @@
+import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Datetime as dtutil } from '../../../../utils';
+import useGlobal from '../../../../store';
 
 const DatetimeWrapper = styled.div`
   font-size: 2rem;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
   padding-left: 15px;
   display: flex;
   flex-direction: column;
-  width: 4.65rem;
-  min-width: 4.65rem;
+  width: 5.5rem;
+  min-width: 5.5rem;
 `;
 
-// const StyledDate = styled.div`
-//   font-family: 'Source Code Pro';
-//   padding: 0 3px;
-// `;
+const SubWrapper = styled.div`
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+`;
 
 const StyledTime = styled.div`
   text-align: center;
@@ -25,7 +29,20 @@ const StyledTime = styled.div`
   display: inline-flex;
 `;
 
-const TimeBox = ({ starttime, endtime }) => {
+const StyledFavIcon = styled(Fa).attrs(() => ({
+  icon: 'star',
+}))`
+  color: ${props => (props.checked ? 'orange' : '#eee')};
+  font-size: 1.75rem;
+`;
+
+const TimeBox = ({ starttime, endtime, eventIndex }) => {
+  const [, globalActions] = useGlobal();
+  const [checked, setChecked] = useState(false);
+
+  // destructuring actions to use
+  const { toggleSelectedEvent } = globalActions;
+
   let singleTime = null;
   let plusTime = null;
   if (starttime === endtime) {
@@ -54,6 +71,22 @@ const TimeBox = ({ starttime, endtime }) => {
           )
           : <StyledTime>{singleTime}</StyledTime>
       }
+      <SubWrapper
+        onClick={(e) => {
+          // set global state
+          toggleSelectedEvent(eventIndex);
+          // set local state
+          setChecked(prev => !prev);
+          // block this because if the item has
+          // description this will propagate
+          // through invoke showing description
+          e.stopPropagation();
+        }}
+      >
+        <StyledFavIcon
+          checked={checked}
+        />
+      </SubWrapper>
     </DatetimeWrapper>
   );
 };
@@ -61,11 +94,16 @@ const TimeBox = ({ starttime, endtime }) => {
 TimeBox.propTypes = {
   starttime: PropTypes.string,
   endtime: PropTypes.string,
+  eventIndex: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.string,
+  ]),
 };
 
 TimeBox.defaultProps = {
   starttime: null,
   endtime: null,
+  eventIndex: null,
 };
 
 export default TimeBox;

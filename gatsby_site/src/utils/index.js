@@ -13,14 +13,15 @@ class Datetime {
   }
 
   static getTime(timeStr) {
+    // eslint-disable-next-line
     // console.log(timeStr);
     // console.log(moment(timeStr, 'HH:mm:ss'));
 
-    return moment(timeStr, 'HH:mm:ss').format('LT');
+    return moment(timeStr, ['h:mA', 'h:m A', 'h:ma', 'h:m a', 'H:m']).format('hh:mm A');
   }
 
   static getAssumedEndtime(timeStr) {
-    return moment(timeStr, 'HH:mm:ss').add(1, 'hour').format('LT');
+    return moment(timeStr, ['h:mA', 'h:m A', 'h:ma', 'h:m a', 'H:m']).add(1, 'hour').format('hh:mm A');
   }
 
   static getDayMonthDate(timeStr) {

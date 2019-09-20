@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import ContentBox from './Components/ContentBox';
 import TimeBox from './Components/TimeBox';
@@ -20,113 +20,92 @@ const StyledContentWrapper = styled.div`
   flex-direction: row;
 `;
 
-class EventItem extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      descriptionVisible: false,
-    };
+const EventItem = ({ eventData }) => {
+  // define local hook
+  const [
+    descriptionVisible,
+    setDescriptionVisible,
+  ] = useState(false);
 
-    this._handleCardClick = this._handleCardClick.bind(this);
-    // this._handleCollapseClick = this._handleCollapseClick.bind(this);
-  }
+  // destructuring variables to use
+  const {
+    event_index: eventIndex,
+    title,
+    description,
+    starttime,
+    endtime,
+    speaker,
+    owner,
+    location,
+    url,
+  } = eventData.node;
 
-  _handleCardClick() {
-    // const { similarEvents, ev } = this.props;
-    // const { descriptionVisible } = this.state;
+  // handle functions
+  const _handleCardClick = () => {
+    // set local state to control description visibility
+    setDescriptionVisible(prev => !prev);
+  };
 
-    // dispatch event id to get similar events on click
-    // similarEvents(ev.event_id);
-
-    this.setState(prev => ({
-      descriptionVisible: !prev.descriptionVisible,
-    }));
-  }
-
-  // _handleCollapseClick() {
-  //   this.setState({
-  //     descriptionVisible: false,
-  //   });
-  // }
-
-  render() {
-    // https://stackoverflow.com/a/39333479/4010864
-    // const getEventTime = ({ starttime, endtime }) => ({ starttime, endtime });
-    // const getEventDetail = ({
-    //   category, description, location, title, school, url,
-    // }) => ({
-    //   category, description, location, title, school, url,
-    // });
-    const { descriptionVisible } = this.state;
-    const { eventData } = this.props;
-    const { node } = eventData;
-    const {
-      // id,
-      // date_dt,
-      title,
-      description,
-      // starttime_dt,
-      // endtime_dt,
-      speaker,
-      owner,
-      location,
-      url,
-    } = eventData.node;
-
-    return (
-      // <StyledListItem
-      // onClick={this._handleCardClick}
-      // color={DataColor.getCatColor(this.props.ev.category)}
-      // cursorPointer={this.props.ev.description && !this.state.descriptionVisible}
-      // >
-      <StyledListItem
-        color={getRandomColorFromText(owner)}
-        cursorPointer={description}
-        onClick={this._handleCardClick}
-      >
-        <StyledContentWrapper>
-          <TimeBox
-            starttime={node.starttime_dt}
-            endtime={node.endtime_dt}
-          />
-          <ContentBox
-            // show by default
-            title={title}
-            location={location}
-            owner={owner}
-            url={url}
-            description={description}
-            isDescriptionExpanded={descriptionVisible}
-          />
-        </StyledContentWrapper>
-        {
-          descriptionVisible && description
-            ? (
-              <DescriptionBox
-                // when expanded
-                description={description}
-                speaker={speaker}
-              />
-            )
-            : null
-        }
-      </StyledListItem>
-    );
-  }
-}
+  return (
+    // <StyledListItem
+    // onClick={this._handleCardClick}
+    // color={DataColor.getCatColor(this.props.ev.category)}
+    // cursorPointer={this.props.ev.description && !this.state.descriptionVisible}
+    // >
+    <StyledListItem
+      color={getRandomColorFromText(owner)}
+      cursorPointer={description}
+      onClick={_handleCardClick}
+    >
+      <StyledContentWrapper>
+        <TimeBox
+          eventIndex={eventIndex}
+          starttime={starttime}
+          endtime={endtime}
+        />
+        <ContentBox
+          // show by default
+          title={title}
+          location={location}
+          owner={owner}
+          url={url}
+          description={description}
+          isDescriptionExpanded={descriptionVisible}
+        />
+      </StyledContentWrapper>
+      {
+        descriptionVisible && description
+          ? (
+            <DescriptionBox
+              // when expanded
+              description={description}
+              speaker={speaker}
+            />
+          )
+          : null
+      }
+    </StyledListItem>
+  );
+};
 
 EventItem.propTypes = {
   eventData: PropTypes.shape({
-    id: PropTypes.string,
-    date_dt: PropTypes.string,
-    title: PropTypes.string,
-    description: PropTypes.string,
-    starttime_dt: PropTypes.string,
-    endtime_dt: PropTypes.string,
-    speaker: PropTypes.string,
-    owner: PropTypes.string,
-    location: PropTypes.string,
-    url: PropTypes.string,
+    node: PropTypes.shape({
+      id: PropTypes.string,
+      event_index: PropTypes.oneOfType([
+        PropTypes.number,
+        PropTypes.string,
+      ]),
+      date_dt: PropTypes.string,
+      title: PropTypes.string,
+      description: PropTypes.string,
+      starttime: PropTypes.string,
+      endtime: PropTypes.string,
+      speaker: PropTypes.string,
+      owner: PropTypes.string,
+      location: PropTypes.string,
+      url: PropTypes.string,
+    }),
   }).isRequired,
 };
 
