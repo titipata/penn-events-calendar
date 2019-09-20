@@ -126,7 +126,7 @@ def save_json(ls, file_path):
     Save list of dictionary to JSON
     """
     with open(file_path, 'w') as fp:
-        fp.write('\n'.join(json.dumps(i) for i in ls))
+        fp.write('[\n  ' + ',\n  '.join(json.dumps(i) for i in ls) + '\n]')
 
 
 def convert_event_to_dict(event):
@@ -1916,7 +1916,7 @@ if __name__ == '__main__':
         event_idx_end = event_idx_begin + events_df.event_index.isnull().sum()
         events_df.loc[pd.isnull(events_df.event_index), 'event_index'] = np.arange(event_idx_begin, event_idx_end)
         events_df['event_index'] = events_df['event_index'].astype(int)
-        events_df.to_json(PATH_DATA, orient='records', lines=True)
+        save_json(events_df.to_dict(orient='records'), PATH_VECTOR)
     
     # produce vector
     if PRODUCE_VECTOR:
@@ -1936,4 +1936,4 @@ if __name__ == '__main__':
         lsa_vectors = lsa_model.fit_transform(X_tfidf)
         events_vector = [list(vector) for vector in lsa_vectors]
         events_df['event_vector'] = events_vector
-        events_df[['event_index', 'event_vector']].to_json(PATH_VECTOR, orient='records', lines=True)
+        save_json(events_df[['event_index', 'event_vector']].to_dict(orient='records'), PATH_VECTOR)
