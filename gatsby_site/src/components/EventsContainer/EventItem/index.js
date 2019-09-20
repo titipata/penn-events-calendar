@@ -29,7 +29,7 @@ const EventItem = ({ eventData }) => {
 
   // destructuring variables to use
   const {
-    id,
+    event_index: eventIndex,
     title,
     description,
     starttime,
@@ -59,7 +59,7 @@ const EventItem = ({ eventData }) => {
     >
       <StyledContentWrapper>
         <TimeBox
-          eventId={id}
+          eventIndex={eventIndex}
           starttime={starttime}
           endtime={endtime}
         />
@@ -92,6 +92,10 @@ EventItem.propTypes = {
   eventData: PropTypes.shape({
     node: PropTypes.shape({
       id: PropTypes.string,
+      event_index: PropTypes.oneOfType([
+        PropTypes.number,
+        PropTypes.string,
+      ]),
       date_dt: PropTypes.string,
       title: PropTypes.string,
       description: PropTypes.string,

@@ -36,7 +36,7 @@ const StyledFavIcon = styled(Fa).attrs(() => ({
   font-size: 1.75rem;
 `;
 
-const TimeBox = ({ starttime, endtime, eventId }) => {
+const TimeBox = ({ starttime, endtime, eventIndex }) => {
   const [, globalActions] = useGlobal();
   const [checked, setChecked] = useState(false);
 
@@ -74,7 +74,7 @@ const TimeBox = ({ starttime, endtime, eventId }) => {
       <SubWrapper
         onClick={(e) => {
           // set global state
-          toggleSelectedEvent(eventId);
+          toggleSelectedEvent(eventIndex);
           // set local state
           setChecked(prev => !prev);
           // block this because if the item has
@@ -94,7 +94,7 @@ const TimeBox = ({ starttime, endtime, eventId }) => {
 TimeBox.propTypes = {
   starttime: PropTypes.string,
   endtime: PropTypes.string,
-  eventId: PropTypes.oneOfType([
+  eventIndex: PropTypes.oneOfType([
     PropTypes.number,
     PropTypes.string,
   ]),
@@ -103,7 +103,7 @@ TimeBox.propTypes = {
 TimeBox.defaultProps = {
   starttime: null,
   endtime: null,
-  eventId: null,
+  eventIndex: null,
 };
 
 export default TimeBox;

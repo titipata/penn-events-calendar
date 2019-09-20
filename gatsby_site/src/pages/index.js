@@ -33,6 +33,7 @@ export const query = graphql`
       edges {
         node {
           id
+          event_index
           date_dt
           title
           description
