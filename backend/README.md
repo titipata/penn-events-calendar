@@ -2,7 +2,7 @@
 
 ## Fetch events
 
-`fetch_events.py` contains functions to fetch Penn events. We can run GROBID and fetch to update data in `data/events.json` file 
+`fetch_events.py` contains functions to fetch Penn events. We can run GROBID and fetch to update data in `data/events.json` file
 as follows
 
 ```sh
@@ -20,12 +20,12 @@ python cron_fetch_events.py
 ```
 
 
-## Running Flask API locally
+## Running Hug API locally
 
-Start Flask API by running
+Start Hug API by running:
 
 ```sh
-python api.py
+hug -f hug_api.py -p 8888
 ```
 
 
