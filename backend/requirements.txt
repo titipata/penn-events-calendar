@@ -1,12 +1,2 @@
-flask
-flask-restful
-unidecode
-python-crontab
-beautifulsoup4
-flask-cors
-webargs
-lxml
-spacy
-requests
+hug
 uwsgi
-nltk
