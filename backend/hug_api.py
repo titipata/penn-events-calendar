@@ -42,6 +42,11 @@ def recommendations(body):
     The body is then passed as an argument to this function, as a dictionary.
     """
     event_indices = body['payload']
+
+    if len(event_indices) == 0:
+        indices_recommendation = []
+        return json.dumps(indices_recommendation)
+
     pref_indices = [int(event_idx) for event_idx in event_indices]
     pref_vector = np.mean([np.array(event_vectors_map[idx])
                            for idx in pref_indices], axis=0)
