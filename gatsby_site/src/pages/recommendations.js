@@ -29,6 +29,7 @@ export default ({ data }) => {
         );
         setRecommendedEvents(filteredData);
       })
+      // eslint-disable-next-line
       .catch(err => console.log(err));
   }, selectedEventsIndexes);
 
