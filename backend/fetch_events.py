@@ -2005,7 +2005,7 @@ def fetch_events_ortner_center(base_url='http://ortnercenter.org'):
     return events
 
 
-def fetch_event_penn_today(base_url='https://penntoday.upenn.edu'):
+def fetch_events_penn_today(base_url='https://penntoday.upenn.edu'):
     """
     Penn Today Events
     """
@@ -2082,6 +2082,74 @@ def fetch_events_mins(base_url='http://go.activecalendar.com/handlers/query.ashx
     return events
 
 
+def extract_mindcore_event_detail(event):
+    """
+    Extract specific event for MindCORE
+    """
+    title = event.find('h2', attrs={'class': 'event-title'})
+    title = title.text.strip() if title is not None else ''
+    date = event.find('div', attrs={'class': 'event-meta-item'})
+    date = date.get_text() if date is not None else ''
+    description = event.find('div', attrs={'class': 'row event-inner-content'})
+    description = description.text.strip() if description is not None else ''
+    event_time = event.find('div', attrs={'class': 'event-meta-item event-time'})
+    event_time = event_time.text.strip() if event_time is not None else ''
+    if '-' in event_time:
+        starttime, endtime = event_time.split('-')
+    else:
+        starttime, endtime = event_time, ''
+    event_url = event.find('a').attrs.get('href', '')
+    speaker = title.split(':')[-1].strip() if ':' in title else ''
+
+    return {
+        'title': title,
+        'date': date,
+        'location': '',
+        'description': description,
+        'starttime': starttime,
+        'endtime': endtime,
+        'url': event_url,
+        'speaker': speaker,
+        'owner': 'MindCORE'
+    }
+
+
+def fetch_events_mindcore(base_url='http://mindcore.sas.upenn.edu/event-category/all-events/'):
+    """
+    Fetch events from MindCORE
+    """
+    events = []
+    event_page = requests.get(event_url)
+    event_soup = BeautifulSoup(event_page.content, 'html.parser')
+    try:
+        pagination = event_soup.find('ul', attrs={'class': 'pagination'})
+        pagination_urls = []
+        for li in pagination.find_all('li'):
+            if li.find('a') is not None:
+                pagination_urls.append(li.find('a').attrs.get('href'))
+        pagination_max = max([int(p.split('/')[-2]) for p in pagination_urls if p != ''])
+    except:
+        pagination_max = 1
+
+    if len(event_soup.find_all('article')) != 1:
+        all_events = event_soup.find('div', attrs={'class': 'calendarp'})
+        all_events = all_events.find_all('article')
+        for event in all_events:
+            events.append(extract_mindcore_event_detail(event))
+
+    if pagination_max > 1:
+        for i in range(2, pagination_max + 1):
+            event_url = 'http://mindcore.sas.upenn.edu/event-category/all-events/page/{}/'.format(i)
+            event_page = requests.get(event_url)
+            event_soup = BeautifulSoup(event_page.content, 'html.parser')
+            if len(event_soup.find_all('article')) != 1:
+                all_events = event_soup.find('div', attrs={'class': 'calendarp'})
+                all_events = all_events.find_all('article')
+                for event in all_events:
+                    events.append(extract_mindcore_event_detail(event))
+    return events
+
+
 if __name__ == '__main__':
     events = []
     fetch_fns = [
@@ -2097,8 +2165,8 @@ if __name__ == '__main__':
         fetch_events_business_ethics, fetch_events_law, fetch_events_penn_SAS,
         fetch_events_physics_astronomy, fetch_events_wolf_humanities, fetch_events_music_dept,
         fetch_events_annenberg, fetch_events_religious_studies, fetch_events_AHEAD,
-        fetch_events_SPP, fetch_events_ortner_center, fetch_event_penn_today,
-        fetch_events_mins
+        fetch_events_SPP, fetch_events_ortner_center, fetch_events_penn_today,
+        fetch_events_mins, fetch_events_mindcore
     ]
     for f in tqdm(fetch_fns):
         try:
