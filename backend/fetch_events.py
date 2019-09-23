@@ -204,14 +204,12 @@ def fetch_events_cni(base_url='https://cni.upenn.edu/events'):
         if date is not None:
             date, event_time = date.attrs.get('content').split('T')
             if '-' in event_time:
-                starttime, endtime = event_time.split('-')
-                try:
-                    starttime, endtime = dateutil.parser.parse(starttime).strftime(
-                        "%I:%M %p"), dateutil.parser.parse(endtime).strftime("%I:%M %p")
-                except:
-                    pass
+                starttime = event_time.split('-')[0]
+                starttime = dateutil.parser.parse(starttime)
+                endtime = (starttime + timedelta(hours=1))
+                starttime, endtime = starttime.strftime("%I:%M %p"), endtime.strftime("%I:%M %p")
             else:
-                starttime, endtime = event_time, ''
+                starttime, endtime = '', ''
         else:
             date, starttime, endtime = '', '', ''
 
@@ -242,7 +240,7 @@ def fetch_events_cni(base_url='https://cni.upenn.edu/events'):
             'location': location,
             'description': description,
             'starttime': starttime,
-            'endtime': '',
+            'endtime': endtime,
             'url': event_url,
             'speaker': speaker,
             'owner': 'Computational Neuroscience Initiative (CNI)'
