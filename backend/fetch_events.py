@@ -93,6 +93,26 @@ def clean_date_format(d):
             return ''
 
 
+def clean_starttime(r):
+    if '-' in r['starttime']:
+        starttime = r['starttime'].split('-')[0].strip()
+    else:
+        starttime = r['starttime']
+    return starttime
+
+
+def clean_endtime(r):
+    if '-' in r['starttime']:
+        endtime = r['starttime'].split('-')[-1].strip()
+    else:
+        try:
+            endtime = dateutil.parser.parse(r['starttime']) + timedelta(hours=1)
+            endtime = endtime.strftime("%I:%M %p")
+        except:
+            endtime = r['endtime']
+    return endtime
+
+
 def find_startend_time(s):
     """
     Find starttime and endtime from a given string
@@ -2174,6 +2194,8 @@ if __name__ == '__main__':
     events_df = pd.DataFrame(events).fillna('')
     events_df['date_dt'] = events_df['date'].map(
         lambda x: clean_date_format(x))
+    events_df.loc[:, 'starttime'] = events_df.apply(clean_starttime, axis=1)
+    events_df.loc[events_df.endtime == '', 'endtime'] = events_df.apply(clean_endtime, axis=1)
 
     # save data
     if not os.path.exists(PATH_DATA):
@@ -2195,7 +2217,7 @@ if __name__ == '__main__':
         events_df['event_index'] = events_df['event_index'].astype(int)
         save_json(events_df.to_dict(orient='records'), PATH_DATA)
 
-    # produce vector
+    # produce topic vectors using tf-idf and Laten Semantic Analysis (LSA)
     if PRODUCE_VECTOR:
         events_df = pd.DataFrame(json.loads(open(PATH_DATA, 'r').read()))
         events_text = [' '.join([e[1] for e in r.items()])
