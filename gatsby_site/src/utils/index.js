@@ -37,7 +37,9 @@ class Events {
       .map(ev => ev.node.date_dt)
       .filter(x => x) // filter blank dates out
       .sort((a, b) => (moment(a, 'DD-MM-YYYY') - moment(b, 'DD-MM-YYYY'))) // sort dates
-      .filter(x => moment(x, 'DD-MM-YYYY') >= moment()); // filter only incoming dates
+      // as the 'today' to compare has time as 00:00, all the actual events of 'today'
+      // are filtered out, fix by subtract 'today' to compare out by 1
+      .filter(x => moment(x, 'DD-MM-YYYY') >= moment().subtract(1, 'day')); // filter only incoming dates
 
     // get sorted unique dates
     const uniqueDates = Array.from(new Set(allDates));
