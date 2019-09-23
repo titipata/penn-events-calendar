@@ -193,7 +193,7 @@ def fetch_events_cni(base_url='https://cni.upenn.edu/events'):
     """
     page = requests.get(base_url)
     event_page = BeautifulSoup(page.content, 'html.parser')
-    all_events = site.find_all('ul', attrs={'class': 'unstyled'})[1]
+    all_events = event_page.find_all('ul', attrs={'class': 'unstyled'})[1]
 
     events = []
     all_events = all_events.find_all('li')
@@ -2119,7 +2119,7 @@ def fetch_events_mindcore(base_url='http://mindcore.sas.upenn.edu/event-category
     Fetch events from MindCORE
     """
     events = []
-    event_page = requests.get(event_url)
+    event_page = requests.get(base_url)
     event_soup = BeautifulSoup(event_page.content, 'html.parser')
     try:
         pagination = event_soup.find('ul', attrs={'class': 'pagination'})
