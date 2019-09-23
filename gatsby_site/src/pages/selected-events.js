@@ -19,6 +19,7 @@ export default ({ data }) => {
       <h1>Selected Events</h1>
       <EventsContainer
         allEvents={selectedEvents}
+        noEventDefaultText="You don't have selected events in your library."
       />
     </Layout>
   );

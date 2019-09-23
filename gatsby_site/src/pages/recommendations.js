@@ -38,6 +38,7 @@ export default ({ data }) => {
       <h1>Recommendations</h1>
       <EventsContainer
         allEvents={recommendedEvents}
+        noEventDefaultText="Add some events to your library to see our recommendations."
       />
     </Layout>
   );

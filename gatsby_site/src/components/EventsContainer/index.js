@@ -21,12 +21,12 @@ const StyledH2 = styled.h2`
   margin: 1rem 0;
 `;
 
-const EventsContainer = ({ allEvents }) => {
+const EventsContainer = ({ allEvents, noEventDefaultText }) => {
   // render no data screen
   if (allEvents.length === 0) {
     return (
       <StyledContainer>
-        <p>No available events!</p>
+        <p>{noEventDefaultText}</p>
       </StyledContainer>
     );
   }
@@ -52,6 +52,11 @@ const EventsContainer = ({ allEvents }) => {
 
 EventsContainer.propTypes = {
   allEvents: PropTypes.arrayOf(Object).isRequired,
+  noEventDefaultText: PropTypes.string,
+};
+
+EventsContainer.defaultProps = {
+  noEventDefaultText: null,
 };
 
 export default EventsContainer;
