@@ -44,7 +44,7 @@ def recommendations(body):
     event_indices = body['payload']
 
     if len(event_indices) == 0:
-        return json.dumps([])
+        return []
 
     pref_indices = [int(event_idx) for event_idx in event_indices]
     pref_vector = np.mean([np.array(event_vectors_map[idx])
@@ -55,6 +55,6 @@ def recommendations(body):
 
     # rank indices by cosine distance and get indices
     rank_indices = np.argsort([cosine(pref_vector, event_vectors_map[idx])
-                               for idx in future_event_indices])[0:15]
+                               for idx in future_event_indices])[0:20]
     indices_recommendation = [future_event_indices[i] for i in rank_indices]
-    return json.dumps(indices_recommendation)
+    return indices_recommendation
