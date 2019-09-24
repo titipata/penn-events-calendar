@@ -3,8 +3,12 @@ import React from 'react';
 import EventsContainer from '../components/EventsContainer';
 import Layout from '../components/layout';
 import useGlobal from '../store';
+import useLocalStorage from '../hooks/useLocalStorage';
 
 export default ({ data }) => {
+  // use this to retrieve data and rehydrate before globalState is used
+  useLocalStorage();
+
   const [globalState] = useGlobal();
 
   // get selected event indexes from global state

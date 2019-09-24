@@ -8,9 +8,8 @@ const toggleSelectedEvent = (store, selectedEventId) => {
   });
 };
 
-const saveToLocalStorage = (store) => {
-  // eslint-disable-next-line
-  console.log(`should save ${store} to localStorage here..`);
+const rehydrateStore = (store, storeObj) => {
+  store.setState(storeObj);
 };
 
-export { toggleSelectedEvent, saveToLocalStorage };
+export { toggleSelectedEvent, rehydrateStore };
