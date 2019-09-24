@@ -2179,15 +2179,20 @@ def fetch_events_seas(base_url='https://events.seas.upenn.edu/calendar/list/'):
             event_url = urljoin(base_url, '?tribe_paged={}&tribe_event_display=list'.format(i))
             event_page = BeautifulSoup(requests.get(event_url).content, 'html.parser')
             all_events = event_page.find('div', attrs={'class': 'tribe-events-loop'})
+            year = event_page.find('h2', attrs={'class': 'tribe-events-list-separator-month'})
+            year = year.text.strip() if year is not None else ''
             for event in all_events.find_all('div', attrs={'class': 'type-tribe_events'}):
                 event_attrs = event.find('a', attrs={'class': 'tribe-event-url'}).attrs
                 event_url = event_attrs.get('href', '')
                 title = event_attrs.get('title', '')
-                date = event.find('span', attrs={'class': 'tribe-event-date-start'}).text
+                date = event.find('span', attrs={'class': 'tribe-event-date-start'})
+                date = date.text if date is not None else ''
                 starttime = find_startend_time(date)[0]
                 date = date.replace(starttime, '').replace(' at ', '')
                 endtime = event.find('span', attrs={'class': 'tribe-event-time'})
                 endtime = endtime.text.strip() if endtime is not None else ''
+                if ' ' in year:
+                    date = date + ' ' + year.split(' ')[-1]
                 location = event.find('div', attrs={'class': 'tribe-events-venue-details'})
                 location = ' '.join(location.text.replace('+ Google Map', '').strip().split('\n')[0:2])
                 description = event.find('div', attrs={'class': 'tribe-events-list-event-description'})
