@@ -2196,23 +2196,27 @@ def fetch_events_seas(base_url='https://events.seas.upenn.edu/calendar/list/'):
                 # get description if available
                 try:
                     event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
-                    description = event_soup.find('div', attrs={'class': 'tribe-events-single-event-description'})
+                    description = event_soup.find('div', attrs={'id': 'z5_events_main_content'})
                     if description is not None:
                         description = description.text.strip()
                         description = '\n'.join([d.strip() for d in description.split('\n') if d.strip() != ''])
+                    speaker = event_soup.find('div', attrs={'id': 'z5_events_speaker_info'})
+                    if speaker is not None:
+                        speaker = speaker.text.strip()
+                        speaker = '\n'.join([d.strip() for d in speaker.split('\n') if d.strip() != ''])
                 except:
-                    pass
-            events.append({
-                'title': title,
-                'date': date,
-                'location': location,
-                'description': description,
-                'starttime': starttime,
-                'endtime': endtime,
-                'url': event_url,
-                'speaker': '',
-                'owner': 'School of Engineering and Applied Science (SEAS)'
-            })
+                    speaker = ''
+                events.append({
+                    'title': title,
+                    'date': date,
+                    'location': location,
+                    'description': description,
+                    'starttime': starttime,
+                    'endtime': endtime,
+                    'url': event_url,
+                    'speaker': speaker,
+                    'owner': 'School of Engineering and Applied Science (SEAS)'
+                })
         except:
             pass
     return events
