@@ -2195,7 +2195,7 @@ if __name__ == '__main__':
     events_df['date_dt'] = events_df['date'].map(
         lambda x: clean_date_format(x))
     events_df.loc[:, 'starttime'] = events_df.apply(clean_starttime, axis=1)
-    events_df.loc[events_df.endtime == '', 'endtime'] = events_df.loc[events_df.endtime == ''].apply(clean_end_time, axis=1)
+    events_df.loc[events_df.endtime == '', 'endtime'] = events_df.loc[events_df.endtime == ''].apply(clean_endtime, axis=1)
 
     # save data
     if not os.path.exists(PATH_DATA):
