@@ -46,14 +46,11 @@ const TimeBox = ({ starttime, endtime, eventIndex }) => {
   const { toggleSelectedEvent } = globalActions;
 
   let singleTime = null;
-  let plusTime = null;
   if (starttime === endtime) {
     if (!starttime || !endtime) {
       singleTime = '-';
-    } else if (starttime.includes('allday')) {
+    } else if (starttime.includes('(All day)')) {
       singleTime = 'All day';
-    } else {
-      plusTime = dtutil.getAssumedEndtime(endtime);
     }
   }
 
@@ -67,7 +64,7 @@ const TimeBox = ({ starttime, endtime, eventIndex }) => {
                 {dtutil.getTime(starttime)}
               </StyledTime>
               <StyledTime>
-                {plusTime || dtutil.getTime(endtime)}
+                {endtime ? dtutil.getTime(endtime) : null}
               </StyledTime>
             </React.Fragment>
           )
