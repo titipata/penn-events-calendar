@@ -2169,7 +2169,7 @@ def fetch_events_mindcore(base_url='http://mindcore.sas.upenn.edu/event-category
     return events
 
 
-def fetch_evetns_seas(base_url='https://events.seas.upenn.edu/calendar/list/'):
+def fetch_events_seas(base_url='https://events.seas.upenn.edu/calendar/list/'):
     """
     Fetch events from School Engineering and Applied Science (SEAS)
     """
@@ -2225,7 +2225,7 @@ if __name__ == '__main__':
         fetch_events_physics_astronomy, fetch_events_wolf_humanities, fetch_events_music_dept,
         fetch_events_annenberg, fetch_events_religious_studies, fetch_events_AHEAD,
         fetch_events_SPP, fetch_events_ortner_center, fetch_events_penn_today,
-        fetch_events_mins, fetch_events_mindcore, fetch_evetns_seas
+        fetch_events_mins, fetch_events_mindcore, fetch_events_seas
     ]
     for f in tqdm(fetch_fns):
         try:

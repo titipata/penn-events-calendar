@@ -1,7 +1,8 @@
 {
   "extends": "airbnb",
   "plugins": [
-    "react"
+    "react",
+    "react-hooks"
   ],
   "parser": "babel-eslint",
   "rules": {
@@ -9,9 +10,13 @@
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
     "no-underscore-dangle": 0,
     "react/prop-types": ["error", { "ignore": ["navigation", "data"] }],
-    "global-require": 0
+    "global-require": 0,
+    "react-hooks/rules-of-hooks": "error",
+    "react-hooks/exhaustive-deps": "warn"
   },
   "globals": {
-    "fetch": false
+    "fetch": false,
+    "localStorage": false,
+    "window": false
   }
 }

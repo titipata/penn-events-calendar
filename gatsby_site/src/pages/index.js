@@ -9,6 +9,7 @@ import { graphql } from 'gatsby';
 import React from 'react';
 import EventsContainer from '../components/EventsContainer';
 import Layout from '../components/layout';
+import useLocalStorage from '../hooks/useLocalStorage';
 
 // add fa font to use
 library.add(
@@ -18,14 +19,19 @@ library.add(
   faCopy, faStar,
 );
 
-export default ({ data }) => (
-  <Layout>
-    <h1>Upcoming Events</h1>
-    <EventsContainer
-      allEvents={data.allEventsJson.edges}
-    />
-  </Layout>
-);
+export default ({ data }) => {
+  // use this to retrieve data and rehydrate before globalState is used
+  useLocalStorage();
+
+  return (
+    <Layout>
+      <h1>Upcoming Events</h1>
+      <EventsContainer
+        allEvents={data.allEventsJson.edges.slice(0, 80)}
+      />
+    </Layout>
+  );
+};
 
 export const query = graphql`
   query {
