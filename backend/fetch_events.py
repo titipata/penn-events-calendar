@@ -470,13 +470,15 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
 
         for event in page_events:
             event_url = base_url + event.find('a')['href']
-            start_time, end_time = event.find_all('time')
-            start_time = start_time.text.strip() if start_time is not None else ''
-            end_time = end_time.text.strip() if end_time is not None else ''
+            try:
+                start_time, end_time = event.find_all('time')
+                start_time = start_time.text.strip() if start_time is not None else ''
+                end_time = end_time.text.strip() if end_time is not None else ''
+            except:
+                start_time, end_time = '', ''
             event_page = requests.get(event_url)
             event_soup = BeautifulSoup(event_page.content, 'html.parser')
-
-            title = event.find('h1', attrs={'class': 'page-header'})
+            title = event_soup.find('h1', attrs={'class': 'page-header'})
             title = title.text.strip() if title is not None else ''
             speaker = event_soup.find(
                 'div', attrs={'class': 'col-sm-4 bs-region bs-region--right'})
@@ -489,7 +491,7 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
                     'a', attrs={'class': 'btn btn-lg btn-primary btn-download'})['href']
                 pdf_url = urljoin('https://economics.sas.upenn.edu/', pdf_path)
                 parsed_article = requests.post(
-                    url, files={'input': requests.get(pdf_url).content}).text
+                    pdf_url, files={'input': requests.get(pdf_url).content}).text
                 pdf_soup = BeautifulSoup(parsed_article, 'lxml')
                 title = pdf_soup.find('title')
                 title = title.text if title is not None else ''
@@ -2064,6 +2066,8 @@ def fetch_events_mins(base_url='http://go.activecalendar.com/handlers/query.ashx
             starttime.split()), ' '.join(endtime.split())
         dates.append([date, starttime, endtime])
     urls = [h4.find('a').attrs['href'] for h4 in event_soup.find_all('h4')]
+    titles = [h4.find('a').attrs.get('aria-label', '') if h4.find('a') is not None else ''
+              for h4 in event_soup.find_all('h4')]
 
     events_descriptions, locations = [], []
     for url in urls:
@@ -2082,9 +2086,6 @@ def fetch_events_mins(base_url='http://go.activecalendar.com/handlers/query.ashx
                 'span', attrs={'itemprop': 'streetAddress'}).get_text()
         events_descriptions.append(event_description)
         locations.append(location)
-
-    titles = [h4.find('a').text if h4.find('a') is not None else ''
-              for h4 in event_soup.find_all('h4')]
 
     for title, date, url, description, location in zip(titles, dates, urls, events_descriptions, locations):
         events.append({
@@ -2168,6 +2169,46 @@ def fetch_events_mindcore(base_url='http://mindcore.sas.upenn.edu/event-category
     return events
 
 
+def fetch_evetns_seas(base_url='https://events.seas.upenn.edu/calendar/list/'):
+    """
+    Fetch events from School Engineering and Applied Science (SEAS)
+    """
+    events = []
+    for i in range(1, 3):
+        try:
+            event_url = base_url + '?tribe_paged={}&tribe_event_display=list'.format(i)
+            event_page = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+            all_events = event_page.find('div', attrs={'class': 'tribe-events-loop'})
+            for event in all_events.find_all('div', attrs={'class': 'type-tribe_events'}):
+                event_attrs = event.find('a', attrs={'class': 'tribe-event-url'}).attrs
+                event_url = event_attrs.get('href', '')
+                title = event_attrs.get('title', '')
+                date = event.find('span', attrs={'class': 'tribe-event-date-start'}).text
+                starttime = find_startend_time(date)[0]
+                date = date.replace(starttime, '')
+                endtime = event.find('span', attrs={'class': 'tribe-event-time'})
+                endtime = endtime.text.strip() if endtime is not None else ''
+                location = event.find('div', attrs={'class': 'tribe-events-venue-details'})
+                location = ' '.join(location.text.replace('+ Google Map', '').strip().split('\n')[0:2])
+                description = event.find('div', attrs={'class': 'tribe-events-list-event-description'})
+                description = description.text.strip() if description is not None else ''
+
+                events.append({
+                    'title': title,
+                    'date': date,
+                    'location': location,
+                    'description': description,
+                    'starttime': starttime,
+                    'endtime': endtime,
+                    'url': event_url,
+                    'speaker': '',
+                    'owner': 'School of Engineering and Applied Science (SEAS)'
+                })
+        except:
+            pass
+    return events
+
+
 if __name__ == '__main__':
     events = []
     fetch_fns = [
@@ -2184,7 +2225,7 @@ if __name__ == '__main__':
         fetch_events_physics_astronomy, fetch_events_wolf_humanities, fetch_events_music_dept,
         fetch_events_annenberg, fetch_events_religious_studies, fetch_events_AHEAD,
         fetch_events_SPP, fetch_events_ortner_center, fetch_events_penn_today,
-        fetch_events_mins, fetch_events_mindcore
+        fetch_events_mins, fetch_events_mindcore, fetch_evetns_seas
     ]
     for f in tqdm(fetch_fns):
         try:
