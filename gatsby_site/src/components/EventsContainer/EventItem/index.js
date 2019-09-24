@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import ContentBox from './Components/ContentBox';
-import TimeBox from './Components/TimeBox';
-import DescriptionBox from './Components/DescriptionBox';
 import { getRandomColorFromText } from '../../../utils';
+import ContentBox from './Components/ContentBox';
+import DescriptionBox from './Components/DescriptionBox';
+import TimeBox from './Components/TimeBox';
 
 const StyledListItem = styled.li`
   margin-bottom: 5px;
@@ -47,11 +47,6 @@ const EventItem = ({ eventData }) => {
   };
 
   return (
-    // <StyledListItem
-    // onClick={this._handleCardClick}
-    // color={DataColor.getCatColor(this.props.ev.category)}
-    // cursorPointer={this.props.ev.description && !this.state.descriptionVisible}
-    // >
     <StyledListItem
       color={getRandomColorFromText(owner)}
       cursorPointer={description}

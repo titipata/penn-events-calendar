@@ -27,7 +27,7 @@ export default ({ data }) => {
     <Layout>
       <h1>Upcoming Events</h1>
       <EventsContainer
-        allEvents={data.allEventsJson.edges}
+        allEvents={data.allEventsJson.edges.slice(0, 80)}
       />
     </Layout>
   );
