@@ -70,9 +70,8 @@ class Events {
 
   // ---- grouping
   static groupByDate(preprocessedEventArr) {
-    // console.log('preprocessedEventArr', preprocessedEventArr);
     // right after mounting, the data is not yet derived
-    if (preprocessedEventArr.length === 0) {
+    if (!preprocessedEventArr || preprocessedEventArr.length === 0) {
       return [];
     }
 
@@ -111,7 +110,7 @@ class Events {
   static getPaginatedEvents(preprocessedEventArr, maxItemsPerPage = 30) {
     const totalPage = Math.ceil(preprocessedEventArr.length / maxItemsPerPage);
     const paginatedEvents = [...Array(totalPage)].map((_, ind) => ({
-      page: ind,
+      page: ind + 1,
       data: preprocessedEventArr
         .slice(
           ind * maxItemsPerPage,

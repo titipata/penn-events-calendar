@@ -31,10 +31,13 @@ const EventsContainer = ({ allEvents, noEventDefaultText }) => {
   // get paginated events
   const paginatedEvents = evUtil.getPaginatedEvents(allEvents);
   // set current page data when currentPage and paginatedEvents is changed
+  // as we use globalState to retrieve data from localStorage
+  // we don't get the data right after the component is mounted
+  // thus we also watch for `allEvents`
   useEffect(() => {
-    const { data } = paginatedEvents.find(grp => grp.page === currentPage);
+    const { data } = paginatedEvents.find(grp => grp.page === currentPage) || [];
     setCurrentPageData(evUtil.groupByDate(data));
-  }, [currentPage]);
+  }, [currentPage, allEvents]);
 
   // ---- render no data screen
   if (allEvents.length === 0) {
