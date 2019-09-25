@@ -11,6 +11,7 @@ import EventsContainer from '../components/EventsContainer';
 import Layout from '../components/layout';
 import useLocalStorage from '../hooks/useLocalStorage';
 import { Events as evUtil } from '../utils';
+import 'rc-pagination/assets/index.css';
 
 // add fa font to use
 library.add(

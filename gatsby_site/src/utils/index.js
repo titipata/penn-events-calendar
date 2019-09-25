@@ -70,6 +70,12 @@ class Events {
 
   // ---- grouping
   static groupByDate(preprocessedEventArr) {
+    // console.log('preprocessedEventArr', preprocessedEventArr);
+    // right after mounting, the data is not yet derived
+    if (preprocessedEventArr.length === 0) {
+      return [];
+    }
+
     // get all dates from preprocessed event array
     const allDates = preprocessedEventArr
       .map(ev => ev.node.date_dt);
@@ -88,6 +94,32 @@ class Events {
     ), []);
 
     return groupbyDate;
+  }
+
+  // paginate structure:
+  // [
+  //   {
+  //     page: x,
+  //     data: [ev1, ev2, ev3],
+  //   },
+  //   {
+  //     page: y,
+  //     data: [ev4, ev5, ev6],
+  //   },
+  // ]
+  // maxItemsPerPage is default at 30
+  static getPaginatedEvents(preprocessedEventArr, maxItemsPerPage = 30) {
+    const totalPage = Math.ceil(preprocessedEventArr.length / maxItemsPerPage);
+    const paginatedEvents = [...Array(totalPage)].map((_, ind) => ({
+      page: ind,
+      data: preprocessedEventArr
+        .slice(
+          ind * maxItemsPerPage,
+          maxItemsPerPage * (ind + 1),
+        ),
+    }));
+
+    return paginatedEvents;
   }
 }
 
