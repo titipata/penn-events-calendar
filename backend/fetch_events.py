@@ -1022,17 +1022,11 @@ def fetch_events_CURF(base_url='https://www.curf.upenn.edu'):
         event_soup = BeautifulSoup(requests.get(
             event_url).content, 'html.parser')
         location = event_soup.find(
-            'span', attrs={'class': 'date-display-start'}).text.strip()
-        try:
-            starttime = event_soup.find(
-                'span', attrs={'class': 'date-display-start'}).text.strip()
-        except:
-            starttime = ''
-        try:
-            endtime = event_soup.find(
-                'span', attrs={'class': 'date-display-end'}).text.strip()
-        except:
-            endtime = ''
+            'div', attrs={'class': 'eventlocation'})
+        location = location.text.strip() if location is not None else ''
+        starttime = find_startend_time(date)[0]
+        endtime = event_soup.find('span', attrs={'class': 'date-display-end'})
+        endtime = endtime.text.strip() if endtime is not None else ''
         event_details = event_soup.find('div', attrs={'class': 'eventdetails'})
         if event_details is not None:
             event_description = event_details.find(
@@ -1046,10 +1040,10 @@ def fetch_events_CURF(base_url='https://www.curf.upenn.edu'):
             'description': description,
             'url': event_url,
             'date': date,
-            'owner': 'Center for Undergrad Research and Fellowship (CURF)',
             'location': location,
             'starttime': starttime,
-            'endtime': endtime
+            'endtime': endtime,
+            'owner': 'Center for Undergrad Research and Fellowship (CURF)',
         })
     return events
 
@@ -1511,7 +1505,8 @@ def fetch_events_CEAS(base_url='https://ceas.sas.upenn.edu'):
         title = event_soup.find('h1', attrs={'class': 'page-header'})
         title = title.text.strip() if title is not None else ''
         date = event_soup.find(
-            'span', attrs={'class': 'date-display-single'}).text.strip()
+            'span', attrs={'class': 'date-display-single'})
+        date = date.text.strip() if date is not None else ''
         starttime, endtime = find_startend_time(date)
         details = event_soup.find('div', attrs={
                                   'class': 'field field-name-body field-type-text-with-summary field-label-hidden'})
@@ -1741,13 +1736,18 @@ def fetch_events_physics_astronomy(base_url='https://www.physics.upenn.edu'):
             event_url = base_url + event.find('a')['href']
             event_soup = BeautifulSoup(requests.get(
                 event_url).content, 'html.parser')
-            title = event.find('a')
+            title = event_soup.find('h3', attrs={'class': 'events-title'})
             title = title.text.strip() if title is not None else ''
-            event_time = event.find('span', attrs={'class': 'news-date'})
-            starttime, endtime = event_time.find_all('time')
-            starttime, endtime = starttime.text or '', endtime.text or ''
+            date = event_soup.find('div', attrs={'class': 'event-date'})
+            date = ' '.join([d.text.strip() for d in date.find_all('time') if d is not None])
+            try:
+                event_time = event_soup.find('span', attrs={'class': 'news-date'})
+                starttime, endtime = event_time.find_all('time')
+                starttime, endtime = starttime.text.strip() or '', endtime.text.strip() or ''
+            except:
+                starttime, endtime = '', ''
             speaker = ' '.join([h5.text.strip() if h5.text is not None else ''
-                                for h5 in all_events[0].find_all('h5')]).strip()
+                                for h5 in event.find_all('h5')]).strip()
             description = event_soup.find('p')
             description = description.text.strip() if description is not None else ''
             events.append({
@@ -2176,23 +2176,41 @@ def fetch_events_seas(base_url='https://events.seas.upenn.edu/calendar/list/'):
     events = []
     for i in range(1, 3):
         try:
-            event_url = base_url + '?tribe_paged={}&tribe_event_display=list'.format(i)
+            event_url = urljoin(base_url, '?tribe_paged={}&tribe_event_display=list'.format(i))
             event_page = BeautifulSoup(requests.get(event_url).content, 'html.parser')
             all_events = event_page.find('div', attrs={'class': 'tribe-events-loop'})
+            year = event_page.find('h2', attrs={'class': 'tribe-events-list-separator-month'})
+            year = year.text.strip() if year is not None else ''
             for event in all_events.find_all('div', attrs={'class': 'type-tribe_events'}):
                 event_attrs = event.find('a', attrs={'class': 'tribe-event-url'}).attrs
                 event_url = event_attrs.get('href', '')
                 title = event_attrs.get('title', '')
-                date = event.find('span', attrs={'class': 'tribe-event-date-start'}).text
+                date = event.find('span', attrs={'class': 'tribe-event-date-start'})
+                date = date.text if date is not None else ''
                 starttime = find_startend_time(date)[0]
-                date = date.replace(starttime, '')
+                date = date.replace(starttime, '').replace(' at ', '')
                 endtime = event.find('span', attrs={'class': 'tribe-event-time'})
                 endtime = endtime.text.strip() if endtime is not None else ''
+                if ' ' in year:
+                    date = date + ' ' + year.split(' ')[-1]
                 location = event.find('div', attrs={'class': 'tribe-events-venue-details'})
                 location = ' '.join(location.text.replace('+ Google Map', '').strip().split('\n')[0:2])
                 description = event.find('div', attrs={'class': 'tribe-events-list-event-description'})
                 description = description.text.strip() if description is not None else ''
 
+                # get description if available
+                try:
+                    event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+                    description = event_soup.find('div', attrs={'id': 'z5_events_main_content'})
+                    if description is not None:
+                        description = description.text.strip()
+                        description = '\n'.join([d.strip() for d in description.split('\n') if d.strip() != ''])
+                    speaker = event_soup.find('div', attrs={'id': 'z5_events_speaker_info'})
+                    if speaker is not None:
+                        speaker = speaker.text.strip()
+                        speaker = '\n'.join([d.strip() for d in speaker.split('\n') if d.strip() != ''])
+                except:
+                    speaker = ''
                 events.append({
                     'title': title,
                     'date': date,
@@ -2201,7 +2219,7 @@ def fetch_events_seas(base_url='https://events.seas.upenn.edu/calendar/list/'):
                     'starttime': starttime,
                     'endtime': endtime,
                     'url': event_url,
-                    'speaker': '',
+                    'speaker': speaker,
                     'owner': 'School of Engineering and Applied Science (SEAS)'
                 })
         except:
