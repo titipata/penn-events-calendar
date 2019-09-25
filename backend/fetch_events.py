@@ -500,6 +500,7 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
                 title = title.text if title is not None else ''
                 description = pdf_soup.find('abstract')
                 description = description.text.strip() if description is not None else ''
+                description = ' '.join(description.split(' ')[0:500])
             except:
                 description = ''
 
