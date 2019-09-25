@@ -51,6 +51,8 @@ const EventsContainer = ({ allEvents, noEventDefaultText }) => {
 };
 
 EventsContainer.propTypes = {
+  // allEvents is supposed to be preprocessed already
+  // including filter incomplete data out and sort by date ascendingly
   allEvents: PropTypes.arrayOf(Object).isRequired,
   noEventDefaultText: PropTypes.string,
 };

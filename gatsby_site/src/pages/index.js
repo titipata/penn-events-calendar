@@ -10,6 +10,7 @@ import React from 'react';
 import EventsContainer from '../components/EventsContainer';
 import Layout from '../components/layout';
 import useLocalStorage from '../hooks/useLocalStorage';
+import { Events as evUtil } from '../utils';
 
 // add fa font to use
 library.add(
@@ -22,12 +23,17 @@ library.add(
 export default ({ data }) => {
   // use this to retrieve data and rehydrate before globalState is used
   useLocalStorage();
+  // preprocess events before sending to events list
+  const preprocessedEvents = evUtil.getPreprocessedEvents(
+    data.allEventsJson.edges,
+    true,
+  );
 
   return (
     <Layout>
       <h1>Upcoming Events</h1>
       <EventsContainer
-        allEvents={data.allEventsJson.edges.slice(0, 80)}
+        allEvents={preprocessedEvents}
       />
     </Layout>
   );
