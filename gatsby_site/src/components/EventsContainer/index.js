@@ -1,7 +1,8 @@
 import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
 import Pagination from 'rc-pagination';
-import React, { useState, useEffect } from 'react';
+import localeInfo from 'rc-pagination/lib/locale/en_US';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Events as evUtil, Key } from '../../utils';
 import EventList from './EventList';
@@ -20,6 +21,18 @@ const StyledH2 = styled.h2`
   font-weight: normal;
   color: #333;
   margin: 1rem 0;
+`;
+
+const StyledPagination = styled(Pagination)`
+  transform: scale(1.25);
+  margin: 10px 15px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  li {
+    outline: none;
+    margin-bottom: 0;
+  }
 `;
 
 const EventsContainer = ({ allEvents, noEventDefaultText }) => {
@@ -66,11 +79,13 @@ const EventsContainer = ({ allEvents, noEventDefaultText }) => {
           </StyledContainer>
         ))
       }
-      <Pagination
+      <StyledPagination
         onChange={nextPage => setCurrentPage(nextPage)}
         current={currentPage}
         total={allEvents.length - 1}
         pageSize={30}
+        hideOnSinglePage
+        locale={localeInfo}
       />
     </>
   );
