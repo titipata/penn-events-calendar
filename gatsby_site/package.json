@@ -25,6 +25,7 @@
     "gatsby-transformer-json": "^2.2.9",
     "moment": "^2.24.0",
     "prop-types": "^15.7.2",
+    "rc-pagination": "^1.20.7",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-typography": "^0.16.19",
