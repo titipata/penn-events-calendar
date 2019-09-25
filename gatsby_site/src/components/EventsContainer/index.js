@@ -62,7 +62,7 @@ const EventsContainer = ({ allEvents, noEventDefaultText }) => {
   }
 
   return (
-    <>
+    <StyledContainer>
       {
         currentPageData.map(grp => (
           <StyledContainer key={Key.getShortKey()}>
@@ -80,14 +80,17 @@ const EventsContainer = ({ allEvents, noEventDefaultText }) => {
         ))
       }
       <StyledPagination
-        onChange={nextPage => setCurrentPage(nextPage)}
+        onChange={(nextPage) => {
+          setCurrentPage(nextPage);
+          window.scrollTo(0, 0);
+        }}
         current={currentPage}
         total={allEvents.length - 1}
         pageSize={30}
         hideOnSinglePage
         locale={localeInfo}
       />
-    </>
+    </StyledContainer>
   );
 };
 

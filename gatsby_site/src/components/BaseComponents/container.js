@@ -15,7 +15,7 @@ const Container = styled.div`
   /* this is for footer to sticky at bottom */
   flex: 1;
   margin: 0 auto;
-  padding: ${rhythm(2)};
+  padding: ${rhythm(1)};
   padding-top: ${rhythm(1.5)};
 
   ${media.extraLarge`
