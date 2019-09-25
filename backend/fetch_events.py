@@ -18,7 +18,9 @@ from tqdm import tqdm
 
 PATH_DATA = os.path.join('data', 'events.json')  # path to save events
 GROBID_URL = 'http://localhost:8070'
+GROBID_PDF_URL = '{}/api/processFulltextDocument'.format(GROBID_URL)
 PRODUCE_VECTOR = True  # if True, produce vector
+
 
 if PRODUCE_VECTOR:
     PATH_VECTOR = os.path.join('data', 'events_vector.json')
@@ -461,8 +463,7 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
 
     # loop through all pages
     for page in range(n_pages + 1):
-        all_event_url = 'https://economics.sas.upenn.edu/events?tid=All&page=%s' % str(
-            page)
+        all_event_url = 'https://economics.sas.upenn.edu/events?tid=All&page={}'.format(page)
         page = requests.get(all_event_url)
         all_event_soup = BeautifulSoup(page.content, 'html.parser')
         page_events = all_event_soup.find(
@@ -473,7 +474,10 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
             try:
                 start_time, end_time = event.find_all('time')
                 start_time = start_time.text.strip() if start_time is not None else ''
+                start_time = start_time.split(' - ')[-1]
+                date = start_time.split(' - ')[0]
                 end_time = end_time.text.strip() if end_time is not None else ''
+                end_time = end_time.split(' - ')[-1]
             except:
                 start_time, end_time = '', ''
             event_page = requests.get(event_url)
@@ -486,12 +490,11 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
                 'Download Paper', '').strip() if speaker is not None else ''
 
             try:
-                url = '%s/api/processFulltextDocument' % GROBID_URL
                 pdf_path = event_soup.find(
                     'a', attrs={'class': 'btn btn-lg btn-primary btn-download'})['href']
                 pdf_url = urljoin('https://economics.sas.upenn.edu/', pdf_path)
                 parsed_article = requests.post(
-                    pdf_url, files={'input': requests.get(pdf_url).content}).text
+                    GROBID_PDF_URL, files={'input': requests.get(pdf_url).content}).text
                 pdf_soup = BeautifulSoup(parsed_article, 'lxml')
                 title = pdf_soup.find('title')
                 title = title.text if title is not None else ''
@@ -506,7 +509,7 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
                 'title': title,
                 'description': description,
                 'speaker': speaker,
-                'date': start_time,
+                'date': date,
                 'starttime': start_time,
                 'endtime': end_time,
                 'location': location,
@@ -2249,7 +2252,7 @@ if __name__ == '__main__':
         try:
             events.extend(f())
         except:
-            pass
+            print(f)
     events_df = pd.DataFrame(events).fillna('')
     events_df['date_dt'] = events_df['date'].map(
         lambda x: clean_date_format(x))
