@@ -4,6 +4,7 @@ import EventsContainer from '../components/EventsContainer';
 import Layout from '../components/layout';
 import useGlobal from '../store';
 import useLocalStorage from '../hooks/useLocalStorage';
+import { Events as evUtil } from '../utils';
 
 export default ({ data }) => {
   // use this to retrieve data and rehydrate before globalState is used
@@ -14,7 +15,9 @@ export default ({ data }) => {
   // get selected event indexes from global state
   const { selectedEvents: selectedEventsIndexes } = globalState;
   // filter only selected event to pass to container
-  const selectedEvents = data.allEventsJson.edges.filter(
+  const selectedEvents = evUtil.getPreprocessedEvents(
+    data.allEventsJson.edges,
+  ).filter(
     x => selectedEventsIndexes.includes(x.node.event_index),
   );
 
