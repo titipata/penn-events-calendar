@@ -35,7 +35,7 @@ export default ({ data }) => {
       })
       // eslint-disable-next-line
       .catch(err => console.log(err));
-  }, selectedEventsIndexes);
+  }, [selectedEventsIndexes]);
 
   return (
     <Layout>
