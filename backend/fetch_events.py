@@ -474,12 +474,11 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
             try:
                 start_time, end_time = event.find_all('time')
                 start_time = start_time.text.strip() if start_time is not None else ''
-                start_time = start_time.split(' - ')[-1]
-                date = start_time.split(' - ')[0]
-                end_time = end_time.text.strip() if end_time is not None else ''
-                end_time = end_time.split(' - ')[-1]
+                date, starttime = start_time.split(' - ')[0], start_time.split(' - ')[-1]
+                endtime = end_time.text.strip() if end_time is not None else ''
+                endtime = end_time.split(' - ')[-1]
             except:
-                start_time, end_time = '', ''
+                starttime, endtime = '', ''
             event_page = requests.get(event_url)
             event_soup = BeautifulSoup(event_page.content, 'html.parser')
             title = event_soup.find('h1', attrs={'class': 'page-header'})
@@ -511,8 +510,8 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
                 'description': description,
                 'speaker': speaker,
                 'date': date,
-                'starttime': start_time,
-                'endtime': end_time,
+                'starttime': starttime,
+                'endtime': endtime,
                 'location': location,
                 'url': event_url,
                 'owner': 'Department of Economics'
