@@ -475,7 +475,7 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
                 start_time, end_time = event.find_all('time')
                 start_time = start_time.text.strip() if start_time is not None else ''
                 date, starttime = start_time.split(' - ')[0], start_time.split(' - ')[-1]
-                endtime = end_time.text.strip() if end_time is not None else ''
+                end_time = end_time.text.strip() if end_time is not None else ''
                 endtime = end_time.split(' - ')[-1]
             except:
                 starttime, endtime = '', ''
@@ -2283,7 +2283,7 @@ if __name__ == '__main__':
     if PRODUCE_VECTOR:
         events_df = pd.DataFrame(json.loads(open(PATH_DATA, 'r').read()))
         events_text = [' '.join([e[1] for e in r.items()])
-                       for _, r in events_df[['title', 'description', 'location', 'starttime']].iterrows()]
+                       for _, r in events_df[['title', 'description', 'location']].iterrows()]
         events_preprocessed_text = [preprocess(text) for text in events_text]
         tfidf_model = TfidfVectorizer(min_df=3, max_df=0.85,
                                       lowercase=True, norm='l2',
