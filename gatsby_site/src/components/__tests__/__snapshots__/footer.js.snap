@@ -1,0 +1,32 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Footer renders correctly 1`] = `
+<div
+  className="sc-bdVaJa bcBbJh"
+>
+  <div
+    className="sc-bwzfXH iOMFMW"
+  >
+    Made at 
+    <a
+      className="sc-htpNat bFVrkX"
+      href="http://kordinglab.com/"
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      kordinglab.com
+    </a>
+     at University of Pennsylvania
+    <br />
+    Help us make it better at 
+    <a
+      className="sc-htpNat bFVrkX"
+      href="https://github.com/titipata/penn-events-calendar/issues/"
+      rel="noopener noreferrer"
+      target="_blank"
+    >
+      titipata/penn-events-calendar
+    </a>
+  </div>
+</div>
+`;
