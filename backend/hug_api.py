@@ -70,16 +70,21 @@ def recommendations(body):
     return indices_recommendation
 
 
-@hug.get("/query", examples="title=CNI")
-def query(title: hug.types.text):
+@hug.get("/query", examples="search_query=CNI")
+def query(search_query: hug.types.text):
     """
     Search events from index,
     this function will return empty list if no events are found
 
-    example query: http://localhost:8888/query?title=CNI
+    example query: http://localhost:8888/query?search_query=CNI
 
     See more query examples at: https://elasticsearch-dsl.readthedocs.io/en/latest/search_dsl.html
     """
-    responses = es_search.query("match", title=title).execute()
+    fields = ['title', 'description', 'owner', 'speaker', 'location']
+    responses = es_search.query(
+        "multi_match",
+        query=search_query,
+        fields=fields
+    ).execute()
     search_responses = [response.to_dict() for response in responses]
     return search_responses
