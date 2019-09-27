@@ -3,6 +3,7 @@
 # loaded data and notebooks
 .vscode/
 grobid-*/
+elasticsearch-*/
 
 ### macOS ###
 *.DS_Store

@@ -2,3 +2,5 @@ hug
 uwsgi
 numpy
 scipy
+elasticsearch
+elasticsearch_dsl
