@@ -85,6 +85,6 @@ def query(search_query: hug.types.text):
         "multi_match",
         query=search_query,
         fields=fields
-    ).execute()
-    search_responses = [response.to_dict() for response in responses]
+    )
+    search_responses = [r.to_dict() for r in responses[0:40].execute()]
     return search_responses
