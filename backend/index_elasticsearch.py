@@ -36,6 +36,66 @@ def generate_event(events):
         }
 
 
+# define custom analyzer and map to index
+# https://blog.bitsrc.io/how-to-build-an-autocomplete-widget-with-react-and-elastic-search-dd4f846f784
+settings = {
+    "settings": {
+        "index": {
+            "analysis": {
+                "filter": {},
+                "analyzer": {
+                    "analyzer_keyword": {
+                        "tokenizer": "keyword",
+                        "filter": "lowercase"
+                    },
+                    "edge_ngram_analyzer": {
+                        "filter": [
+                            "lowercase"
+                        ],
+                        "tokenizer": "edge_ngram_tokenizer"
+                    }
+                },
+                "tokenizer": {
+                    "edge_ngram_tokenizer": {
+                        "type": "edge_ngram",
+                        "min_gram": 2,
+                        "max_gram": 5,
+                        "token_chars": [
+                            "letter"
+                        ]
+                    }
+                }
+            }
+        }
+    },
+    "mappings": {
+        "event": {
+            "properties": {
+                "title": {
+                    "type": "text",
+                    "analyzer": "edge_ngram_analyzer"
+                },
+                "description": {
+                    "type": "text",
+                    "analyzer": "edge_ngram_analyzer"
+                },
+                "owner": {
+                    "type": "text",
+                    "analyzer": "edge_ngram_analyzer"
+                },
+                "speaker": {
+                    "type": "text",
+                    "analyzer": "edge_ngram_analyzer"
+                },
+                "location": {
+                    "type": "text",
+                    "analyzer": "edge_ngram_analyzer"
+                }
+            }
+        }
+    }
+}
+
 if __name__ == '__main__':
     print('Indexing events to ElasticSearch...')
     events = json.loads(open('data/events.json', 'r').read())
@@ -43,6 +103,13 @@ if __name__ == '__main__':
 
     es.indices.delete(index=INDEX_NAME, ignore=[
                       400, 404])  # delete current index
+    # add settings to es indices client
+    # include_type_name is very important!
+    # also dont ignore 400, 404 here to know what the error is
+    es.indices.create(index=INDEX_NAME,
+                      body=settings,
+                      include_type_name=True)
+
     # insert all events to elasticsearch
     helpers.bulk(es, generate_event(events))
     print('Done indexing events to ElasticSearch!')
