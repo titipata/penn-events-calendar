@@ -23,7 +23,7 @@ python cron_fetch_events.py
 
 Run the following to serve and index events to `elasticsearch`
 
-```
+```sh
 bash serve_elasticsearch.sh
 python index_elasticsearch.py
 ```

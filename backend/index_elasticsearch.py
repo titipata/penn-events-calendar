@@ -30,7 +30,7 @@ def generate_event(events):
         }
         yield {
             "_index": "penn-events",
-            "_type": "doc",
+            "_type": "event",
             "_id": event['event_index'],
             "_source": event_add
         }
