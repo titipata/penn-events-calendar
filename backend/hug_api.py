@@ -50,11 +50,14 @@ def recommendations(body):
     pref_vector = np.mean([np.array(event_vectors_map[idx])
                            for idx in pref_indices], axis=0)
     # get indices of event happens after current time
-    future_event_indices = [e['event_index'] for e in
-                            filter(lambda r: get_future_event(r['date_dt']), events)]
-
+    future_event_indices = [e['event_index'] for e in filter(
+        lambda r: get_future_event(r['date_dt']), events)]
     # rank indices by cosine distance and get indices
-    rank_indices = np.argsort([cosine(pref_vector, event_vectors_map[idx])
-                               for idx in future_event_indices])[0:20]
+    relevances = np.array([cosine(pref_vector, np.array(
+        event_vectors_map[idx])) for idx in future_event_indices]).ravel()
+    rank_indices = np.argsort(relevances)
+    relevances = np.clip(np.sort(relevances)[::-1] * 100, 0, 100).astype(int)
     indices_recommendation = [future_event_indices[i] for i in rank_indices]
-    return indices_recommendation
+    recommendations = [{'event_index': idx, 'relevance': rel}
+                       for idx, rel in zip(indices_recommendation, relevances)]
+    return recommendations[0:20]
