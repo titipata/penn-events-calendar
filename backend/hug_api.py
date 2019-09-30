@@ -4,6 +4,9 @@ import numpy as np
 from datetime import datetime
 from scipy.spatial.distance import cosine
 
+from elasticsearch import Elasticsearch
+from elasticsearch_dsl import Search
+
 # enable CORS
 api = hug.API(__name__)
 api.http.add_middleware(hug.middleware.CORSMiddleware(api))
@@ -14,6 +17,13 @@ event_vectors = json.load(open(path_vector, 'r'))
 events = json.load(open(path_data, 'r'))
 event_vectors_map = {e['event_index']: e['event_vector']
                      for e in event_vectors}
+
+
+# elasticsearch
+es = Elasticsearch([
+    {'host': 'localhost', 'port': 9200},
+])
+es_search = Search(using=es)
 
 
 def get_future_event(date):
@@ -61,3 +71,23 @@ def recommendations(body):
     recommendations = [{'event_index': idx, 'relevance': rel}
                        for idx, rel in zip(indices_recommendation, relevances)]
     return recommendations[0:20]
+
+
+@hug.get("/query", examples="search_query=CNI")
+def query(search_query: hug.types.text):
+    """
+    Search events from index,
+    this function will return empty list if no events are found
+
+    example query: http://localhost:8888/query?search_query=CNI
+
+    See more query examples at: https://elasticsearch-dsl.readthedocs.io/en/latest/search_dsl.html
+    """
+    fields = ['title', 'description', 'owner', 'speaker', 'location']
+    responses = es_search.query(
+        "multi_match",
+        query=search_query,
+        fields=fields
+    )
+    search_responses = [r.to_dict() for r in responses[0:40].execute()]
+    return search_responses

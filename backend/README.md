@@ -19,6 +19,15 @@ then run cron job by using the following script
 python cron_fetch_events.py
 ```
 
+## Serve ElasticSearch
+
+Run the following to serve and index events to `elasticsearch`
+
+```sh
+bash serve_elasticsearch.sh
+python index_elasticsearch.py
+```
+
 
 ## Running Hug API locally
 
@@ -26,19 +35,4 @@ Start Hug API by running:
 
 ```sh
 hug -f hug_api.py -p 8888
-```
-
-
-## Dependencies
-
-All dependencies are in `requirements.txt` file, you can install all dependencies by running
-
-```sh
-pip install -r requirements.txt
-```
-
-And download `spacy` model
-
-```sh
-python -m spacy download en_core_web_sm
 ```
