@@ -39,6 +39,24 @@ class Sort {
       ? date1 - date2
       : date2 - date1;
   }
+
+  static sortStarttime(event1, event2, desc = false) {
+    const time1 = moment(event1.node.starttime, ['h:mA', 'h:m A', 'h:ma', 'h:m a', 'H:m']);
+    const time2 = moment(event2.node.starttime, ['h:mA', 'h:m A', 'h:ma', 'h:m a', 'H:m']);
+
+    return !desc
+      ? time1 - time2
+      : time2 - time1;
+  }
+
+  static sortOwner(event1, event2, desc = false) {
+    const owner1 = event1.node.owner;
+    const owner2 = event2.node.owner;
+
+    return !desc
+      ? owner1 - owner2
+      : owner2 - owner1;
+  }
 }
 
 class Events {
@@ -51,7 +69,9 @@ class Events {
 
   static sortEvents(eventArr) {
     return Events.filterEvents(eventArr)
-      .sort(Sort.sortDate); // sort dates ascendingly
+      .sort(Sort.sortDate) // sort dates ascendingly
+      .sort(Sort.sortStarttime) // sort starttime ascendingly
+      .sort(Sort.sortOwner); // sort owner ascendingly
   }
 
   static getFutureEvents(eventArr) {
