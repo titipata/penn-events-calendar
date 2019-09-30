@@ -71,6 +71,9 @@ settings = {
     "mappings": {
         "event": {
             "properties": {
+                "suggest" : {
+                    "type" : "completion"
+                },
                 "title": {
                     "type": "text",
                     "analyzer": "edge_ngram_analyzer"
