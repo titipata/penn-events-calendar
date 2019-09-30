@@ -29,11 +29,31 @@ export default ({ data }) => {
     })
       .then(res => res.json())
       .then((recommendedIndexes) => {
-        const filteredData = evUtil.getPreprocessedEvents(
-          data.allEventsJson.edges,
-        ).filter(
-          x => recommendedIndexes.includes(x.node.event_index),
-        );
+        // stop here if there is no data
+        if (!recommendedIndexes || recommendedIndexes.length === 0) {
+          return;
+        }
+
+        const filteredData = evUtil.getPreprocessedEvents(data.allEventsJson.edges)
+          .filter(
+            event => recommendedIndexes.find(rec => rec.event_index === event.node.event_index),
+          )
+          // recommended events should contain relevance value:
+          // {
+          //   node: { `event_data` },
+          //   relevance: `relevance_value`
+          // }
+          .reduce((acc, cur) => ([
+            ...acc,
+            {
+              ...cur,
+              relevance: recommendedIndexes.find(
+                rec => rec.event_index === cur.node.event_index,
+              ).relevance,
+            },
+          ]), []);
+
+        // add to global state
         setRecommendedEvents(filteredData);
       })
       // eslint-disable-next-line

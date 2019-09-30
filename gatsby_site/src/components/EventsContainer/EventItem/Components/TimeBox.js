@@ -1,9 +1,10 @@
 import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { Datetime as dtutil } from '../../../../utils';
 import useGlobal from '../../../../store';
+import SvgVerticalGradient from '../../../BaseComponents/SvgVerticalGradient';
 
 const DatetimeWrapper = styled.div`
   font-size: 2rem;
@@ -29,14 +30,29 @@ const StyledTime = styled.div`
   display: inline-flex;
 `;
 
+const starColor = {
+  normal: '#eee',
+  selected: 'orange',
+  relevance: '#3dd',
+};
+
 const StyledFavIcon = styled(Fa).attrs(() => ({
   icon: 'star',
 }))`
-  color: ${props => (props.checked ? 'orange' : '#eee')};
+  color: ${props => (props.checked ? starColor.selected : starColor.normal)};
   font-size: 1.75rem;
+  position: relative;
+  /* refer to the id of svg  */
+  ${props => props.relevance && !props.checked && css`
+    path {
+      fill: url(#${`lgrad-${props.relevance}`});
+    }
+  `}
 `;
 
-const TimeBox = ({ starttime, endtime, eventIndex }) => {
+const TimeBox = ({
+  starttime, endtime, eventIndex, relevance,
+}) => {
   const [globalState, globalActions] = useGlobal();
 
   // destructuring state to use
@@ -80,8 +96,14 @@ const TimeBox = ({ starttime, endtime, eventIndex }) => {
           e.stopPropagation();
         }}
       >
+        <SvgVerticalGradient
+          fillColor={starColor.relevance}
+          bgColor={starColor.normal}
+          fillPercent={relevance}
+        />
         <StyledFavIcon
           checked={selectedEvents.includes(eventIndex)}
+          relevance={relevance}
         />
       </SubWrapper>
     </DatetimeWrapper>
@@ -95,12 +117,17 @@ TimeBox.propTypes = {
     PropTypes.number,
     PropTypes.string,
   ]),
+  relevance: PropTypes.oneOfType([
+    PropTypes.number,
+    PropTypes.string,
+  ]),
 };
 
 TimeBox.defaultProps = {
   starttime: null,
   endtime: null,
   eventIndex: null,
+  relevance: null,
 };
 
 export default TimeBox;

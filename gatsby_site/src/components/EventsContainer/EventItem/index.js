@@ -57,6 +57,7 @@ const EventItem = ({ eventData }) => {
           eventIndex={eventIndex}
           starttime={starttime}
           endtime={endtime}
+          relevance={eventData.relevance}
         />
         <ContentBox
           // show by default
@@ -85,6 +86,10 @@ const EventItem = ({ eventData }) => {
 
 EventItem.propTypes = {
   eventData: PropTypes.shape({
+    relevance: PropTypes.oneOfType([
+      PropTypes.number,
+      PropTypes.string,
+    ]),
     node: PropTypes.shape({
       id: PropTypes.string,
       event_index: PropTypes.oneOfType([

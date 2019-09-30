@@ -7,10 +7,12 @@
   "scripts": {
     "build": "gatsby build",
     "develop": "gatsby develop",
-    "format": "prettier --write src/**/*.{js,jsx}",
-    "start": "concurrently -n 'hug,gatsby' -c 'bgBlue,bgMagenta' 'cd ../backend && hug -f hug_api.py -p 8888' 'gatsby develop'",
     "serve": "gatsby serve",
-    "deploy": "concurrently -n 'hug,gatsby' -c 'bgBlue,bgMagenta' 'cd ../backend && hug -f hug_api.py -p 8888' 'gatsby build && gatsby serve'",
+    "hug-dev": "cd ../backend && hug -f hug_api.py -p 8888",
+    "gatsby-prod": "gatsby build && gatsby serve",
+    "start": "concurrently -n 'hug,gatsby' -c 'bgBlue,bgMagenta' 'npm run hug-dev' 'gatsby develop'",
+    "deploy": "concurrently -n 'hug,gatsby' -c 'bgBlue,bgMagenta' 'npm run hug-dev' 'npm run gatsby-prod'",
+    "format": "prettier --write src/**/*.{js,jsx}",
     "test": "jest"
   },
   "dependencies": {
