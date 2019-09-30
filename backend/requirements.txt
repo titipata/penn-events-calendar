@@ -5,3 +5,4 @@ scipy
 pandas
 elasticsearch
 elasticsearch_dsl
+spacy

@@ -113,3 +113,20 @@ if __name__ == '__main__':
     # insert all events to elasticsearch
     helpers.bulk(es, generate_event(events))
     print('Done indexing events to ElasticSearch!')
+
+    print('Updating elasticsearch index...')
+    events_feature = json.loads(open('data/events_vector.json', 'r').read())
+    events_feature_df = pd.DataFrame(events_feature).fillna('')
+    for _, r in events_feature_df.iterrows():
+        es.update(
+            index='penn-events',
+            id=r['event_index'],
+            doc_type='event',
+            body={
+                'doc':{
+                    'suggest': r['suggest_candidates']
+                }
+            },
+            refresh=True,
+        )
+    print('Done!')
