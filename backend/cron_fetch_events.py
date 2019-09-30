@@ -2,7 +2,7 @@ import os
 import sys
 from crontab import CronTab
 
-cron = CronTab(user='') # put your user name here
+cron = CronTab(user='')  # put your user name here
 cron.remove_all()
 print('Len of crontab =', len(cron))
 
