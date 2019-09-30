@@ -39,18 +39,25 @@ const EventsContainer = ({ allEvents, noEventDefaultText }) => {
   // local state
   const [currentPage, setCurrentPage] = useState(1);
   const [currentPageData, setCurrentPageData] = useState([]);
+  const [paginatedEvents, setPaginatedEvents] = useState([]);
 
   // ---- manage pagination
-  // get paginated events
-  const paginatedEvents = evUtil.getPaginatedEvents(allEvents);
   // set current page data when currentPage and paginatedEvents is changed
   // as we use globalState to retrieve data from localStorage
   // we don't get the data right after the component is mounted
   // thus we also watch for `allEvents`
   useEffect(() => {
-    const { data } = paginatedEvents.find(grp => grp.page === currentPage) || [];
-    setCurrentPageData(evUtil.groupByDate(data));
-  }, [currentPage, allEvents]);
+    // get/set paginated events
+    if (allEvents.length > 0 && paginatedEvents.length === 0) {
+      setPaginatedEvents(evUtil.getPaginatedEvents(allEvents));
+    }
+
+    // only update page data if there is paginatedEvents
+    if (paginatedEvents.length > 0) {
+      const { data } = paginatedEvents.find(grp => grp.page === currentPage) || [];
+      setCurrentPageData(evUtil.groupByDate(data));
+    }
+  }, [currentPage, allEvents, paginatedEvents]);
 
   // ---- render no data screen
   if (allEvents.length === 0) {
