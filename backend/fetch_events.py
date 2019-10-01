@@ -1951,7 +1951,7 @@ def fetch_events_SPP(base_url='https://www.sp2.upenn.edu'):
             'endtime': endtime,
             'description': details,
             'url': event_url,
-            'owner': 'Penn Social Policy & Practice'
+            'owner': 'Social Policy & Practice'
         })
     return events
 
