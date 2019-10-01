@@ -3,7 +3,7 @@ import {
   faBookmark, faCalendarAlt, faChevronCircleDown,
   faChevronCircleUp, faClock, faCopy, faExternalLinkAlt,
   faFileAlt, faMapMarkerAlt, faSchool,
-  faStar, faUniversity, faUserTie,
+  faStar, faUniversity, faUserTie, faSearch,
 } from '@fortawesome/free-solid-svg-icons';
 import { useState, useEffect } from 'react';
 import 'rc-pagination/assets/index.css';
@@ -13,7 +13,7 @@ function useStaticResources() {
     faCalendarAlt, faMapMarkerAlt, faClock, faFileAlt,
     faExternalLinkAlt, faUserTie, faSchool, faUniversity,
     faBookmark, faChevronCircleDown, faChevronCircleUp,
-    faCopy, faStar,
+    faCopy, faStar, faSearch,
   ]);
 
   useEffect(() => {
