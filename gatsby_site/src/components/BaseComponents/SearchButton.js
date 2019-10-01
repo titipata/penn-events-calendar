@@ -46,10 +46,30 @@ const StyledInput = styled.input`
   `}
 `;
 
+const SuggestionList = styled.ul`
+  width: auto;
+  list-style: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+`;
+
+const SuggestionItem = styled.li`
+  height: 20px;
+`;
+
+const fetcher = (kw, setter) => fetch(`http://localhost:8888/suggestion?text=${kw}`)
+  .then(res => res.json())
+  .then((resJson) => {
+    console.log(resJson);
+    setter(resJson);
+  });
+
 const SearchButton = () => {
   const inputRef = useRef(null);
   const [active, setActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [suggestionList, setSuggestionList] = useState([]);
 
   const handleQueryChange = (event) => {
     setSearchQuery(event.target.value);
@@ -58,7 +78,11 @@ const SearchButton = () => {
   useEffect(() => {
     // ref should be used in effect
     inputRef.current.focus();
-  }, [active]);
+
+    if (searchQuery) {
+      fetcher(searchQuery, setSuggestionList);
+    }
+  }, [active, searchQuery]);
 
   return (
     <Container>
@@ -75,6 +99,15 @@ const SearchButton = () => {
         active={active}
         ref={inputRef}
       />
+      <SuggestionList>
+        {suggestionList.slice(0, 10).map(item => (
+          <SuggestionItem
+            onClick={() => setSearchQuery(item)}
+          >
+            {item}
+          </SuggestionItem>
+        ))}
+      </SuggestionList>
     </Container>
   );
 };
