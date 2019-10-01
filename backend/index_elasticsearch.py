@@ -3,6 +3,7 @@ import pandas as pd
 from elasticsearch import Elasticsearch, helpers
 from datetime import datetime
 from dateutil.parser import parse
+from tqdm import tqdm
 
 
 es = Elasticsearch([
@@ -71,8 +72,8 @@ settings = {
     "mappings": {
         "event": {
             "properties": {
-                "suggest" : {
-                    "type" : "completion"
+                "suggest": {
+                    "type": "completion"
                 },
                 "title": {
                     "type": "text",
@@ -117,19 +118,22 @@ if __name__ == '__main__':
     helpers.bulk(es, generate_event(events))
     print('Done indexing events to ElasticSearch!')
 
-    print('Updating elasticsearch index...')
+    print('Updating elasticsearch index...\n')
     events_feature = json.loads(open('data/events_vector.json', 'r').read())
     events_feature_df = pd.DataFrame(events_feature).fillna('')
-    for _, r in events_feature_df.iterrows():
+    for _, r in tqdm(
+        events_feature_df.iterrows(),
+        total=len(events_feature_df.index)
+    ):
         es.update(
             index='penn-events',
             id=r['event_index'],
             doc_type='event',
             body={
-                'doc':{
+                'doc': {
                     'suggest': r['suggest_candidates']
                 }
             },
             refresh=True,
         )
-    print('Done!')
+    print('\nDone!')
