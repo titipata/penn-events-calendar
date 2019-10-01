@@ -84,14 +84,21 @@ def query(search_query: hug.types.text):
 
     See more query examples at: https://elasticsearch-dsl.readthedocs.io/en/latest/search_dsl.html
     """
-    fields = ['title', 'description', 'owner', 'speaker', 'location']
-    responses = es_search.query(
-        "multi_match",
-        query=search_query,
-        fields=fields
-    )
-    search_responses = [r.to_dict() for r in responses[0:40].execute()]
-    return search_responses
+    query_body = {
+        "query": {
+            "multi_match" : {
+                "query": search_query,
+                "fields": ['title', 'description', 'owner', 'speaker', 'location']
+            }
+        }
+    }
+    responses = es.search(index='penn-events', body=query_body)
+
+    # return future events for a given query
+    future_events_indices = []
+    for response in filter(lambda r: get_future_event(r['_source']['date_dt']), responses['hits']['hits']):
+        future_events_indices.append(int(response['_id']))
+    return future_events_indices
 
 
 @hug.get("/suggestion", examples="text=department")
@@ -104,9 +111,9 @@ def suggestion(text: hug.types.text):
     suggest_body = {
         "suggest": {
             "field-suggest" : {
-                "prefix" : text, 
-                "completion" : { 
-                    "field" : "suggest" 
+                "prefix" : text,
+                "completion" : {
+                    "field" : "suggest"
                 }
             }
         }
