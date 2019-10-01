@@ -137,8 +137,9 @@ if __name__ == '__main__':
     description_candidates = events_df.apply(
         generate_description_candidate, axis=1)
     owner_candidates = events_df.owner.map(lambda x: [x])
+    owner_candidates_rm = events_df.owner.map(lambda x: [x.replace('Department of ', '')])
 
-    suggest_candidates = (location_candidates + owner_candidates + description_candidates).\
+    suggest_candidates = (location_candidates + owner_candidates_rm + owner_candidates + description_candidates).\
         map(lambda x: list(pd.unique(
             [e.strip() for e in x if e is not '' and len(e.split()) <= 4])[0:10]))
     events_df['suggest_candidates'] = suggest_candidates
