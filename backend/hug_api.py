@@ -1,6 +1,7 @@
 import hug
 import json
 import numpy as np
+import pandas as pd
 from datetime import datetime
 from scipy.spatial.distance import cosine
 
@@ -88,3 +89,31 @@ def query(search_query: hug.types.text):
     )
     search_responses = [r.to_dict() for r in responses[0:40].execute()]
     return search_responses
+
+
+@hug.get("/suggestion", examples="text=department")
+def suggestion(text: hug.types.text):
+    """
+    For a given text, return possible terms from a suggest list in elastic search index
+
+    example query: http://localhost:8888/suggestion?text=department
+    """
+    suggest_body = {
+        "suggest": {
+            "field-suggest" : {
+                "prefix" : text, 
+                "completion" : { 
+                    "field" : "suggest" 
+                }
+            }
+        }
+    }
+    responses = es.search(index='penn-events', body=suggest_body)
+
+    # return all possible full term from suggest list
+    suggest_terms = []
+    for response in responses['suggest']['field-suggest'][0]['options']:
+        for s in response['_source']['suggest']:
+            if text.lower() in s.lower():
+                suggest_terms.append(s)
+    return list(pd.unique(suggest_terms))
