@@ -86,7 +86,7 @@ def query(search_query: hug.types.text):
     """
     query_body = {
         "query": {
-            "multi_match" : {
+            "multi_match": {
                 "query": search_query,
                 "fields": ['title', 'description', 'owner', 'speaker', 'location']
             }
@@ -110,10 +110,10 @@ def suggestion(text: hug.types.text):
     """
     suggest_body = {
         "suggest": {
-            "field-suggest" : {
-                "prefix" : text,
-                "completion" : {
-                    "field" : "suggest"
+            "field-suggest": {
+                "prefix": text,
+                "completion": {
+                    "field": "suggest"
                 }
             }
         }
