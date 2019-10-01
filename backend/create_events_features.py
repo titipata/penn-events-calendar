@@ -27,6 +27,7 @@ PENN_LOCATIONS = [
     'Wu and Chen Auditorium',
     'Levine Hall',
     'Towne',
+    'Goddard Labs',
     'Fireside Lounge',
     'Penn Museum',
     'Annenberg Center',
@@ -40,7 +41,18 @@ PENN_LOCATIONS = [
     'Barchi Library',
     'John Morgan Building',
     'Hayden Hall',
-    'Blockley Hall'
+    'Blockley Hall',
+    'Irvine Auditorium',
+    'Blockley Hall',
+    'Fireside Lounge',
+    'BRB Auditorium',
+    'Penn Book Center',
+    'International House',
+    'Slought',
+    'Van Pelt Library',
+    'College Green',
+    'Locust Walk',
+    'National Mechanics'
 ]
 
 
@@ -75,32 +87,32 @@ def preprocess(text, stemming=True):
 
 def generate_location_candidate(event):
     """
-    Generate location cadidate
+    Generate location cadidate from a given row of events dataframe
     """
     location = nlp(event['location'])
-    location_candidate = [
+    location_candidates = [
         ent.text for ent in location.ents if ent.label_ in ('ORG', 'LOC')]
     for penn_location in PENN_LOCATIONS:
         if penn_location in location.text:
-            location_candidate.append(penn_location)
-    return list(pd.unique(location_candidate))
+            location_candidates.append(penn_location)
+    return location_candidates
 
 
 def generate_description_candidate(event):
     """
-    Generate person, organization candidate from speaker, title and description
+    Generate person, organization candidate using speaker, title and description
+    from a given row of events dataframe
     """
     event_text = event['speaker'] + ' ' + \
         event['title'] + ' ' + event['description']
     candidates = [ent.text for ent in nlp(
         event_text).ents if ent.label_ in ('PERSON', 'ORG')]
-    return list(pd.unique(candidates))
+    return candidates
 
 
 if __name__ == '__main__':
     # produce topic vectors using tf-idf and Laten Semantic Analysis (LSA) and search candidate list
     print('Compute LSA vectors...')
-    print('Done!')
     events_df = pd.DataFrame(json.loads(open(PATH_DATA, 'r').read()))
     events_text = [' '.join([e[1] for e in r.items()])
                    for _, r in events_df[['title', 'description', 'location', 'owner']].iterrows()]
@@ -117,6 +129,7 @@ if __name__ == '__main__':
     lsa_vectors = lsa_model.fit_transform(X_tfidf)
     events_vector = [list(vector) for vector in lsa_vectors]
     events_df['event_vector'] = events_vector
+    print('Done!')
 
     # produce search candidate list
     print('Compute search candidate list...')
