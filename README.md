@@ -1,18 +1,19 @@
 # Events at the University of Pennsylvania
 
 All events happening at the University of Pennsylvania event with built-in search and recommendation engine.
-The repository contains **backend** and **frontend (gatsby_site)**.
 
 ### Backend
 
 We use Python as our backend. Backend mainly contains scripts to fetch events from Penn, search and recommendation API using [hug](https://www.hug.rest/), 
-and index fetched events to `elasticsearch`. See `backend` folder on how to run the backend scripts
+and index fetched events to `elasticsearch`. The hug backend is set by default to run on port `8888` and elasticsearch is run on port `9200`. 
+See `backend` folder on how to run the backend scripts.
+
 
 ### Frontend
 
-We use react-js as a front-end. Before running, make sure that you have recent version of `npm` installed (NodeJS 8+).
-
-In order to run the web-application, if it is the first time, you need to install `gatsby-cli`:
+We use react-js as a frontend. The frontend is located in `gatsby_site` folder. 
+Before running, make sure that you have recent version of `npm` installed (NodeJS 8+).
+If it is the first time, you need to install `gatsby-cli`.
 
 ```sh
 # only once on first time
