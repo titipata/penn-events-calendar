@@ -1,10 +1,7 @@
 # Events at the University of Pennsylvania
 
 All events happening at the University of Pennsylvania event with built-in search and recommendation engine.
-
-## Project structure
-
-The repository contains main 2 parts: **backend** and **frontend**.
+The repository contains **backend** and **frontend (gatsby_site)**.
 
 ### Backend
 
