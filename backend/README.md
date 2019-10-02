@@ -1,6 +1,6 @@
-# Flask back-end for Penn event
+# Backend for Penn events
 
-## Fetch events
+## Fetch all events
 
 `fetch_events.py` contains functions to fetch Penn events. We use GROBID to parse PDF 
 and fetch all event to `data/events.json`. `create_events_features.py` contains a script 
