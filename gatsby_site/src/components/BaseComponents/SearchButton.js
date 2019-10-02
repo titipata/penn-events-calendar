@@ -1,10 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
-import styled, { keyframes, css } from 'styled-components';
+import { navigate } from '@reach/router';
+import { Link } from 'gatsby';
+import React, { useEffect, useRef, useState } from 'react';
 import { slideInRight } from 'react-animations';
+import styled, { css, keyframes } from 'styled-components';
 import { Key } from '../../utils';
 
-const Container = styled.div`
+const Container = styled.form`
   height: 40px;
   width: 35%;
   margin-bottom: 1.56rem;
@@ -57,7 +59,7 @@ const SuggestionList = styled.ul`
   background-color: white;
   margin: 0;
   max-height: 250px;
-  overflow: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
   ::-webkit-scrollbar {
     width: 3px;
@@ -128,7 +130,14 @@ const SearchButton = () => {
   }, [active, searchQuery]);
 
   return (
-    <Container>
+    <Container
+      onSubmit={(e) => {
+        e.preventDefault();
+        console.log(searchQuery);
+        navigate(`/search?search_query=${searchQuery}`);
+      }}
+      autoComplete="off"
+    >
       <StyledFa
         icon="search"
         onClick={() => {
@@ -136,6 +145,7 @@ const SearchButton = () => {
         }}
       />
       <StyledInput
+        name="search_query"
         type="text"
         value={searchQuery}
         onChange={handleQueryChange}
@@ -143,17 +153,25 @@ const SearchButton = () => {
         ref={inputRef}
       />
       <SuggestionList
-        hidden={suggestionList.length === 0 || !searchQuery}
+        hidden={
+          suggestionList.length === 0
+          || !searchQuery
+          || !active
+        }
       >
         {suggestionList.slice(0, 10).map(item => (
-          <SuggestionItem
-            onClick={() => setSearchQuery(item)}
+          <Link
+            to={`/search?search_query=${item}`}
             key={Key.getShortKey()}
           >
-            <TextWrapper>
-              {item}
-            </TextWrapper>
-          </SuggestionItem>
+            <SuggestionItem
+              onClick={() => setSearchQuery(item)}
+            >
+              <TextWrapper>
+                {item}
+              </TextWrapper>
+            </SuggestionItem>
+          </Link>
         ))}
       </SuggestionList>
     </Container>
