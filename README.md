@@ -28,14 +28,15 @@ npm install
 gatsby develop
 ```
 
-This will run Gatsby site on port `8000`. You will see the demo looks something like the following:
+This will run Gatsby frontend site on port `8000`.
 
 
 ## Core members
 
-- [titipata](https://github.com/titipata)
-- [bluenex](https://github.com/bluenex)
-- [kittinan](https://github.com/kittinan)
+- Titipat Achakulvisut ([titipata](https://github.com/titipata))
+- Tulakan Ruangrong ([bluenex](https://github.com/bluenex))
+- Kittinan Srithaworn ([kittinan](https://github.com/kittinan))
+
 
 ## Sponsors
 
@@ -47,4 +48,4 @@ the University of Pennsylvania.
 ## Contributions
 
 We are welcome to all contribution. If you spot any errors in the web-application, 
-please feel free to report them in the issue.
+please feel free to report them on the [issue page](https://github.com/titipata/penn-events-calendar/issues).
