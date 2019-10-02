@@ -1,10 +1,11 @@
 # download GROBID if directory does not exist
-if [ ! -d grobid-0.5.5 ]; then
-  wget https://github.com/kermitt2/grobid/archive/0.5.5.zip
-  unzip 0.5.5.zip
-  rm 0.5.5.zip
+version="0.5.5"
+if [ ! -d grobid-${version} ]; then
+  wget https://github.com/kermitt2/grobid/archive/${version}.zip
+  unzip ${version}.zip
+  rm ${version}.zip
 fi
 
 # run GROBID
-cd grobid-0.5.5
+cd grobid-${version}
 ./gradlew run
