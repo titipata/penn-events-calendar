@@ -20,6 +20,7 @@ const Navbar = styled.nav`
   top: 0;
   width: 100%;
   box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.19);
+  z-index: 999;
 `;
 
 // nav is fixed, so it needs padder underneath
