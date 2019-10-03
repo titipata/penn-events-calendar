@@ -2,7 +2,6 @@ import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
 import { navigate } from '@reach/router';
 import { Link } from 'gatsby';
 import React, { useEffect, useRef, useState } from 'react';
-import { slideInRight } from 'react-animations';
 import styled, { css, keyframes } from 'styled-components';
 import { Key } from '../../utils';
 
@@ -33,23 +32,42 @@ const StyledFa = styled(Fa)`
   }
 `;
 
-const slideInAnimation = keyframes`${slideInRight}`;
+const slideInAnimation = keyframes`
+  0% {
+    width: 0%;
+    opacity: 0;
+  }
+  100% {
+    width: 100%;
+    opacity: 1;
+  }
+`;
+
+const slideOutAnimation = keyframes`
+  0% {
+    width: 100%;
+    opacity: 1;
+  }
+  100% {
+    width: 0%;
+    opacity: 0;
+  }
+`;
 
 const StyledInput = styled.input`
   width: 0;
-  display: none;
   outline: none;
   border: none;
   border-bottom: 2px solid #333;
   padding: 0 5px;
 
-  ${props => props.active
-    && css`
-      width: 100%;
-      display: block;
-      /* animation */
-      animation: 0.5s ${props.active && slideInAnimation} forwards;
-    `}
+  ${props => (props.active
+    ? css`
+      animation: 0.45s ${slideInAnimation} ease-out forwards;
+    `
+    : css`
+      animation: 0.4s ${slideOutAnimation} ease-in forwards;
+    `)}
 `;
 
 const SuggestionList = styled.ul`
@@ -189,9 +207,7 @@ const SearchButton = () => {
     >
       <StyledFa
         icon="search"
-        onClick={() => {
-          setActive(!active);
-        }}
+        onClick={() => setActive(true)}
       />
       <StyledInput
         name="search_query"

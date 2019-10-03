@@ -51,8 +51,7 @@ const CategoryLabel = ({
           <StyledSpan
             color={getRandomColorFromText(owner)}
           >
-          See Details
-            {' '}
+            See Details&nbsp;
             <Fa icon={`chevron-circle-${isDescriptionExpanded ? 'up' : 'down'}`} />
           </StyledSpan>
         )
