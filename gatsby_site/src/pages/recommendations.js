@@ -4,20 +4,30 @@ import EventsContainer from '../components/EventsContainer';
 import Layout from '../components/layout';
 import useGlobal from '../store';
 import useLocalStorage from '../hooks/useLocalStorage';
+import useStaticResources from '../hooks/useStaticResources';
 import { Events as evUtil } from '../utils';
 
-export default ({ data }) => {
+export default ({ data, location }) => {
   // use this to retrieve data and rehydrate before globalState is used
   useLocalStorage();
+  useStaticResources();
+  // this is used to set origin hostname
+  const [globalState, globalActions] = useGlobal();
+  const { hostname } = globalState;
 
-  const [globalState] = useGlobal();
+  useEffect(() => {
+    globalActions.setHostName(location.hostname);
+  }, [globalActions, location.hostname]);
+
+  // local state
   const [recommendedEvents, setRecommendedEvents] = useState([]);
 
   // get selected event indexes from global state
   const { selectedEvents: selectedEventsIndexes } = globalState;
 
   useEffect(() => {
-    fetch('http://localhost:8888/recommendations', {
+    if (!hostname) return;
+    fetch(`http://${hostname}:8888/recommendations`, {
       method: 'POST',
       mode: 'cors',
       headers: {
@@ -58,7 +68,7 @@ export default ({ data }) => {
       })
       // eslint-disable-next-line
       .catch(err => console.log(err));
-  }, [data.allEventsJson.edges, selectedEventsIndexes]);
+  }, [data.allEventsJson.edges, hostname, selectedEventsIndexes]);
 
   return (
     <Layout>

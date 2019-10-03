@@ -7,7 +7,7 @@ import useLocalStorage from '../hooks/useLocalStorage';
 import useStaticResources from '../hooks/useStaticResources';
 import { Events as evUtil } from '../utils';
 import SearchButton from '../components/BaseComponents/SearchButton';
-// import SearchButton from '../components/BaseComponents/SearchButton';
+import useGlobal from '../store';
 
 const HeaderWrapper = styled.div`
   display: flex;
@@ -38,10 +38,16 @@ const getSearchResults = (requestUrl, callback) => {
 };
 
 export default ({ data, location }) => {
-  // load static resources
-  useStaticResources();
   // use this to retrieve data and rehydrate before globalState is used
   useLocalStorage();
+  useStaticResources();
+  // this is used to set origin hostname
+  const [globalState, globalActions] = useGlobal();
+  const { hostname } = globalState;
+
+  useEffect(() => {
+    globalActions.setHostName(location.hostname);
+  }, [globalActions, location.hostname]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResultIndexes, setSearchResultIndexes] = useState([]);
@@ -54,17 +60,31 @@ export default ({ data, location }) => {
 
   // for searchResultsIndexes
   useEffect(() => {
-    getSearchResults(`http://${location.hostname}:8888/query?search_query=${searchQuery}}`, x => setSearchResultIndexes(x));
-  }, [location.hostname, searchQuery]);
+    if (!hostname) return;
+    getSearchResults(`http://${hostname}:8888/query?search_query=${searchQuery}}`, x => setSearchResultIndexes(x));
+  }, [hostname, location.hostname, searchQuery]);
 
   // for searchResultsEvents
   useEffect(() => {
     // filter only selected event to pass to container
-    const filteredEvent = evUtil.getPreprocessedEvents(
-      data.allEventsJson.edges,
-    ).filter(
-      x => searchResultIndexes.includes(x.node.event_index),
-    );
+    const filteredEvent = evUtil.getPreprocessedEvents(data.allEventsJson.edges)
+      .filter(
+        event => searchResultIndexes.find(sri => sri.event_index === event.node.event_index),
+      )
+      // recommended events should contain relevance value:
+      // {
+      //   node: { `event_data` },
+      //   relevance: `relevance_value`
+      // }
+      .reduce((acc, cur) => ([
+        ...acc,
+        {
+          ...cur,
+          relevance: searchResultIndexes.find(
+            rec => rec.event_index === cur.node.event_index,
+          ).relevance,
+        },
+      ]), []);
 
     setSearchResultEvents(filteredEvent);
   }, [data.allEventsJson.edges, searchResultIndexes]);

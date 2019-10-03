@@ -2,9 +2,9 @@ import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
 import { navigate } from '@reach/router';
 import { Link } from 'gatsby';
 import React, { useEffect, useRef, useState } from 'react';
-import { slideInRight } from 'react-animations';
 import styled, { css, keyframes } from 'styled-components';
 import { Key } from '../../utils';
+import useGlobal from '../../store';
 
 const Container = styled.form`
   height: 40px;
@@ -33,23 +33,42 @@ const StyledFa = styled(Fa)`
   }
 `;
 
-const slideInAnimation = keyframes`${slideInRight}`;
+const slideInAnimation = keyframes`
+  0% {
+    width: 0%;
+    opacity: 0;
+  }
+  100% {
+    width: 100%;
+    opacity: 1;
+  }
+`;
+
+const slideOutAnimation = keyframes`
+  0% {
+    width: 100%;
+    opacity: 1;
+  }
+  100% {
+    width: 0%;
+    opacity: 0;
+  }
+`;
 
 const StyledInput = styled.input`
   width: 0;
-  display: none;
   outline: none;
   border: none;
   border-bottom: 2px solid #333;
   padding: 0 5px;
 
-  ${props => props.active
-    && css`
-      width: 100%;
-      display: block;
-      /* animation */
-      animation: 0.5s ${props.active && slideInAnimation} forwards;
-    `}
+  ${props => (props.active
+    ? css`
+      animation: 0.45s ${slideInAnimation} ease-out forwards;
+    `
+    : css`
+      animation: 0.4s ${slideOutAnimation} ease-in forwards;
+    `)}
 `;
 
 const SuggestionList = styled.ul`
@@ -138,9 +157,9 @@ const FillerIcon = styled(StyledFa).attrs(() => ({
   }
 `;
 
-const getSuggestions = (keyword, callback) => {
-  if (!keyword) return;
-  fetch(`http://localhost:8888/suggestion?text=${keyword}`)
+const getSuggestions = (suggestionUrl, callback) => {
+  if (!suggestionUrl) return;
+  fetch(suggestionUrl)
     .then(res => res.json())
     .then((resJson) => {
       callback(resJson);
@@ -148,6 +167,9 @@ const getSuggestions = (keyword, callback) => {
 };
 
 const SearchButton = () => {
+  const [globalState] = useGlobal();
+  const { hostname } = globalState;
+
   const inputRef = useRef(null);
   const [active, setActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -165,14 +187,15 @@ const SearchButton = () => {
   }, [active]);
 
   useEffect(() => {
-    getSuggestions(searchQuery, setSuggestionList);
-  }, [searchQuery]);
+    if (!hostname || !searchQuery) return;
+    const url = `http://${hostname}:8888/suggestion?text=${searchQuery}`;
+    getSuggestions(url, setSuggestionList);
+  }, [hostname, searchQuery]);
 
   return (
     <Container
       onSubmit={(e) => {
         e.preventDefault();
-        console.log(searchQuery);
         navigate(`/search?search_query=${searchQuery}`);
         setActive(false);
       }}
@@ -189,9 +212,7 @@ const SearchButton = () => {
     >
       <StyledFa
         icon="search"
-        onClick={() => {
-          setActive(!active);
-        }}
+        onClick={() => setActive(true)}
       />
       <StyledInput
         name="search_query"

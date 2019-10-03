@@ -12,4 +12,10 @@ const rehydrateStore = (store, storeObj) => {
   store.setState(storeObj);
 };
 
-export { toggleSelectedEvent, rehydrateStore };
+const setHostName = (store, hostname) => {
+  store.setState({
+    hostname,
+  });
+};
+
+export { toggleSelectedEvent, rehydrateStore, setHostName };
