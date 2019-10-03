@@ -42,11 +42,12 @@ export default ({ data, location }) => {
   useLocalStorage();
   useStaticResources();
   // this is used to set origin hostname
-  const [, globalActions] = useGlobal();
+  const [globalState, globalActions] = useGlobal();
+  const { hostname } = globalState;
 
   useEffect(() => {
-    globalActions.setHostName(location.origin);
-  }, [globalActions, location.origin]);
+    globalActions.setHostName(location.hostname);
+  }, [globalActions, location.hostname]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResultIndexes, setSearchResultIndexes] = useState([]);
@@ -59,8 +60,9 @@ export default ({ data, location }) => {
 
   // for searchResultsIndexes
   useEffect(() => {
-    getSearchResults(`http://${location.hostname}:8888/query?search_query=${searchQuery}}`, x => setSearchResultIndexes(x));
-  }, [location.hostname, searchQuery]);
+    if (!hostname) return;
+    getSearchResults(`http://${hostname}:8888/query?search_query=${searchQuery}}`, x => setSearchResultIndexes(x));
+  }, [hostname, location.hostname, searchQuery]);
 
   // for searchResultsEvents
   useEffect(() => {

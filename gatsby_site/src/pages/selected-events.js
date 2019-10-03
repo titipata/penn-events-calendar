@@ -15,8 +15,8 @@ export default ({ data, location }) => {
   const [globalState, globalActions] = useGlobal();
 
   useEffect(() => {
-    globalActions.setHostName(location.origin);
-  }, [globalActions, location.origin]);
+    globalActions.setHostName(location.hostname);
+  }, [globalActions, location.hostname]);
 
   // get selected event indexes from global state
   const { selectedEvents: selectedEventsIndexes } = globalState;

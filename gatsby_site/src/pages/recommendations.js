@@ -13,10 +13,11 @@ export default ({ data, location }) => {
   useStaticResources();
   // this is used to set origin hostname
   const [globalState, globalActions] = useGlobal();
+  const { hostname } = globalState;
 
   useEffect(() => {
-    globalActions.setHostName(location.origin);
-  }, [globalActions, location.origin]);
+    globalActions.setHostName(location.hostname);
+  }, [globalActions, location.hostname]);
 
   // local state
   const [recommendedEvents, setRecommendedEvents] = useState([]);
@@ -25,7 +26,8 @@ export default ({ data, location }) => {
   const { selectedEvents: selectedEventsIndexes } = globalState;
 
   useEffect(() => {
-    fetch('http://localhost:8888/recommendations', {
+    if (!hostname) return;
+    fetch(`http://${hostname}:8888/recommendations`, {
       method: 'POST',
       mode: 'cors',
       headers: {
@@ -66,7 +68,7 @@ export default ({ data, location }) => {
       })
       // eslint-disable-next-line
       .catch(err => console.log(err));
-  }, [data.allEventsJson.edges, selectedEventsIndexes]);
+  }, [data.allEventsJson.edges, hostname, selectedEventsIndexes]);
 
   return (
     <Layout>

@@ -23,8 +23,8 @@ export default ({ data, location }) => {
   const [, globalActions] = useGlobal();
 
   useEffect(() => {
-    globalActions.setHostName(location.origin);
-  }, [globalActions, location.origin]);
+    globalActions.setHostName(location.hostname);
+  }, [globalActions, location.hostname]);
 
   // preprocess events before sending to events list
   const preprocessedEvents = evUtil.getPreprocessedEvents(
