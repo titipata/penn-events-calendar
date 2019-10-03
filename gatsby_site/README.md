@@ -10,7 +10,7 @@ npm install -g gatsby-cli
 
 ```sh
 npm install
-gatsby develop
+npm start
 ```
 
 Full documentation for Gatsby can be found [here](https://www.gatsbyjs.org/).
