@@ -31,9 +31,9 @@ class Datetime {
 
 class Sort {
   // default to ascending
-  static sortDate(event1, event2, desc = false) {
-    const date1 = moment(event1.node.date_dt, 'DD-MM-YYYY');
-    const date2 = moment(event2.node.date_dt, 'DD-MM-YYYY');
+  static sortDate(dt1, dt2, desc = false) {
+    const date1 = moment(dt1, 'DD-MM-YYYY');
+    const date2 = moment(dt2, 'DD-MM-YYYY');
 
     return !desc
       ? date1 - date2
@@ -69,7 +69,9 @@ class Events {
 
   static sortEvents(eventArr) {
     return Events.filterEvents(eventArr)
-      .sort(Sort.sortDate) // sort dates ascendingly
+      .sort((ev1, ev2) => Sort.sortDate(
+        ev1.node.date_dt, ev2.node.date_dt,
+      )) // sort dates ascendingly
       .sort(Sort.sortStarttime) // sort starttime ascendingly
       .sort(Sort.sortOwner); // sort owner ascendingly
   }
@@ -99,7 +101,8 @@ class Events {
     const allDates = preprocessedEventArr
       .map(ev => ev.node.date_dt);
     // get sorted unique dates
-    const uniqueDates = Array.from(new Set(allDates));
+    const uniqueDates = Array.from(new Set(allDates)).sort(Sort.sortDate);
+
     // groupby date with reduce
     const groupbyDate = uniqueDates.reduce((acc, cur) => (
       [

@@ -6,3 +6,4 @@ pandas
 elasticsearch
 elasticsearch_dsl
 spacy
+tqdm

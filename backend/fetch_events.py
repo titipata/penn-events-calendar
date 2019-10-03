@@ -1629,14 +1629,14 @@ def fetch_events_law(base_url='https://www.law.upenn.edu/institutes/legalhistory
             'location': event_detail['event']['location'],
             'description': BeautifulSoup(event_detail['event'].get('description', ''), 'html.parser').text.strip(),
             'url': 'https://www.law.upenn.edu/newsevents/calendar.php#event_id/{}/view/event'.format(event_id),
-            'owner': 'Penn Law School'
+            'owner': 'Law School'
         })
     return events
 
 
 def fetch_events_penn_SAS(base_url='https://www.sas.upenn.edu'):
     """
-    Penn Events for Penn SAS
+    Penn Events for Penn School of Arts & Science
     """
     page_soup = BeautifulSoup(requests.get(
         base_url + '/events/upcoming-events').content, 'html.parser')
@@ -1672,7 +1672,7 @@ def fetch_events_penn_SAS(base_url='https://www.sas.upenn.edu'):
             'speaker': speaker,
             'description': details,
             'url': event_url,
-            'owner': 'Penn SAS'
+            'owner': 'School of Arts & Science (SAS)'
         })
     return events
 
@@ -1951,7 +1951,7 @@ def fetch_events_SPP(base_url='https://www.sp2.upenn.edu'):
             'endtime': endtime,
             'description': details,
             'url': event_url,
-            'owner': 'Penn Social Policy & Practice'
+            'owner': 'Social Policy & Practice'
         })
     return events
 

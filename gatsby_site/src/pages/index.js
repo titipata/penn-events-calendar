@@ -1,29 +1,25 @@
-import { library } from '@fortawesome/fontawesome-svg-core';
-import {
-  faBookmark, faCalendarAlt, faChevronCircleDown,
-  faChevronCircleUp, faClock, faCopy, faExternalLinkAlt,
-  faFileAlt, faMapMarkerAlt, faSchool,
-  faStar, faUniversity, faUserTie,
-} from '@fortawesome/free-solid-svg-icons';
 import { graphql } from 'gatsby';
 import React from 'react';
+import styled from 'styled-components';
 import EventsContainer from '../components/EventsContainer';
 import Layout from '../components/layout';
 import useLocalStorage from '../hooks/useLocalStorage';
+import useStaticResources from '../hooks/useStaticResources';
 import { Events as evUtil } from '../utils';
-import 'rc-pagination/assets/index.css';
+import SearchButton from '../components/BaseComponents/SearchButton';
 
-// add fa font to use
-library.add(
-  faCalendarAlt, faMapMarkerAlt, faClock, faFileAlt,
-  faExternalLinkAlt, faUserTie, faSchool, faUniversity,
-  faBookmark, faChevronCircleDown, faChevronCircleUp,
-  faCopy, faStar,
-);
+const HeaderWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
 
 export default ({ data }) => {
+  // load static resources
+  useStaticResources();
   // use this to retrieve data and rehydrate before globalState is used
   useLocalStorage();
+
   // preprocess events before sending to events list
   const preprocessedEvents = evUtil.getPreprocessedEvents(
     data.allEventsJson.edges,
@@ -32,7 +28,10 @@ export default ({ data }) => {
 
   return (
     <Layout>
-      <h1>Upcoming Events</h1>
+      <HeaderWrapper>
+        <h1>Upcoming Events</h1>
+        <SearchButton />
+      </HeaderWrapper>
       <EventsContainer
         allEvents={preprocessedEvents}
       />

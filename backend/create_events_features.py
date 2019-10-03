@@ -110,6 +110,26 @@ def generate_description_candidate(event):
     return candidates
 
 
+def generate_owner_candidate(event):
+    """
+    Generate alternative owner list from a given row of events dataframe
+    """
+    owner_candidates = []
+    owner_candidates.append(event['owner'])
+    owner_alternative = event['owner'].replace('Department of ', '')
+    owner_alternative = owner_alternative.replace('Center for the ', '')
+    owner_alternative = owner_alternative.replace('Center for ', '')
+    owner_candidates.append(owner_alternative)
+
+    if 'SAS' in owner_alternative:
+        owner_candidates.extend(['Arts & Science', 'School of Arts & Science'])
+
+    abbr = re.search(r'\((.*?)\)', event['owner'])
+    if abbr is not None:
+        owner_candidates.append(abbr.group(1))
+    return owner_candidates
+
+
 if __name__ == '__main__':
     # produce topic vectors using tf-idf and Laten Semantic Analysis (LSA) and search candidate list
     print('Compute LSA vectors...')
@@ -132,16 +152,15 @@ if __name__ == '__main__':
     print('Done!')
 
     # produce search candidate list
-    print('Compute search candidate list...')
+    print('Compute list of search candidates...')
     location_candidates = events_df.apply(generate_location_candidate, axis=1)
     description_candidates = events_df.apply(
         generate_description_candidate, axis=1)
-    owner_candidates = events_df.owner.map(lambda x: [x])
-    owner_candidates_rm = events_df.owner.map(lambda x: [x.replace('Department of ', '')])
+    owner_candidates = events_df.apply(generate_owner_candidate, axis=1)
 
-    suggest_candidates = (location_candidates + owner_candidates_rm + owner_candidates + description_candidates).\
+    suggest_candidates = (location_candidates + owner_candidates + description_candidates).\
         map(lambda x: list(pd.unique(
-            [e.strip() for e in x if e is not '' and len(e.split()) <= 4])[0:10]))
+            [e.strip() for e in x if e is not '' and len(e.split()) <= 5])[0:15]))
     events_df['suggest_candidates'] = suggest_candidates
     print('Done!')
 

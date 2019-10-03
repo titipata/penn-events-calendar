@@ -91,8 +91,13 @@ def query(search_query: hug.types.text):
         query=search_query,
         fields=fields
     )
-    search_responses = [r.to_dict() for r in responses[0:n_results].execute()]
-    return search_responses
+    search_responses = responses[0:40].execute().to_dict()['hits']['hits']
+
+    # return future events for a given query
+    future_events_indices = []
+    for response in filter(lambda r: get_future_event(r['_source']['date_dt']), search_responses):
+        future_events_indices.append(int(response['_id']))
+    return future_events_indices
 
 
 @hug.get("/suggestion", examples="text=department")
