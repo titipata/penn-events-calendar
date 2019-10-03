@@ -43,21 +43,25 @@ const StyledInput = styled.input`
   border-bottom: 2px solid #333;
   padding: 0 5px;
 
-  ${props => props.active && css`
-    width: 100%;
-    display: block;
-    /* animation */
-    animation: 0.5s ${props.active && slideInAnimation} forwards;
-  `}
+  ${props => props.active
+    && css`
+      width: 100%;
+      display: block;
+      /* animation */
+      animation: 0.5s ${props.active && slideInAnimation} forwards;
+    `}
 `;
 
 const SuggestionList = styled.ul`
+  background-color: white;
   list-style: none;
   position: absolute;
   top: 45px;
   right: 0;
-  background-color: white;
   margin: 0;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  width: 120%;
   max-height: 250px;
   overflow-y: auto;
   overflow-x: hidden;
@@ -75,9 +79,6 @@ const SuggestionList = styled.ul`
   ::-webkit-scrollbar-thumb:hover {
     background: #333;
   }
-  border: 1px solid #ddd;
-  width: 120%;
-  border-radius: 2px;
   ${props => props.hidden && css`
     display: none;
   `}
@@ -85,14 +86,26 @@ const SuggestionList = styled.ul`
 
 const SuggestionItem = styled.li`
   height: 50px;
-  display: flex;
-  align-items: center;
   margin: 0;
-  padding: 5px 15px;
 
   & :hover {
     background-color: rgba(50, 50, 50, 0.1);
-    cursor: pointer;
+  }
+
+  & :active {
+    background-color: rgba(50, 50, 50, 0.25);
+  }
+`;
+
+const StyledLink = styled(Link)`
+  height: 100%;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  padding: 5px 15px;
+
+  & :hover {
+    text-decoration: none;
   }
 `;
 
@@ -101,6 +114,7 @@ const TextWrapper = styled.span`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: #333;
 `;
 
 const getSuggestions = (keyword, callback) => {
@@ -139,8 +153,18 @@ const SearchButton = () => {
         e.preventDefault();
         console.log(searchQuery);
         navigate(`/search?search_query=${searchQuery}`);
+        setActive(false);
       }}
       autoComplete="off"
+      onBlur={(e) => {
+        // https://gist.github.com/pstoica/4323d3e6e37e8a23dd59
+        const { currentTarget } = e;
+        setTimeout(() => {
+          if (!currentTarget.contains(document.activeElement)) {
+            setActive(false);
+          }
+        }, 0);
+      }}
     >
       <StyledFa
         icon="search"
@@ -164,18 +188,21 @@ const SearchButton = () => {
         }
       >
         {suggestionList.slice(0, 10).map(item => (
-          <Link
-            to={`/search?search_query=${item}`}
+          <SuggestionItem
+            // onClick={() => setSearchQuery(item)}
             key={Key.getShortKey()}
           >
-            <SuggestionItem
-              onClick={() => setSearchQuery(item)}
+            <StyledLink
+              to={`/search?search_query=${item}`}
+              onClick={() => {
+                setActive(false);
+                // should we also reset query string?
+                // setSearchQuery('');
+              }}
             >
-              <TextWrapper>
-                {item}
-              </TextWrapper>
-            </SuggestionItem>
-          </Link>
+              <TextWrapper>{item}</TextWrapper>
+            </StyledLink>
+          </SuggestionItem>
         ))}
       </SuggestionList>
     </Container>
