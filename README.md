@@ -8,7 +8,7 @@ We use Python as our backend. Backend mainly contains scripts to fetch events fr
 and index fetched events to `elasticsearch`. The hug backend is set by default to run on port `8888` and elasticsearch is run on port `9200`. 
 See `backend` folder on how to run the backend scripts. 
 
-To start backend server with a given example data after runing and indexing data into `elasticsearch`
+In short, you can start backend server with a given example data by running and indexing data into `elasticsearch`
 
 ```sh
 bash serve_elasticsearch.sh
@@ -18,7 +18,7 @@ python index_elasticsearch.py
 
 ### Frontend
 
-We use react-js as a frontend. The frontend is located in `gatsby_site` folder. 
+We use [`Gatsby.js`](https://www.gatsbyjs.org/) as our frontend. The frontend is located in `gatsby_site` folder. 
 Before running, make sure that you have recent version of `npm` installed (NodeJS 8+).
 If it is the first time, you need to install `gatsby-cli`.
 
@@ -32,10 +32,10 @@ and run front-end application from the `gatsby_site` folder as follows:
 ```sh
 cd gatsby_site
 npm install
-npm start # this will concurrently run hug API backend and reactjs frontend
+npm start
 ```
 
-This will run Gatsby frontend site on port `8000`.
+This will, by default, concurrently run Gatsby frontend site on port `8000` and hug API backend on port `8888`.
 
 
 ## Core members
