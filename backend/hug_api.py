@@ -84,7 +84,8 @@ def query(search_query: hug.types.text):
 
     See more query examples at: https://elasticsearch-dsl.readthedocs.io/en/latest/search_dsl.html
     """
-    fields = ['title', 'description', 'owner', 'speaker', 'location']
+    fields = ['title^2', 'owner^2', 'speaker^2', 'location^2', 'description']
+    n_results = 30
     responses = es_search.query(
         "multi_match",
         query=search_query,
