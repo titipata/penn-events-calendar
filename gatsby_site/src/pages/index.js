@@ -15,10 +15,9 @@ const HeaderWrapper = styled.div`
 `;
 
 export default ({ data }) => {
-  // load static resources
-  useStaticResources();
   // use this to retrieve data and rehydrate before globalState is used
   useLocalStorage();
+  useStaticResources();
 
   // preprocess events before sending to events list
   const preprocessedEvents = evUtil.getPreprocessedEvents(

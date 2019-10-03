@@ -37,10 +37,9 @@ const getSearchResults = (requestUrl, callback) => {
 };
 
 export default ({ data, location }) => {
-  // load static resources
-  useStaticResources();
   // use this to retrieve data and rehydrate before globalState is used
   useLocalStorage();
+  useStaticResources();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResultIndexes, setSearchResultIndexes] = useState([]);

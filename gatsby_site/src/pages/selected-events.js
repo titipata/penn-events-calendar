@@ -5,10 +5,12 @@ import Layout from '../components/layout';
 import useGlobal from '../store';
 import useLocalStorage from '../hooks/useLocalStorage';
 import { Events as evUtil } from '../utils';
+import useStaticResources from '../hooks/useStaticResources';
 
 export default ({ data }) => {
   // use this to retrieve data and rehydrate before globalState is used
   useLocalStorage();
+  useStaticResources();
 
   const [globalState] = useGlobal();
 
