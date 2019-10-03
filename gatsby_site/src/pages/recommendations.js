@@ -4,11 +4,13 @@ import EventsContainer from '../components/EventsContainer';
 import Layout from '../components/layout';
 import useGlobal from '../store';
 import useLocalStorage from '../hooks/useLocalStorage';
+import useStaticResources from '../hooks/useStaticResources';
 import { Events as evUtil } from '../utils';
 
 export default ({ data }) => {
   // use this to retrieve data and rehydrate before globalState is used
   useLocalStorage();
+  useStaticResources();
 
   const [globalState] = useGlobal();
   const [recommendedEvents, setRecommendedEvents] = useState([]);

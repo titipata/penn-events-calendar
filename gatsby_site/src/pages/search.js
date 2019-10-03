@@ -7,7 +7,6 @@ import useLocalStorage from '../hooks/useLocalStorage';
 import useStaticResources from '../hooks/useStaticResources';
 import { Events as evUtil } from '../utils';
 import SearchButton from '../components/BaseComponents/SearchButton';
-// import SearchButton from '../components/BaseComponents/SearchButton';
 
 const HeaderWrapper = styled.div`
   display: flex;
@@ -60,11 +59,26 @@ export default ({ data, location }) => {
   // for searchResultsEvents
   useEffect(() => {
     // filter only selected event to pass to container
-    const filteredEvent = evUtil.getPreprocessedEvents(
-      data.allEventsJson.edges,
-    ).filter(
-      x => searchResultIndexes.includes(x.node.event_index),
-    );
+    const filteredEvent = evUtil.getPreprocessedEvents(data.allEventsJson.edges)
+      .filter(
+        event => searchResultIndexes.find(sri => sri.event_index === event.node.event_index),
+      )
+      // recommended events should contain relevance value:
+      // {
+      //   node: { `event_data` },
+      //   relevance: `relevance_value`
+      // }
+      .reduce((acc, cur) => ([
+        ...acc,
+        {
+          ...cur,
+          relevance: searchResultIndexes.find(
+            rec => rec.event_index === cur.node.event_index,
+          ).relevance,
+        },
+      ]), []);
+
+    console.log('filteredEvent:', filteredEvent);
 
     setSearchResultEvents(filteredEvent);
   }, [data.allEventsJson.edges, searchResultIndexes]);

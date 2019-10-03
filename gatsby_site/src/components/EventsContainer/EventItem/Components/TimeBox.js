@@ -33,7 +33,7 @@ const StyledTime = styled.div`
 const starColor = {
   normal: '#eee',
   selected: 'orange',
-  relevance: '#3dd',
+  relevance: '#8cb3d9',
 };
 
 const StyledFavIcon = styled(Fa).attrs(() => ({

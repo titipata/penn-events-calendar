@@ -99,8 +99,8 @@ def query(search_query: hug.types.text):
         future_events_indices.append(response['_id'])
         relevances.append(response['_score'])
     relevances = [int(100 * (r / max(relevances))) for r in relevances] # normalize to range 0 - 100
-    search_relevances = [{'event_index': i, 'relevance': r}
-                        for i, r in zip(future_events_indices, relevances)]
+    search_relevances = [{'event_index': int(i), 'relevance': r}
+                         for i, r in zip(future_events_indices, relevances)]
 
     return search_relevances
 
