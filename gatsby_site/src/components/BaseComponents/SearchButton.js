@@ -98,10 +98,12 @@ const SuggestionItem = styled.li`
 `;
 
 const StyledLink = styled(Link)`
+  color: #333;
   height: 100%;
   display: flex;
   flex: 1;
   align-items: center;
+  justify-content: space-between;
   padding: 5px 15px;
 
   & :hover {
@@ -114,7 +116,26 @@ const TextWrapper = styled.span`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #333;
+`;
+
+const FillerIcon = styled(StyledFa).attrs(() => ({
+  icon: 'arrow-up',
+  transform: { rotate: 45 },
+}))`
+  height: auto;
+  font-size: 2.1rem;
+  font-weight: lighter;
+  color: #555;
+
+  & :hover {
+    border-radius: 0;
+    background-color: #fff;
+  }
+
+  & :active {
+    background-color: #555;
+    color: #eee;
+  }
 `;
 
 const getSuggestions = (keyword, callback) => {
@@ -189,7 +210,6 @@ const SearchButton = () => {
       >
         {suggestionList.slice(0, 10).map(item => (
           <SuggestionItem
-            // onClick={() => setSearchQuery(item)}
             key={Key.getShortKey()}
           >
             <StyledLink
@@ -201,6 +221,16 @@ const SearchButton = () => {
               }}
             >
               <TextWrapper>{item}</TextWrapper>
+              <FillerIcon
+                onClick={(e) => {
+                  // manage event
+                  e.stopPropagation();
+                  e.preventDefault();
+                  // this click behavior
+                  setSearchQuery(item);
+                  inputRef.current.focus();
+                }}
+              />
             </StyledLink>
           </SuggestionItem>
         ))}
