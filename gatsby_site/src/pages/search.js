@@ -7,6 +7,7 @@ import useLocalStorage from '../hooks/useLocalStorage';
 import useStaticResources from '../hooks/useStaticResources';
 import { Events as evUtil } from '../utils';
 import SearchButton from '../components/BaseComponents/SearchButton';
+import useGlobal from '../store';
 
 const HeaderWrapper = styled.div`
   display: flex;
@@ -40,6 +41,12 @@ export default ({ data, location }) => {
   // use this to retrieve data and rehydrate before globalState is used
   useLocalStorage();
   useStaticResources();
+  // this is used to set origin hostname
+  const [, globalActions] = useGlobal();
+
+  useEffect(() => {
+    globalActions.setHostName(location.origin);
+  }, [globalActions, location.origin]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResultIndexes, setSearchResultIndexes] = useState([]);

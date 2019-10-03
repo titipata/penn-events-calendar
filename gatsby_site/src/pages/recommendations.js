@@ -7,12 +7,18 @@ import useLocalStorage from '../hooks/useLocalStorage';
 import useStaticResources from '../hooks/useStaticResources';
 import { Events as evUtil } from '../utils';
 
-export default ({ data }) => {
+export default ({ data, location }) => {
   // use this to retrieve data and rehydrate before globalState is used
   useLocalStorage();
   useStaticResources();
+  // this is used to set origin hostname
+  const [globalState, globalActions] = useGlobal();
 
-  const [globalState] = useGlobal();
+  useEffect(() => {
+    globalActions.setHostName(location.origin);
+  }, [globalActions, location.origin]);
+
+  // local state
   const [recommendedEvents, setRecommendedEvents] = useState([]);
 
   // get selected event indexes from global state
