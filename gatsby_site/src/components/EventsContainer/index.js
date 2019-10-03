@@ -47,17 +47,13 @@ const EventsContainer = ({ allEvents, noEventDefaultText }) => {
   // we don't get the data right after the component is mounted
   // thus we also watch for `allEvents`
   useEffect(() => {
-    // get/set paginated events
-    if (allEvents.length > 0 && paginatedEvents.length === 0) {
-      setPaginatedEvents(evUtil.getPaginatedEvents(allEvents));
-    }
+    setPaginatedEvents(evUtil.getPaginatedEvents(allEvents));
+  }, [allEvents]);
 
-    // only update page data if there is paginatedEvents
-    if (paginatedEvents.length > 0) {
-      const { data } = paginatedEvents.find(grp => grp.page === currentPage) || [];
-      setCurrentPageData(evUtil.groupByDate(data));
-    }
-  }, [currentPage, allEvents, paginatedEvents]);
+  useEffect(() => {
+    const { data } = paginatedEvents.find(grp => grp.page === currentPage) || [];
+    setCurrentPageData(evUtil.groupByDate(data));
+  }, [currentPage, paginatedEvents]);
 
   // ---- render no data screen
   if (allEvents.length === 0) {

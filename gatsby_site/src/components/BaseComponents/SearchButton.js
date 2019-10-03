@@ -103,12 +103,14 @@ const TextWrapper = styled.span`
   text-overflow: ellipsis;
 `;
 
-const fetcher = (kw, setter) => fetch(`http://localhost:8888/suggestion?text=${kw}`)
-  .then(res => res.json())
-  .then((resJson) => {
-    console.log(resJson);
-    setter(resJson);
-  });
+const getSuggestions = (keyword, callback) => {
+  if (!keyword) return;
+  fetch(`http://localhost:8888/suggestion?text=${keyword}`)
+    .then(res => res.json())
+    .then((resJson) => {
+      callback(resJson);
+    });
+};
 
 const SearchButton = () => {
   const inputRef = useRef(null);
@@ -122,12 +124,14 @@ const SearchButton = () => {
 
   useEffect(() => {
     // ref should be used in effect
-    inputRef.current.focus();
-
-    if (searchQuery) {
-      fetcher(searchQuery, setSuggestionList);
+    if (inputRef) {
+      inputRef.current.focus();
     }
-  }, [active, searchQuery]);
+  }, [active]);
+
+  useEffect(() => {
+    getSuggestions(searchQuery, setSuggestionList);
+  }, [searchQuery]);
 
   return (
     <Container

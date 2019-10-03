@@ -44,32 +44,35 @@ export default ({ data, location }) => {
   useLocalStorage();
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResultsIndexes, setSearchResultsIndexes] = useState([]);
+  const [searchResultIndexes, setSearchResultIndexes] = useState([]);
+  const [searchResultEvents, setSearchResultEvents] = useState([]);
 
-  getSearchResults();
-
+  // handle effect for searchQuery
   useEffect(() => {
-    if (!searchQuery) {
-      setSearchQuery(decodeURI(parseQueryString(location.search).search_query));
-    }
+    setSearchQuery(decodeURI(parseQueryString(location.search).search_query));
+  }, [location.search]);
 
-    if (searchResultsIndexes.length === 0) {
-      getSearchResults(`http://${location.hostname}:8888/query?search_query=${searchQuery}}`, x => setSearchResultsIndexes(x));
-    }
-  }, [location.hostname, location.search, searchQuery, searchResultsIndexes]);
+  // for searchResultsIndexes
+  useEffect(() => {
+    getSearchResults(`http://${location.hostname}:8888/query?search_query=${searchQuery}}`, x => setSearchResultIndexes(x));
+  }, [location.hostname, searchQuery]);
 
-  // filter only selected event to pass to container
-  const searchResultEvents = evUtil.getPreprocessedEvents(
-    data.allEventsJson.edges,
-  ).filter(
-    x => searchResultsIndexes.includes(x.node.event_index),
-  );
+  // for searchResultsEvents
+  useEffect(() => {
+    // filter only selected event to pass to container
+    const filteredEvent = evUtil.getPreprocessedEvents(
+      data.allEventsJson.edges,
+    ).filter(
+      x => searchResultIndexes.includes(x.node.event_index),
+    );
+
+    setSearchResultEvents(filteredEvent);
+  }, [data.allEventsJson.edges, searchResultIndexes]);
 
   return (
     <Layout>
       <HeaderWrapper>
         <h1>Search Results</h1>
-        {/* need to fix dont redirect */}
         <SearchButton />
       </HeaderWrapper>
       <p>
