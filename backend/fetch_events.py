@@ -73,7 +73,8 @@ def clean_endtime(r):
         endtime = r['starttime'].split('-')[-1].strip()
     else:
         try:
-            endtime = dateutil.parser.parse(r['starttime']) + timedelta(hours=1)
+            endtime = dateutil.parser.parse(
+                r['starttime']) + timedelta(hours=1)
             endtime = endtime.strftime("%I:%M %p")
         except:
             endtime = r['endtime']
@@ -194,7 +195,8 @@ def fetch_events_cni(base_url='https://cni.upenn.edu/events'):
                 starttime = event_time.split('-')[0]
                 starttime = dateutil.parser.parse(starttime)
                 endtime = (starttime + timedelta(hours=1))
-                starttime, endtime = starttime.strftime("%I:%M %p"), endtime.strftime("%I:%M %p")
+                starttime, endtime = starttime.strftime(
+                    "%I:%M %p"), endtime.strftime("%I:%M %p")
             else:
                 starttime, endtime = '', ''
         else:
@@ -211,12 +213,14 @@ def fetch_events_cni(base_url='https://cni.upenn.edu/events'):
             event_page = requests.get(event_url)
             event_soup = BeautifulSoup(event_page.content, 'html.parser')
             description = []
-            description_soup = event_soup.find_all('div', attrs={'class': 'field-item even'})
+            description_soup = event_soup.find_all(
+                'div', attrs={'class': 'field-item even'})
             for div in description_soup:
                 if div.find('strong') is None:
                     description.append(div.text)
                 else:
-                    description.append('\n'.join([d.text for d in div.find_all('strong')] + [p.text for p in div.find_all('p')]))
+                    description.append('\n'.join([d.text for d in div.find_all(
+                        'strong')] + [p.text for p in div.find_all('p')]))
             description = ' '.join(description)
         except:
             description = ''
@@ -237,60 +241,49 @@ def fetch_events_cni(base_url='https://cni.upenn.edu/events'):
 
 def fetch_events_english_dept(base_url='https://www.english.upenn.edu/events/calendar-export/'):
     """
-    Saving English Department events to JSON format
+    Fetch events from English Department
     """
-    events_list = []
-    page = requests.get(base_url)
-    site = html.fromstring(page.text)
-    events = site.xpath(
-        '//ul[@class="unstyled"]//li//span[@class="field-content"]')
-    events = events[0]
-    event_months = [stringify_children(e).strip(
-    ) for e in events.xpath('//div[@class="month-date"]')]
-    event_days = [stringify_children(e).strip()
-                  for e in events.xpath('//div[@class="day-date"]')]
-    event_locations = events.xpath('//p[@class="location"]/text()')
+    events = []
+    page_soup = BeautifulSoup(requests.get(base_url).content, 'html.parser')
+    event_content = page_soup.find_all('div', attrs={'class': 'view-content'})
+    if len(event_content) >= 2:
+        event_content = event_content[1]
+        events_li = event_content.find_all('li', attrs={'class': 'row-fluid'})
+        for event_li in events_li:
+            try:
+                title = event_li.find('div', attrs={'class': 'views-field views-field-views-conditional'})
+                title = title.find('span', attrs={'class': 'field-content'}) or '' if title is not None else ''
+                event_url = title.find('a')['href']
+                event_url = urljoin('https://www.english.upenn.edu', event_url)
+                title = title.text.strip() if title is not None else ''
+                date = event_li.find('div', attrs={'month-date'})
+                date = dateutil.parser.parse(date.find('span').attrs['content'].split('T')[0])
+                date = date.strftime("%Y-%m-%d")
+                event_time = event_li.find('div', attrs={'class': 'date-time'})
+                starttime = event_time.find('span', attrs={'class': 'date-display-start'})
+                starttime = starttime.text.strip() if starttime is not None else ''
+                endtime = event_time.find('span', attrs={'class': 'date-display-end'})
+                endtime = endtime.text.strip() if endtime is not None else ''
+                location = event_li.find('p', attrs={'class': 'location'})
+                location = location.text.strip() if location is not None else ''
 
-    starttimes = []
-    endtimes = []
-    for div in events.xpath('//div[@class="date-time"]'):
-        event_time = div.find('span[@class="date-display-single"]')
-        if event_time is not None and event_time.find('span[@class="date-display-start"]') is not None:
-            starttime = event_time.find(
-                'span[@class="date-display-start"]').text
-            endtime = event_time.find('span[@class="date-display-end"]').text
-            starttimes.append(starttime)
-            endtimes.append(endtime)
-        else:
-            starttimes.append(event_time.text or '')
-            endtimes.append(event_time.text or '')
+                event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+                description = event_soup.find('div', attrs={'class': 'views-field views-field-nothing'})
+                description = description.text.strip() if description is not None else ''
 
-    titles = [span.find('a').text for span in events.xpath('//span[@class="field-content"]')
-              if span.find('a') is not None]
-    urls = [span.find('a').attrib.get('href') for span in events.xpath('//span[@class="field-content"]')
-            if span.find('a') is not None]
-    descriptions = [stringify_children(e).strip()
-                    for e in events.xpath('//div[@class="span10"]')]
-
-    for (month, day, location, starttime, endtime, title, description, url) in zip(event_months, event_days, event_locations, starttimes, endtimes, titles, descriptions, urls):
-        try:
-            date = '{} {}'.format(day, month)
-            date = re.sub(r'to \d+', '', date)
-            event_dict = {
-                "date": dateutil.parser.parse(date).strftime("%Y-%m-%d"),
-                "starttime": starttime,
-                "endtime": endtime,
-                "title": title,
-                "description": description,
-                "location": location,
-                "speaker": '',
-                "url": urljoin(base_url, url),
-                "owner": "English Department",
-            }
-            events_list.append(event_dict)
-        except:
-            pass
-    return events_list
+                events.append({
+                    'title': title,
+                    'date': date,
+                    'starttime': starttime,
+                    'endtime': endtime,
+                    'location': location,
+                    'description': description,
+                    'url': event_url,
+                    'owner': "English Department",
+                })
+            except:
+                pass
+    return events
 
 
 def fetch_events_crim(base_url='https://crim.sas.upenn.edu'):
@@ -428,7 +421,8 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
 
     # loop through all pages
     for page in range(n_pages + 1):
-        all_event_url = 'https://economics.sas.upenn.edu/events?tid=All&page={}'.format(page)
+        all_event_url = 'https://economics.sas.upenn.edu/events?tid=All&page={}'.format(
+            page)
         page = requests.get(all_event_url)
         all_event_soup = BeautifulSoup(page.content, 'html.parser')
         page_events = all_event_soup.find(
@@ -439,7 +433,8 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
             try:
                 start_time, end_time = event.find_all('time')
                 start_time = start_time.text.strip() if start_time is not None else ''
-                date, starttime = start_time.split(' - ')[0], start_time.split(' - ')[-1]
+                date, starttime = start_time.split(
+                    ' - ')[0], start_time.split(' - ')[-1]
                 end_time = end_time.text.strip() if end_time is not None else ''
                 endtime = end_time.split(' - ')[-1]
             except:
@@ -1224,8 +1219,9 @@ def fetch_events_fels(base_url='https://www.fels.upenn.edu'):
         event_soup = BeautifulSoup(requests.get(
             event_url).content, 'html.parser')
         title = event_soup.find('h1', attrs={'id': 'page-title'}).text.strip()
-        description = event_soup.find(
-            'div', attrs={'class': 'field-name-body'}).text.strip()
+        description = event_soup.find('div', attrs={'class': 'field-name-body'})
+        description = description.text.strip() if description is not None else ''
+        description = description.replace('Event Information: ', '')
         location = event_soup.find(
             'div', attrs={'class': 'field-name-field-event-location'})
         location = location.text.replace(
@@ -1243,7 +1239,7 @@ def fetch_events_fels(base_url='https://www.fels.upenn.edu'):
             'Home\xa0 // \xa0', '').strip() if speaker is not None else ''
         events.append({
             'title': title,
-            'location': location,
+            'location': (location + ' ' + room).strip(),
             'date': date,
             'starttime': starttime,
             'endtime': endtime,
@@ -1280,12 +1276,15 @@ def fetch_events_sciencehistory(base_url='https://www.sciencehistory.org'):
         event_time = event_time.text.strip() if event_time is not None else ''
         starttime, endtime = find_startend_time(event_time)
 
-        descriptions = event_soup.find_all('p')
+        descriptions = event_soup.find(
+            'div', attrs={'class': 'content event_padding'})
+        descriptions = descriptions.find_all('p')
         if len(descriptions) >= 5:
             descriptions = ' '.join([p.text.strip()
-                                     for p in descriptions[0:5]])
+                                     for p in descriptions[0:5] if p is not None])
         else:
-            descriptions = ' '.join([p.text.strip() for p in descriptions])
+            descriptions = ' '.join([p.text.strip()
+                                     for p in descriptions if p is not None])
 
         events.append({
             'title': title,
@@ -1704,9 +1703,11 @@ def fetch_events_physics_astronomy(base_url='https://www.physics.upenn.edu'):
             title = event_soup.find('h3', attrs={'class': 'events-title'})
             title = title.text.strip() if title is not None else ''
             date = event_soup.find('div', attrs={'class': 'event-date'})
-            date = ' '.join([d.text.strip() for d in date.find_all('time') if d is not None])
+            date = ' '.join([d.text.strip()
+                             for d in date.find_all('time') if d is not None])
             try:
-                event_time = event_soup.find('span', attrs={'class': 'news-date'})
+                event_time = event_soup.find(
+                    'span', attrs={'class': 'news-date'})
                 starttime, endtime = event_time.find_all('time')
                 starttime, endtime = starttime.text.strip() or '', endtime.text.strip() or ''
             except:
@@ -1804,14 +1805,17 @@ def fetch_events_annenberg(base_url='https://www.asc.upenn.edu'):
     Penn Events for Annenberg School of Communication
     """
     page_soup = BeautifulSoup(requests.get(
-        base_url + '/news-events/events').content, 'html.parser')
+        urljoin(base_url, '/news-events/events')).content, 'html.parser')
 
     events = []
     event_table = page_soup.find('div', attrs={'id': 'content'})
     all_events = event_table.find_all('h3', attrs={'class': 'field-content'})
     for event in all_events:
         try:
-            event_url = base_url + event.find('a')['href']
+            if 'https://www.asc.upenn.edu/news-events/events/' in event.find('a')['href']:
+                event_url = event.find('a')['href']
+            else:
+                event_url = urljoin(base_url, event.find('a')['href'])
             event_soup = BeautifulSoup(requests.get(
                 event_url).content, 'html.parser')
             title = event_soup.find('h1', attrs={'class': 'title'})
@@ -1823,16 +1827,21 @@ def fetch_events_annenberg(base_url='https://www.asc.upenn.edu'):
             location = event_soup.find('div', attrs={
                                        'class': 'field field-name-field-event-location field-type-text field-label-inline clearfix'})
             location = location.text.strip() if location is not None else ''
+            location = location.replace('Location:', '').strip()
             details = event_soup.find('div', attrs={
                                       'class': 'field field-name-body field-type-text-with-summary field-label-hidden'})
             details = details.text.strip() if details is not None else ''
+            speaker = ''
+            for kw in ['Talk: ', 'Colloquium:', 'Series:']:
+                if kw in title:
+                    speaker = title.split(kw)[-1]
             events.append({
                 'title': title,
                 'date': date,
                 'location': location,
                 'description': details,
                 'url': event_url,
-                'speaker': '',
+                'speaker': speaker,
                 'starttime': starttime,
                 'endtime': endtime,
                 'owner': 'Annenberg School of Communication'
@@ -2076,7 +2085,8 @@ def extract_mindcore_event_detail(event):
     date = date.get_text() if date is not None else ''
     description = event.find('div', attrs={'class': 'row event-inner-content'})
     description = description.text.strip() if description is not None else ''
-    event_time = event.find('div', attrs={'class': 'event-meta-item event-time'})
+    event_time = event.find(
+        'div', attrs={'class': 'event-meta-item event-time'})
     event_time = event_time.text.strip() if event_time is not None else ''
     if '-' in event_time:
         starttime, endtime = event_time.split('-')
@@ -2111,7 +2121,8 @@ def fetch_events_mindcore(base_url='http://mindcore.sas.upenn.edu/event-category
         for li in pagination.find_all('li'):
             if li.find('a') is not None:
                 pagination_urls.append(li.find('a').attrs.get('href'))
-        pagination_max = max([int(p.split('/')[-2]) for p in pagination_urls if p != ''])
+        pagination_max = max([int(p.split('/')[-2])
+                              for p in pagination_urls if p != ''])
     except:
         pagination_max = 1
 
@@ -2123,11 +2134,13 @@ def fetch_events_mindcore(base_url='http://mindcore.sas.upenn.edu/event-category
 
     if pagination_max > 1:
         for i in range(2, pagination_max + 1):
-            event_url = 'http://mindcore.sas.upenn.edu/event-category/all-events/page/{}/'.format(i)
+            event_url = 'http://mindcore.sas.upenn.edu/event-category/all-events/page/{}/'.format(
+                i)
             event_page = requests.get(event_url)
             event_soup = BeautifulSoup(event_page.content, 'html.parser')
             if len(event_soup.find_all('article')) != 1:
-                all_events = event_soup.find('div', attrs={'class': 'calendarp'})
+                all_events = event_soup.find(
+                    'div', attrs={'class': 'calendarp'})
                 all_events = all_events.find_all('article')
                 for event in all_events:
                     events.append(extract_mindcore_event_detail(event))
@@ -2141,39 +2154,54 @@ def fetch_events_seas(base_url='https://events.seas.upenn.edu/calendar/list/'):
     events = []
     for i in range(1, 4):
         try:
-            event_url = urljoin(base_url, '?tribe_paged={}&tribe_event_display=list'.format(i))
-            event_page = BeautifulSoup(requests.get(event_url).content, 'html.parser')
-            all_events = event_page.find('div', attrs={'class': 'tribe-events-loop'})
-            year = event_page.find('h2', attrs={'class': 'tribe-events-list-separator-month'})
+            event_url = urljoin(
+                base_url, '?tribe_paged={}&tribe_event_display=list'.format(i))
+            event_page = BeautifulSoup(requests.get(
+                event_url).content, 'html.parser')
+            all_events = event_page.find(
+                'div', attrs={'class': 'tribe-events-loop'})
+            year = event_page.find(
+                'h2', attrs={'class': 'tribe-events-list-separator-month'})
             year = year.text.strip() if year is not None else ''
             for event in all_events.find_all('div', attrs={'class': 'type-tribe_events'}):
-                event_attrs = event.find('a', attrs={'class': 'tribe-event-url'}).attrs
+                event_attrs = event.find(
+                    'a', attrs={'class': 'tribe-event-url'}).attrs
                 event_url = event_attrs.get('href', '')
                 title = event_attrs.get('title', '')
-                date = event.find('span', attrs={'class': 'tribe-event-date-start'})
+                date = event.find(
+                    'span', attrs={'class': 'tribe-event-date-start'})
                 date = date.text if date is not None else ''
                 starttime = find_startend_time(date)[0]
                 date = date.replace(starttime, '').replace(' at ', '')
-                endtime = event.find('span', attrs={'class': 'tribe-event-time'})
+                endtime = event.find(
+                    'span', attrs={'class': 'tribe-event-time'})
                 endtime = endtime.text.strip() if endtime is not None else ''
                 if ' ' in year:
                     date = date + ' ' + year.split(' ')[-1]
-                location = event.find('div', attrs={'class': 'tribe-events-venue-details'})
-                location = ' '.join(location.text.replace('+ Google Map', '').strip().split('\n')[0:2])
-                description = event.find('div', attrs={'class': 'tribe-events-list-event-description'})
+                location = event.find(
+                    'div', attrs={'class': 'tribe-events-venue-details'})
+                location = ' '.join(location.text.replace(
+                    '+ Google Map', '').strip().split('\n')[0:2])
+                description = event.find(
+                    'div', attrs={'class': 'tribe-events-list-event-description'})
                 description = description.text.strip() if description is not None else ''
 
                 # get event description if available
                 try:
-                    event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
-                    description = event_soup.find('div', attrs={'id': 'z5_events_main_content'})
+                    event_soup = BeautifulSoup(requests.get(
+                        event_url).content, 'html.parser')
+                    description = event_soup.find(
+                        'div', attrs={'id': 'z5_events_main_content'})
                     if description is not None:
                         description = description.text.strip()
-                        description = '\n'.join([d.strip() for d in description.split('\n') if d.strip() != ''])
-                    speaker = event_soup.find('div', attrs={'id': 'z5_events_speaker_info'})
+                        description = '\n'.join(
+                            [d.strip() for d in description.split('\n') if d.strip() != ''])
+                    speaker = event_soup.find(
+                        'div', attrs={'id': 'z5_events_speaker_info'})
                     if speaker is not None:
                         speaker = speaker.text.strip()
-                        speaker = '\n'.join([d.strip() for d in speaker.split('\n') if d.strip() != ''])
+                        speaker = '\n'.join(
+                            [d.strip() for d in speaker.split('\n') if d.strip() != ''])
                 except:
                     speaker = ''
 
@@ -2236,7 +2264,8 @@ if __name__ == '__main__':
     events_df['date_dt'] = events_df['date'].map(
         lambda x: clean_date_format(x))
     events_df.loc[:, 'starttime'] = events_df.apply(clean_starttime, axis=1)
-    events_df.loc[events_df.endtime == '', 'endtime'] = events_df.loc[events_df.endtime == ''].apply(clean_endtime, axis=1)
+    events_df.loc[events_df.endtime == '',
+                  'endtime'] = events_df.loc[events_df.endtime == ''].apply(clean_endtime, axis=1)
 
     # save data
     if not os.path.exists(PATH_DATA):
