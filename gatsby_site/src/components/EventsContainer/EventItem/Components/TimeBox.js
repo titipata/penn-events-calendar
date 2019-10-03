@@ -39,6 +39,7 @@ const starColor = {
 const StyledFavIcon = styled(Fa).attrs(() => ({
   icon: 'star',
 }))`
+  cursor: pointer;
   color: ${props => (props.checked ? starColor.selected : starColor.normal)};
   font-size: 1.75rem;
   /* refer to the id of svg  */

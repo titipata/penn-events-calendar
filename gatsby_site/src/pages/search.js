@@ -78,8 +78,6 @@ export default ({ data, location }) => {
         },
       ]), []);
 
-    console.log('filteredEvent:', filteredEvent);
-
     setSearchResultEvents(filteredEvent);
   }, [data.allEventsJson.edges, searchResultIndexes]);
 
