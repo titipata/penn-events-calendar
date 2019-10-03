@@ -76,7 +76,7 @@ export default ({ data, location }) => {
         <SearchButton />
       </HeaderWrapper>
       <p>
-        <BoldText>Results for</BoldText>
+        <BoldText>Search results for</BoldText>
         {` ${searchQuery}`}
       </p>
       <EventsContainer
