@@ -13,7 +13,7 @@
     "elasticsearch": "cd ../backend && ./serve_elasticsearch.sh",
     "index-elastic": "cd ../backend && python index_elasticsearch.py",
     "start": "concurrently -n 'hug,gatsby,elasticsearch' -c 'bgBlue,bgMagenta,bgGreen' 'npm run hug-dev' 'gatsby develop' 'npm run elasticsearch'",
-    "deploy": "concurrently -n 'hug,gatsby' -c 'bgBlue,bgMagenta' 'npm run hug-dev' 'npm run gatsby-prod'",
+    "deploy": "concurrently -n 'hug,gatsby,elasticsearch' -c 'bgBlue,bgMagenta,bgGreen' 'npm run hug-dev' 'npm run gatsby-prod' 'npm run elasticsearch'",
     "format": "prettier --write src/**/*.{js,jsx}",
     "test": "jest"
   },
