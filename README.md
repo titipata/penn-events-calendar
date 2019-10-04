@@ -2,21 +2,8 @@
 
 All events happening at the University of Pennsylvania event with built-in search and recommendation engine.
 
-### Backend
 
-We use Python as our backend. Backend mainly contains scripts to fetch events from Penn, search and recommendation API using [hug](https://www.hug.rest/), 
-and index fetched events to `elasticsearch`. The hug backend is set by default to run on port `8888` and elasticsearch is run on port `9200`. 
-See `backend` folder on how to run the backend scripts. 
-
-In short, you can start backend server with a given example data by running and indexing data into `elasticsearch`
-
-```sh
-bash serve_elasticsearch.sh
-python index_elasticsearch.py
-```
-
-
-### Frontend
+## Run web application
 
 We use [`Gatsby.js`](https://www.gatsbyjs.org/) as our frontend. The frontend is located in `gatsby_site` folder. 
 Before running, make sure that you have recent version of `npm` installed (NodeJS 8+).
@@ -35,8 +22,16 @@ npm install
 npm start
 ```
 
-This will, by default, concurrently run Gatsby frontend site on port `8000` and hug API backend on port `8888`.
+Then index given example data to elasticsearch located in `backend/data` using
 
+```sh
+npm run index-elastic # index data to elasticsearch
+```
+
+By default, this will concurrently run Gatsby frontend site at port `8000`, 
+hug API backend at port `8888`,  and ElasticSearch at port `9200`. 
+For deployment, use `npm run deploy` instead. This will run the site at port `9000`.
+See `gatsby_site`, to see how to run on a remote serveer.
 
 ## Core members
 

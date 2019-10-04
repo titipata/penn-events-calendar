@@ -1,5 +1,11 @@
 # Backend for Penn events
 
+
+We use Python as our backend. Backend mainly contains scripts to fetch events from Penn, search and recommendation API using [hug](https://www.hug.rest/), 
+and index fetched events to `elasticsearch`. The hug backend is set by default to run on port `8888` and elasticsearch is run on port `9200`. 
+See `backend` folder on how to run the backend scripts. 
+
+
 ## Fetch all events
 
 `fetch_events.py` contains functions to fetch Penn events. We use GROBID to parse PDF 
