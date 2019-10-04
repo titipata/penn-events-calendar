@@ -1057,7 +1057,7 @@ def fetch_events_ldi(base_url='https://ldi.upenn.edu'):
     """
     events = []
     page_soup = BeautifulSoup(requests.get(
-        base_url + '/events').content, 'html.parser')
+        urljoin(base_url, '/events')).content, 'html.parser')
 
     try:
         pages = page_soup.find('ul', attrs={'class': 'pager'}).find_all('li')
@@ -1066,7 +1066,7 @@ def fetch_events_ldi(base_url='https://ldi.upenn.edu'):
         n_pages = 1
 
     for n_page in range(n_pages):
-        event_page_url = base_url + '/events?page={}'.format(n_page)
+        event_page_url = urljoin(base_url, '/events?page={}'.format(n_page))
         page_soup = BeautifulSoup(requests.get(
             event_page_url).content, 'html.parser')
         all_events = page_soup.find_all('div', attrs={'class': 'views-row'})
@@ -1130,13 +1130,13 @@ def fetch_events_korean_studies(base_url='https://www.sas.upenn.edu'):
     """
     events = []
     page_soup = BeautifulSoup(requests.get(
-        base_url + '/koreanstudies/events').content, 'html.parser')
+        urljoin(base_url, '/koreanstudies/events')).content, 'html.parser')
 
     events = []
     event_table = page_soup.find('ul', attrs={'class': 'unstyled'})
     all_events = event_table.find_all('li', attrs={'class': 'row-fluid'})
     for event in all_events:
-        event_url = base_url + event.find('a')['href']
+        event_url = urljoin(base_url, event.find('a')['href'])
         event_soup = BeautifulSoup(requests.get(
             event_url).content, 'html.parser')
         title = event_soup.find('h1', attrs={'class': 'page-header'})
@@ -1188,7 +1188,7 @@ def fetch_events_cscc(base_url='https://cscc.sas.upenn.edu/'):
                 [t.text for t in event_date.find_all('time')])
             starttime, endtime = find_startend_time(event_time)
             speaker = div.find_all('h5')[-1].text
-            event_url = base_url + div.find('a')['href']
+            event_url = urljoin(base_url, div.find('a')['href'])
             event_soup = BeautifulSoup(requests.get(
                 event_url).content, 'html.parser')
             description = event_soup.find(
@@ -1216,9 +1216,9 @@ def fetch_events_fels(base_url='https://www.fels.upenn.edu'):
     """
     events = []
     page_soup = BeautifulSoup(requests.get(
-        base_url + '/events').content, 'html.parser')
+        urljoin(base_url, '/events')).content, 'html.parser')
     all_events = page_soup.find('div', attrs={'class': 'view-content'})
-    event_urls = [base_url + a['href']
+    event_urls = [urljoin(base_url, a['href'])
                   for a in all_events.find_all('a') if a is not None]
 
     for event_url in event_urls:
@@ -1264,7 +1264,7 @@ def fetch_events_sciencehistory(base_url='https://www.sciencehistory.org'):
     """
     events = []
     page_soup = BeautifulSoup(requests.get(
-        base_url + '/events').content, 'html.parser')
+        urljoin(base_url, '/events')).content, 'html.parser')
 
     all_events = page_soup.find('div', attrs={'class': 'eventpageleft'})
     all_events = all_events.find_all('div', attrs={'class': 'views-row'})
@@ -1272,8 +1272,7 @@ def fetch_events_sciencehistory(base_url='https://www.sciencehistory.org'):
     for event in all_events:
         title = event.find('div', attrs={'class': 'eventtitle'}).text.strip()
         date = event.find('div', attrs={'class': 'eventdate'}).text.strip()
-        event_url = base_url + \
-            event.find('div', attrs={'class': 'eventtitle'}).find('a')['href']
+        event_url = urljoin(base_url, event.find('div', attrs={'class': 'eventtitle'}).find('a')['href'])
         event_soup = BeautifulSoup(requests.get(
             event_url).content, 'html.parser')
         location = event_soup.find('div', attrs={'class': 'event-location'})
@@ -1311,7 +1310,7 @@ def fetch_events_HIP(base_url='https://www.impact.upenn.edu/'):
     Penn Events for Center for High Impact Philanthropy
     """
     page_soup = BeautifulSoup(requests.get(
-        base_url + 'events/').content, 'html.parser')
+        urljoin(base_url, 'events/')).content, 'html.parser')
 
     events = []
     event_table = page_soup.find('div', attrs={'class': 'entry-content'})
@@ -1354,13 +1353,13 @@ def fetch_events_italian_studies(base_url='https://www.sas.upenn.edu'):
     Penn Events for Italian Studies
     """
     page_soup = BeautifulSoup(requests.get(
-        base_url + '/italians/center/events').content, 'html.parser')
+        urljoin(base_url, '/italians/center/events')).content, 'html.parser')
 
     events = []
     event_table = page_soup.find('div', attrs={'class': 'view-content'})
     all_events = event_table.find_all('div', attrs={'class': 'field-content'})
     for event in all_events:
-        event_url = base_url + event.find('a')['href']
+        event_url = urljoin(base_url, event.find('a')['href'])
         event_soup = BeautifulSoup(requests.get(
             event_url).content, 'html.parser')
         title = event_soup.find('h1', attrs={'class': 'title'})
@@ -1413,7 +1412,7 @@ def fetch_events_CEMB(base_url='https://cemb.upenn.edu'):
     Penn Events for Center for Engineering MechanoBiology
     """
     page_soup = BeautifulSoup(requests.get(
-        base_url + '/items/calendar/').content, 'html.parser')
+        urljoin(base_url, '/items/calendar/')).content, 'html.parser')
 
     events = []
     event_table = page_soup.find(
@@ -1465,12 +1464,12 @@ def fetch_events_CEAS(base_url='https://ceas.sas.upenn.edu'):
     Penn Events for Center for East Asian Studies
     """
     page_soup = BeautifulSoup(requests.get(
-        base_url + '/events').content, 'html.parser')
+        urljoin(base_url, '/events')).content, 'html.parser')
 
     events = []
     all_events = page_soup.find_all('li', attrs={'class': 'views-row'})
     for event in all_events:
-        event_url = base_url + event.find('a')['href']
+        event_url = urljoin(base_url, event.find('a')['href'])
         event_soup = BeautifulSoup(requests.get(
             event_url).content, 'html.parser')
         title = event_soup.find('h1', attrs={'class': 'page-header'})
@@ -1499,14 +1498,14 @@ def fetch_events_CASI(base_url='https://casi.ssc.upenn.edu'):
     Penn Events for Center for the Advanced Study of India
     """
     page_soup = BeautifulSoup(requests.get(
-        base_url + '/events').content, 'html.parser')
+        urljoin(base_url, '/events')).content, 'html.parser')
 
     events = []
     event_table = page_soup.find(
         'div', attrs={'class': 'main-container container'})
     all_events = event_table.find_all('div', attrs={'class': 'views-row'})
     for event in all_events:
-        event_url = base_url + event.find('a')['href']
+        event_url = urljoin(base_url, event.find('a')['href'])
         event_soup = BeautifulSoup(requests.get(
             event_url).content, 'html.parser')
         title = event_soup.find('h1', attrs={'class': 'page-header'})
@@ -1535,13 +1534,13 @@ def fetch_events_african_studies(base_url='https://africana.sas.upenn.edu'):
     site available at https://africana.sas.upenn.edu/center/events
     """
     page_soup = BeautifulSoup(requests.get(
-        base_url + '/center/events').content, 'html.parser')
+        urljoin(base_url, '/center/events')).content, 'html.parser')
 
     events = []
     event_table = page_soup.find('div', attrs={'class': 'body-content'})
     all_events = event_table.find_all('div', attrs={'class': 'views-row'})
     for event in all_events:
-        event_url = base_url + event.find('a')['href']
+        event_url = urljoin(base_url, event.find('a')['href'])
         event_soup = BeautifulSoup(requests.get(
             event_url).content, 'html.parser')
         title = event_soup.find('h1', attrs={'class': 'page-header'})
@@ -1576,7 +1575,7 @@ def fetch_events_business_ethics(base_url='https://zicklincenter.wharton.upenn.e
     Penn Events for Carol and Lawrence Zicklin Center for Business Ethics Research:
     """
     page_soup = BeautifulSoup(requests.get(
-        base_url + '/upcoming-events/').content, 'html.parser')
+        urljoin(base_url, '/upcoming-events/')).content, 'html.parser')
 
     events = []
     event_table = page_soup.find('div', attrs={'class': 'post-entry'})
@@ -1689,7 +1688,7 @@ def fetch_events_physics_astronomy(base_url='https://www.physics.upenn.edu'):
     Penn Events Penn Physics and Astronomy Department
     """
     page_soup = BeautifulSoup(requests.get(
-        base_url + '/events/').content, 'html.parser')
+        urljoin(base_url, '/events/')).content, 'html.parser')
     try:
         pagination = page_soup.find('ul', attrs={'class': 'pagination'})
         pagination_max = max([a.attrs.get('href')
@@ -1701,11 +1700,11 @@ def fetch_events_physics_astronomy(base_url='https://www.physics.upenn.edu'):
     events = []
     for pagination in range(0, pagination_max):
         page_soup = BeautifulSoup(requests.get(
-            base_url + '/events/' + '?page={}'.format(pagination)).content, 'html.parser')
+            urljoin(base_url, '/events/' + '?page={}'.format(pagination))).content, 'html.parser')
         all_events = page_soup.find_all(
             'div', attrs={'class': 'events-listing'})
         for event in all_events:
-            event_url = base_url + event.find('a')['href']
+            event_url = urljoin(base_url, event.find('a')['href'])
             event_soup = BeautifulSoup(requests.get(
                 event_url).content, 'html.parser')
             title = event_soup.find('h3', attrs={'class': 'events-title'})
@@ -1742,13 +1741,13 @@ def fetch_events_wolf_humanities(base_url='http://wolfhumanities.upenn.edu'):
     Wolf Humanities Center Events, http://wolfhumanities.upenn.edu/events/color
     """
     page_soup = BeautifulSoup(requests.get(
-        base_url + '/events/color').content, 'html.parser')
+        urljoin(base_url, '/events/color')).content, 'html.parser')
 
     events = []
     event_table = page_soup.find('div', attrs={'class': 'event-list'})
     all_events = event_table.find_all('li', attrs={'class': 'clearfix'})
     for event in all_events:
-        event_url = base_url + event.find('a')['href']
+        event_url = urljoin(base_url, event.find('a')['href'])
         event_soup = BeautifulSoup(requests.get(
             event_url).content, 'html.parser')
         title = event_soup.find('h1')
@@ -1778,13 +1777,13 @@ def fetch_events_music_dept(base_url='https://www.sas.upenn.edu'):
     Department of Music... details does not output anything
     """
     page_soup = BeautifulSoup(requests.get(
-        base_url + '/music/performance/performance-calendar').content, 'html.parser')
+        urljoin(base_url, '/music/performance/performance-calendar')).content, 'html.parser')
 
     events = []
     event_table = page_soup.find('div', attrs={'class': 'view-content'})
     all_events = event_table.find_all('li', attrs={'class': 'group'})
     for event in all_events:
-        event_url = base_url + event.find('a')['href']
+        event_url = urljoin(base_url, event.find('a')['href'])
         event_soup = BeautifulSoup(requests.get(
             event_url).content, 'html.parser')
         title = event_soup.find('h1', attrs={'class': 'title'})
@@ -1864,13 +1863,13 @@ def fetch_events_religious_studies(base_url='https://www.sas.upenn.edu'):
     Penn Events for Department of Religious Studies
     """
     page_soup = BeautifulSoup(requests.get(
-        base_url + '/religious_studies/news').content, 'html.parser')
+        urljoin(base_url, '/religious_studies/news')).content, 'html.parser')
 
     events = []
     event_table = page_soup.find('div', attrs={'id': 'content-area'})
     all_events = event_table.find_all('div', attrs={'class': 'views-row'})
     for event in all_events:
-        event_url = base_url + event.find('a')['href']
+        event_url = urljoin(base_url, event.find('a')['href'])
         event_soup = BeautifulSoup(requests.get(
             event_url).content, 'html.parser')
         title = event_soup.find('h1', attrs={'class': 'title'})
@@ -1902,13 +1901,13 @@ def fetch_events_AHEAD(base_url='http://www.ahead-penn.org'):
     Penn Events for Penn AHEAD
     """
     page_soup = BeautifulSoup(requests.get(
-        base_url + '/events').content, 'html.parser')
+        urljoin(base_url, '/events')).content, 'html.parser')
 
     events = []
     event_table = page_soup.find('div', attrs={'id': 'main-content'})
     all_events = event_table.find_all('div', attrs={'class': 'views-row'})
     for event in all_events:
-        event_url = base_url + event.find('a')['href']
+        event_url = urljoin(base_url, event.find('a')['href'])
         event_soup = BeautifulSoup(requests.get(
             event_url).content, 'html.parser')
         title = event_soup.find('h1', attrs={'class': 'title'})
@@ -1940,7 +1939,7 @@ def fetch_events_SPP(base_url='https://www.sp2.upenn.edu'):
     Penn Events for Penn Social Policy & Practice
     """
     page_soup = BeautifulSoup(requests.get(
-        base_url + '/sp2-events/list/').content, 'html.parser')
+        urljoin(base_url, '/sp2-events/list/')).content, 'html.parser')
 
     events = []
     event_table = page_soup.find('div', attrs={'id': 'tribe-events-content'})
@@ -1979,14 +1978,14 @@ def fetch_events_ortner_center(base_url='http://ortnercenter.org'):
     ref: http://ortnercenter.org/updates?tag=events
     """
     page_soup = BeautifulSoup(requests.get(
-        base_url + '/updates?tag=events').content, 'html.parser')
+        urljoin(base_url, '/updates?tag=events')).content, 'html.parser')
 
     events = []
     event_table = page_soup.find(
         'div', attrs={'class': 'block content columnBlog--left'})
     all_events = event_table.find_all('div', attrs={'class': 'blog-title'})
     for event in all_events:
-        event_url = base_url + event.find('a')['href']
+        event_url = urljoin(base_url, event.find('a')['href'])
         event_soup = BeautifulSoup(requests.get(
             event_url).content, 'html.parser')
         title = event_soup.find('h6')
@@ -2023,7 +2022,7 @@ def fetch_events_penn_today(base_url='https://penntoday.upenn.edu'):
             'starttime': event['starttime'],
             'endtime': event['endtime'],
             'location': event['location'] if event['location'] is not False else '',
-            'url': base_url + event['path'],
+            'url': urljoin(base_url, event['path']),
             'owner': 'Penn Today Events'
         })
     return events_list
