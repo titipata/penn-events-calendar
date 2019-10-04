@@ -22,7 +22,7 @@ npm install
 npm start
 ```
 
-Then index given example data to elasticsearch using
+Then index given example data to elasticsearch located in `backend/data` using
 
 ```sh
 npm run index-elastic # index data to elasticsearch
@@ -31,7 +31,7 @@ npm run index-elastic # index data to elasticsearch
 By default, this will concurrently run Gatsby frontend site at port `8000`, 
 hug API backend at port `8888`,  and ElasticSearch at port `9200`. 
 For deployment, use `npm run deploy` instead. This will run the site at port `9000`.
-
+See `gatsby_site`, to see how to run on a remote serveer.
 
 ## Core members
 
