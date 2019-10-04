@@ -2284,7 +2284,7 @@ if __name__ == '__main__':
             clean_endtime, axis=1)
 
     # save data
-    group_columns = ['owner', 'title', 'url', 'owner', 'date', 'starttime']
+    group_columns = ['owner', 'title', 'url', 'date', 'starttime']
     if not os.path.exists(PATH_DATA):
         events_df = events_df.drop_duplicates(
             subset=group_columns, keep='first')
