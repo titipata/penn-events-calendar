@@ -62,12 +62,11 @@ const TimeBox = ({
   const { toggleSelectedEvent } = globalActions;
 
   let singleTime = null;
-  if (starttime === endtime) {
-    if (!starttime || !endtime) {
-      singleTime = '-';
-    } else if (starttime.includes('(All day)')) {
-      singleTime = 'All day';
-    }
+  if (starttime.toLowerCase().includes('all day')) {
+    singleTime = 'All day';
+  }
+  if (!starttime && !endtime) {
+    singleTime = '-';
   }
 
   return (
