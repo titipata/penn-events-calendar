@@ -2241,6 +2241,17 @@ def fetch_events_seas(base_url='https://events.seas.upenn.edu/calendar/list/'):
     return events
 
 
+def drop_duplicate_events(df):
+    """
+    Function to group dataframe, use all new information from the latest row
+    but keep the ``event_index`` from the first one
+    """
+    event_index = df.event_index.iloc[0]
+    r = df.iloc[-1]
+    r['event_index'] = event_index
+    return pd.Series(r)
+
+
 if __name__ == '__main__':
     events = []
     fetch_fns = [
@@ -2273,9 +2284,10 @@ if __name__ == '__main__':
             clean_endtime, axis=1)
 
     # save data
+    group_columns = ['owner', 'title', 'url', 'owner', 'date', 'starttime']
     if not os.path.exists(PATH_DATA):
         events_df = events_df.drop_duplicates(
-            subset=['owner', 'title', 'url', 'owner', 'date', 'starttime'], keep='first')
+            subset=group_columns, keep='first')
         events_df['event_index'] = np.arange(len(events_df))
         save_json(events_df.to_dict(orient='records'), PATH_DATA)
     else:
@@ -2283,7 +2295,11 @@ if __name__ == '__main__':
             json.loads(open(PATH_DATA, 'r').read()))
         events_df = pd.concat(
             (events_former_df, events_df), axis=0, sort=False)
-        events_df = events_df.drop_duplicates(
-            subset=['owner', 'title', 'url', 'owner', 'date', 'starttime'], keep='last')
-        events_df.loc[:, 'event_index'] = np.arange(len(events_df)).astype(int)
+        events_df = events_df.groupby(group_columns, as_index=False, level=0).apply(drop_duplicate_events)
+        events_df.sort_values('event_index', na_position='last', inplace=True)
+        event_idx_begin = events_former_df['event_index'].max() + 1
+        event_idx_end = event_idx_begin + events_df.event_index.isnull().sum()
+        events_df.loc[pd.isnull(events_df.event_index), 'event_index'] = np.arange(
+            event_idx_begin, event_idx_end)
+        events_df.loc[:, 'event_index'] =  events_df.loc[:, 'event_index'].astype(int)
         save_json(events_df.fillna('').to_dict(orient='records'), PATH_DATA)
