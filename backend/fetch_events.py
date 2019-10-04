@@ -937,31 +937,26 @@ def fetch_events_dsl(base_url='http://dsl.cis.upenn.edu/seminar/'):
     The DSL Seminar is a weekly gathering of the research students and professors in the Distributed Systems Laboratory
     """
     page_soup = BeautifulSoup(requests.get(base_url).content, 'html.parser')
-    events_list = page_soup.find('table').find_all('tr')
+    events_list = page_soup.find('table', attrs={'class': 'wp-block-table'}).find_all('tr')
     events = []
     for event in events_list[1::]:
-        date = event.find('td', attrs={'class': 'ms-grid5-left'}).text
-        speaker = event.find('td', attrs={'class': 'ms-grid5-even'}).text
-        description = event.find_all(
-            'td', attrs={'class': 'ms-grid5-even'})[-1].text.strip()
-        if 'Abstract' in description:
-            title = description.split('Abstract')[0].strip()
-            description = ' '.join(description.split('Abstract')[1::]).strip()
-            description = ' '.join(description.split())
-        else:
-            title = description
-            description = description
-        events.append({
-            'title': title,
-            'description': description,
-            'date': date,
-            'url': base_url,
-            'speaker': speaker,
-            'owner': 'DSL',
-            'location': 'DSL Conference Room',
-            'starttime': '12 PM',
-            'endtime': '1 PM'
-        })
+        date, speaker, title = event.find_all('td')
+        date = date.text.strip() if date is not None else ''
+        speaker = speaker.text.strip() if speaker is not None else ''
+        title = title.text.strip() if title is not None else ''
+        description = title
+        if date != '' and speaker != '' and title != '':
+            events.append({
+                'title': title,
+                'description': description,
+                'date': date,
+                'url': base_url,
+                'speaker': speaker,
+                'owner': 'Distributed Systems Laboratory (DSL)',
+                'location': 'DSL Conference Room',
+                'starttime': '12:00 PM',
+                'endtime': '1:00 PM'
+            })
     return events
 
 
@@ -2277,7 +2272,7 @@ if __name__ == '__main__':
     # save data
     if not os.path.exists(PATH_DATA):
         events_df = events_df.drop_duplicates(
-            subset=['starttime', 'owner', 'location', 'title', 'description', 'url'], keep='first')
+            subset=['owner', 'title', 'url', 'owner', 'date', 'starttime'], keep='first')
         events_df['event_index'] = np.arange(len(events_df))
         save_json(events_df.to_dict(orient='records'), PATH_DATA)
     else:
@@ -2286,10 +2281,6 @@ if __name__ == '__main__':
         events_df = pd.concat(
             (events_former_df, events_df), axis=0, sort=False)
         events_df = events_df.drop_duplicates(
-            subset=['starttime', 'owner', 'location', 'title', 'description', 'url'], keep='first')
-        event_idx_begin = events_former_df['event_index'].max() + 1
-        event_idx_end = event_idx_begin + events_df.event_index.isnull().sum()
-        events_df.loc[pd.isnull(events_df.event_index), 'event_index'] = np.arange(
-            event_idx_begin, event_idx_end)
-        events_df['event_index'] = events_df['event_index'].astype(int)
+            subset=['owner', 'title', 'url', 'owner', 'date', 'starttime'], keep='last')
+        events_df.loc[:, 'event_index'] = np.arange(len(events_df)).astype(int)
         save_json(events_df.to_dict(orient='records'), PATH_DATA)
