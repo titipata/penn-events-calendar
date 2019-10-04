@@ -937,7 +937,8 @@ def fetch_events_dsl(base_url='http://dsl.cis.upenn.edu/seminar/'):
     The DSL Seminar is a weekly gathering of the research students and professors in the Distributed Systems Laboratory
     """
     page_soup = BeautifulSoup(requests.get(base_url).content, 'html.parser')
-    events_list = page_soup.find('table', attrs={'class': 'wp-block-table'}).find_all('tr')
+    events_list = page_soup.find(
+        'table', attrs={'class': 'wp-block-table'}).find_all('tr')
     events = []
     for event in events_list[1::]:
         date, speaker, title = event.find_all('td')
@@ -1267,7 +1268,8 @@ def fetch_events_sciencehistory(base_url='https://www.sciencehistory.org'):
     for event in all_events:
         title = event.find('div', attrs={'class': 'eventtitle'}).text.strip()
         date = event.find('div', attrs={'class': 'eventdate'}).text.strip()
-        event_url = urljoin(base_url, event.find('div', attrs={'class': 'eventtitle'}).find('a')['href'])
+        event_url = urljoin(base_url, event.find(
+            'div', attrs={'class': 'eventtitle'}).find('a')['href'])
         event_soup = BeautifulSoup(requests.get(
             event_url).content, 'html.parser')
         location = event_soup.find('div', attrs={'class': 'event-location'})
@@ -2266,8 +2268,9 @@ if __name__ == '__main__':
     events_df['date_dt'] = events_df['date'].map(
         lambda x: clean_date_format(x))
     events_df.loc[:, 'starttime'] = events_df.apply(clean_starttime, axis=1)
-    events_df.loc[events_df.endtime == '',
-                  'endtime'] = events_df.loc[events_df.endtime == ''].apply(clean_endtime, axis=1)
+    if len(events_df.loc[events_df.endtime == '']) > 0:
+        events_df.loc[events_df.endtime == '', 'endtime'] = events_df.loc[events_df.endtime == ''].apply(
+            clean_endtime, axis=1)
 
     # save data
     if not os.path.exists(PATH_DATA):
@@ -2283,4 +2286,4 @@ if __name__ == '__main__':
         events_df = events_df.drop_duplicates(
             subset=['owner', 'title', 'url', 'owner', 'date', 'starttime'], keep='last')
         events_df.loc[:, 'event_index'] = np.arange(len(events_df)).astype(int)
-        save_json(events_df.to_dict(orient='records'), PATH_DATA)
+        save_json(events_df.fillna('').to_dict(orient='records'), PATH_DATA)
