@@ -61,14 +61,12 @@ const TimeBox = ({
   // destructuring actions to use
   const { toggleSelectedEvent } = globalActions;
 
-  let singleTime = null;
-  if (starttime === endtime) {
-    if (!starttime || !endtime) {
-      singleTime = '-';
-    } else if (starttime.includes('(All day)')) {
-      singleTime = 'All day';
-    }
-  }
+  // check if event time is 'all day' or null
+  const singleTime = starttime.toLowerCase().includes('all day')
+    ? 'All day'
+    : !starttime && !endtime
+      ? '-'
+      : null;
 
   return (
     <DatetimeWrapper>
