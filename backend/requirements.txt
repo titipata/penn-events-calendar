@@ -1,5 +1,5 @@
 hug
-uwsgi
+# uwsgi
 numpy
 scipy
 pandas
