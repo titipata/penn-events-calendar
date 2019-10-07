@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { Key } from '../../utils';
+import { media } from '../../utils/ui';
 
 // variables
 const navHeight = 60;
@@ -12,12 +13,37 @@ const NavList = styled.ul`
   flex: 1;
   /* display flex makes its children has flex effect */
   display: flex;
-  flex-direction: row;
   list-style-type: none;
   margin: 0;
   padding: 0;
-  /* put all children items to the right */
-  justify-content: flex-end;
+
+  ${media.extraLarge`
+    flex-direction: row;
+    /* put all children items to the right */
+    justify-content: flex-end;
+  `}
+  ${media.large`
+    flex-direction: row;
+    /* put all children items to the right */
+    justify-content: flex-end;
+  `}
+  ${media.medium`
+    flex-direction: column;
+    justify-content: flex-end;
+    flex: 1 1 100%;
+
+    li {
+      height: ${navHeight - 10}px;
+    }
+
+    li a {
+      justify-content: flex-start;
+    }
+
+    & :active {
+      background-color: #eee;
+    }
+  `}
 `;
 
 const NavItem = styled.li`
@@ -29,6 +55,10 @@ const NavItem = styled.li`
   width: auto;
   justify-content: center;
   align-items: center;
+
+  ${media.medium`
+    padding: 0;
+  `}
 `;
 
 const Menus = ({ items }) => {

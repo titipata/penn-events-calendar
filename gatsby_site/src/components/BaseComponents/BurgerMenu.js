@@ -1,10 +1,11 @@
 // Burger.js
 import React from 'react';
 import styled from 'styled-components';
+import { media } from '../../utils/ui';
 
 export const StyledBurger = styled.button`
   /* position: absolute; */
-  display: flex;
+  display: none;
   flex-direction: column;
   justify-content: space-around;
   width: 1.5rem;
@@ -28,6 +29,10 @@ export const StyledBurger = styled.button`
     position: relative;
     transform-origin: 1px;
   }
+
+  ${media.medium`
+    display: flex;
+  `}
 `;
 
 const Burger = () => (

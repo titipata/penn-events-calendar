@@ -16,7 +16,7 @@ const navHeight = 60;
 // navbar component
 const Navbar = styled.nav`
   background-color: #fefefe;
-  height: ${navHeight}px;
+  min-height: ${navHeight}px;
   position: fixed;
   top: 0;
   width: 100%;
@@ -51,10 +51,10 @@ const NavbarComponent = ({ children }) => (
         <LogoWrapper>
           <StyledImg src={pennLogoURI} alt="Penn Logo" />
         </LogoWrapper>
+        <Burger />
         <Menus
           items={children}
         />
-        <Burger />
       </NavContainer>
     </Navbar>
     <NavPadder />

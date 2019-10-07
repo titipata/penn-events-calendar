@@ -42,19 +42,23 @@ const Container = styled.div`
 `;
 
 const NavContainer = styled(Container)`
+  flex: 1;
   display: flex;
+  flex-wrap: wrap;
   flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
   padding: 0 ${rhythm(2)};
 
-  ${media.small`
+  /* ${media.small`
     width: ${bsContainerWidth.small};
     padding: 0 ${rhythm(0.25)};
-  `}
+  `}*/
 
-  ${media.extraSmall`
+  /* ${media.extraSmall`
     width: 100%;
-    padding: 0 ${rhythm(0.25)};
-  `}
+    padding: 10px 15px;
+  `} */
 `;
 
 export { Container, NavContainer };
