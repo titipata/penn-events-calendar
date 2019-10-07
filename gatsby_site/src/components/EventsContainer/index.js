@@ -27,6 +27,7 @@ const StyledPagination = styled(Pagination)`
   transform: scale(1.25);
   margin: 10px 15px 20px;
   display: flex;
+  width: auto;
   justify-content: center;
   align-items: center;
   li {
