@@ -14,7 +14,7 @@ INDEX_NAME = 'penn-events'
 
 def generate_event(events):
     """
-    Yield event for inserting to elasticsearch
+    For a given list of events, yield event for inserting to elasticsearch
     """
     for event in events:
         try:
@@ -100,7 +100,8 @@ settings = {
     }
 }
 
-if __name__ == '__main__':
+
+def index_events_elasticsearch():
     print('Indexing events to ElasticSearch...')
     events = json.loads(open('data/events.json', 'r').read())
     events = pd.DataFrame(events).fillna('').to_dict(orient='records')
@@ -136,4 +137,8 @@ if __name__ == '__main__':
             },
             refresh=True,
         )
-    print('\nDone!')
+    print('\nDone updating search keywords to ElasticSearch!')
+
+
+if __name__ == '__main__':
+    index_events_elasticsearch()
