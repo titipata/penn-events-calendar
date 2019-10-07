@@ -5,5 +5,8 @@ scipy
 pandas
 elasticsearch
 elasticsearch_dsl
-spacy
 tqdm
+schedule
+spacy
+scikit-learn
+nltk

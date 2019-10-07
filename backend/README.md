@@ -8,7 +8,7 @@ See `backend` folder on how to run the backend scripts.
 
 ## Fetch all events
 
-`fetch_events.py` contains functions to fetch Penn events. We use GROBID to parse PDF 
+The `fetch_events.py` script contains functions to fetch Penn events. We use GROBID to parse PDF 
 and fetch all event to `data/events.json`. `create_events_features.py` contains a script 
 to transform events to LSA vectors and list of search keywords.
 

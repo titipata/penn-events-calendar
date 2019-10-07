@@ -2354,7 +2354,7 @@ def drop_duplicate_events(df):
     return pd.Series(r)
 
 
-if __name__ == '__main__':
+def fetch_all_events():
     events = []
     fetch_fns = [
         fetch_events_cni, fetch_events_english_dept, fetch_events_crim,
@@ -2406,3 +2406,7 @@ if __name__ == '__main__':
             event_idx_begin, event_idx_end)
         events_df.loc[:, 'event_index'] =  events_df.loc[:, 'event_index'].astype(int)
         save_json(events_df.fillna('').to_dict(orient='records'), PATH_DATA)
+
+
+if __name__ == '__main__':
+    fetch_all_events()
