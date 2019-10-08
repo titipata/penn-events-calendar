@@ -48,3 +48,11 @@ We use Hug API as a backend site for the search keywords and recommendation engi
 ```sh
 hug -f hug_api.py -p 8888
 ```
+
+To serve hug with `uwsgi`, use the following command
+
+```sh
+uwsgi --http 0.0.0.0:8888 --wsgi-file hug_api.py -p 2 --callable __hug_wsgi__
+```
+
+this will serve `uwsgi` with 2 processes. Before running, make sure that uwsgi is installed via `conda install -c conda-forge uwsgi`
