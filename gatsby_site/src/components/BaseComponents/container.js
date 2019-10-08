@@ -32,12 +32,11 @@ const Container = styled.div`
 
   ${media.small`
     width: ${bsContainerWidth.small};
-    padding: ${rhythm(0.25)};
+    padding: ${rhythm(1)} ${rhythm(0.25)};
   `}
 
   ${media.extraSmall`
     width: 100%;
-    padding: ${rhythm(0.25)};
   `}
 `;
 
@@ -50,15 +49,14 @@ const NavContainer = styled(Container)`
   align-items: center;
   padding: 0 ${rhythm(2)};
 
-  /* ${media.small`
+  ${media.small`
     width: ${bsContainerWidth.small};
     padding: 0 ${rhythm(0.25)};
-  `}*/
+  `}
 
-  /* ${media.extraSmall`
+  ${media.extraSmall`
     width: 100%;
-    padding: 10px 15px;
-  `} */
+  `}
 `;
 
 export { Container, NavContainer };

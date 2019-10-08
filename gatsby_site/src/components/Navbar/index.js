@@ -1,11 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { NavContainer } from '../BaseComponents/container';
 import Burger from '../BaseComponents/BurgerMenu';
 import Menus from './Menus';
-
-// TODO: responsive menu items => hamburger
 
 // get logo image using require
 const pennLogoURI = require('../../images/penn-logo.png');
@@ -44,22 +42,27 @@ const StyledImg = styled.img`
   height: 100%;
 `;
 
-const NavbarComponent = ({ children }) => (
-  <>
-    <Navbar>
-      <NavContainer>
-        <LogoWrapper>
-          <StyledImg src={pennLogoURI} alt="Penn Logo" />
-        </LogoWrapper>
-        <Burger />
-        <Menus
-          items={children}
-        />
-      </NavContainer>
-    </Navbar>
-    <NavPadder />
-  </>
-);
+const NavbarComponent = ({ children }) => {
+  const [hideMenu, setHideMenu] = useState(true);
+
+  return (
+    <>
+      <Navbar>
+        <NavContainer>
+          <LogoWrapper>
+            <StyledImg src={pennLogoURI} alt="Penn Logo" />
+          </LogoWrapper>
+          <Burger handlePress={() => setHideMenu(!hideMenu)} />
+          <Menus
+            hidden={hideMenu}
+            items={children}
+          />
+        </NavContainer>
+      </Navbar>
+      <NavPadder />
+    </>
+  );
+};
 
 NavbarComponent.propTypes = {
   children: PropTypes.node,

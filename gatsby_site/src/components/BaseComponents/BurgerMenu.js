@@ -1,5 +1,6 @@
 // Burger.js
 import React from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { media } from '../../utils/ui';
 
@@ -14,6 +15,7 @@ export const StyledBurger = styled.button`
   border: none;
   cursor: pointer;
   padding: 0;
+  margin-right: 10px;
   z-index: 999;
 
   &:focus {
@@ -35,12 +37,16 @@ export const StyledBurger = styled.button`
   `}
 `;
 
-const Burger = () => (
-  <StyledBurger>
+const Burger = ({ handlePress }) => (
+  <StyledBurger onClick={() => handlePress()}>
     <div />
     <div />
     <div />
   </StyledBurger>
 );
+
+Burger.propTypes = {
+  handlePress: PropTypes.func.isRequired,
+};
 
 export default Burger;
