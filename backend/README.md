@@ -56,3 +56,14 @@ uwsgi --http 0.0.0.0:8888 --wsgi-file hug_api.py -p 2 --callable __hug_wsgi__
 ```
 
 this will serve `uwsgi` with 2 processes. Before running, make sure that uwsgi is installed via `conda install -c conda-forge uwsgi`
+
+
+## Requirements
+
+Apart from the packages specified in `requirements.txt`, you need to download corpora and models 
+from `nltk` and `spacy` respectively.
+
+```sh
+python -m nltk.downloader all
+python -m spacy download en_core_web_sm
+```
