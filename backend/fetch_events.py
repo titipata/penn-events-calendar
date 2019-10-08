@@ -11,7 +11,6 @@ from datetime import datetime, timedelta
 import dateutil.parser
 from dateutil import relativedelta
 from itertools import chain
-from lxml import etree, html
 from bs4 import BeautifulSoup, NavigableString
 from urllib.parse import urljoin
 from tqdm import tqdm

@@ -130,7 +130,7 @@ def generate_owner_candidate(event):
     return owner_candidates
 
 
-def create_events_feautures():
+def create_events_features():
     # produce topic vectors using tf-idf and Laten Semantic Analysis (LSA) and search candidate list
     print('Compute LSA vectors...')
     events_df = pd.DataFrame(json.loads(open(PATH_DATA, 'r').read()))
@@ -171,4 +171,4 @@ def create_events_feautures():
 
 
 if __name__ == '__main__':
-    create_events_feautures()
+    create_events_features()

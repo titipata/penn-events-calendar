@@ -1,14 +1,26 @@
+import os
+import subprocess
+from pathlib import Path
+
 import schedule
 import time
 from datetime import datetime
 
 from fetch_events import fetch_all_events
-from create_events_features import create_events_feautures
+from create_events_features import create_events_features
 from index_elasticsearch import index_events_elasticsearch
 
+
+home_dir = str(Path.home())
+if not os.path.isdir(os.path.join(home_dir, 'nltk_data')):
+    subprocess.run(['python', '-m', 'nltk.downloader', 'all'])
+subprocess.run(['python', '-m', 'spacy', 'download', 'en_core_web_sm'])
+
+
 def job():
+    print("Start fetching events...")
     fetch_all_events() # fetch all events
-    create_events_feautures() # create events features: event topics, search keywords
+    create_events_features() # create events features: event topics, search keywords
     index_events_elasticsearch() # index events and keywords to elasticsearch
     print("Done fetching events at {}...".format(str(datetime.now())))
 

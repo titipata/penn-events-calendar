@@ -6,8 +6,10 @@ We use [Supervisor](http://supervisord.org/index.html) to control all the proces
 - `supervisor-hug`: serve Hug API.
 - `supervisor-elasticsearch`: serve Elasticsearch.
 
+
 ## Usage
 
+- Activate `hug` environment with `source activate hug`.
 - Make sure there is no `supervisord` process running, kill it if there is:
 
 ```sh
@@ -17,15 +19,16 @@ ps aux | grep supervisord
 kill -9 <supervisord_pid>
 ```
 
-- Activate `hug` environment with `source activate hug`.
-- Start `supervisord` process. Change the path to `conf` file depending on your current directory:
+- Start `supervisord` process in the root of the project.
 
 ```sh
-supervisord -c penn-calendar.supervisor.conf
+# run the following in the root of the project so that %(ENV_PWD)s is set to path to root of the project
+supervisord -c devops/penn-calendar.supervisor.conf
 ```
 
 - Run all programs with `supervisorctl start all` or enter interactive mode with `supervisorctl`.
 - All programs are set to auto-restart. They should restart themselves if anything goes wrong.
+
 
 ## Logs
 

@@ -1,5 +1,5 @@
 hug
-# uwsgi
+beautifulsoup4
 numpy
 scipy
 pandas
