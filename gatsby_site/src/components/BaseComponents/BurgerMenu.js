@@ -1,4 +1,5 @@
 // Burger.js
+// thanks to https://css-tricks.com/hamburger-menu-with-a-side-of-react-hooks-and-styled-components/
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
