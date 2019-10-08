@@ -6,9 +6,9 @@ and index fetched events to `elasticsearch`. The hug backend is set by default t
 See `backend` folder on how to run the backend scripts. 
 
 
-## Fetch all events
+## Fetch events
 
-`fetch_events.py` contains functions to fetch Penn events. We use GROBID to parse PDF 
+The `fetch_events.py` script contains functions to fetch Penn events. We use GROBID to parse PDF 
 and fetch all event to `data/events.json`. `create_events_features.py` contains a script 
 to transform events to LSA vectors and list of search keywords.
 
@@ -18,16 +18,8 @@ python fetch_events.py # scrape data
 python create_events_features.py # create LSA vectors and search candidates
 ```
 
-**Running CRON to fetch event daily**
 
-We can use CRON to make `fetch_events.py` constantly fetch events from Penn. Edit your `username` in `cron_fetch_events.py`
-then run cron job by using the following script
-
-```sh
-python cron_fetch_events.py
-```
-
-## Serve ElasticSearch backend
+## Serve and index events to ElasticSearch
 
 Run the following to serve and index events to `elasticsearch`
 
@@ -37,10 +29,41 @@ python index_elasticsearch.py # index events and search candidates to elasticsea
 ```
 
 
+## Running schedule to fetch, index events weekly
+
+We use [`scheudle`](https://github.com/dbader/schedule) to fetch events weekly from Penn using `fetch_events.py`.
+You can run
+
+```sh
+python schedule_fetch_events.py
+```
+
+in order to schedule the script for fetching, creating features, and indexing events to `elasticsearch`.
+
+
 ## Running Hug API locally
 
-We use Hug API as a backend site for the recommendation engine. You can start Hug API by running:
+We use Hug API as a backend site for the search keywords and recommendation engine. You can start Hug API by running:
 
 ```sh
 hug -f hug_api.py -p 8888
+```
+
+To serve hug with `uwsgi`, use the following command
+
+```sh
+uwsgi --http 0.0.0.0:8888 --wsgi-file hug_api.py -p 2 --callable __hug_wsgi__
+```
+
+this will serve `uwsgi` with 2 processes. Before running, make sure that uwsgi is installed via `conda install -c conda-forge uwsgi`
+
+
+## Requirements
+
+Apart from the packages specified in `requirements.txt`, you need to download corpora and models 
+from `nltk` and `spacy` respectively.
+
+```sh
+python -m nltk.downloader all
+python -m spacy download en_core_web_sm
 ```

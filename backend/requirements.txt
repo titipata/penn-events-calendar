@@ -1,9 +1,12 @@
 hug
-# uwsgi
+beautifulsoup4
 numpy
 scipy
 pandas
 elasticsearch
 elasticsearch_dsl
-spacy
 tqdm
+schedule
+spacy
+scikit-learn
+nltk
