@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Events as evUtil, Key } from '../../utils';
 import EventList from './EventList';
+import { media } from '../../utils/ui';
 
 const StyledContainer = styled.div`
   margin-bottom: 2rem;
@@ -27,12 +28,23 @@ const StyledPagination = styled(Pagination)`
   transform: scale(1.25);
   margin: 10px 15px 20px;
   display: flex;
+  flex: initial;
+  width: auto;
   justify-content: center;
   align-items: center;
   li {
     outline: none;
     margin-bottom: 0;
   }
+  ${media.extraSmall`
+    transform: scale(1.05);
+  `}
+`;
+
+const PaginationWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const EventsContainer = ({ allEvents, noEventDefaultText }) => {
@@ -65,7 +77,7 @@ const EventsContainer = ({ allEvents, noEventDefaultText }) => {
   }
 
   return (
-    <StyledContainer>
+    <>
       {
         currentPageData.map(grp => (
           <StyledContainer key={Key.getShortKey()}>
@@ -82,18 +94,20 @@ const EventsContainer = ({ allEvents, noEventDefaultText }) => {
           </StyledContainer>
         ))
       }
-      <StyledPagination
-        onChange={(nextPage) => {
-          setCurrentPage(nextPage);
-          window.scrollTo(0, 0);
-        }}
-        current={currentPage}
-        total={allEvents.length - 1}
-        pageSize={30}
-        hideOnSinglePage
-        locale={localeInfo}
-      />
-    </StyledContainer>
+      <PaginationWrapper>
+        <StyledPagination
+          onChange={(nextPage) => {
+            setCurrentPage(nextPage);
+            window.scrollTo(0, 0);
+          }}
+          current={currentPage}
+          total={allEvents.length - 1}
+          pageSize={30}
+          hideOnSinglePage
+          locale={localeInfo}
+        />
+      </PaginationWrapper>
+    </>
   );
 };
 

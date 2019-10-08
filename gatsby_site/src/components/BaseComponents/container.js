@@ -32,18 +32,21 @@ const Container = styled.div`
 
   ${media.small`
     width: ${bsContainerWidth.small};
-    padding: ${rhythm(0.25)};
+    padding: ${rhythm(1)} ${rhythm(0.25)};
   `}
 
   ${media.extraSmall`
     width: 100%;
-    padding: ${rhythm(0.25)};
   `}
 `;
 
 const NavContainer = styled(Container)`
+  flex: 1;
   display: flex;
+  flex-wrap: wrap;
   flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
   padding: 0 ${rhythm(2)};
 
   ${media.small`
@@ -53,7 +56,6 @@ const NavContainer = styled(Container)`
 
   ${media.extraSmall`
     width: 100%;
-    padding: 0 ${rhythm(0.25)};
   `}
 `;
 

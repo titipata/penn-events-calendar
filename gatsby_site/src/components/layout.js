@@ -15,18 +15,26 @@ const StickyFooterWrapper = styled.div`
   flex-direction: column;
 `;
 
+const StyledLink = styled(Link)`
+  height: 100%;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+`;
+
 const Layout = ({ children }) => (
   <StickyFooterWrapper>
     <NavBar>
-      <Link to="/">
+      <StyledLink to="/">
         Home
-      </Link>
-      <Link to="/selected-events">
+      </StyledLink>
+      <StyledLink to="/selected-events">
         Selected Events
-      </Link>
-      <Link to="/recommendations">
+      </StyledLink>
+      <StyledLink to="/recommendations">
         Recommendations
-      </Link>
+      </StyledLink>
     </NavBar>
 
     <Container>
