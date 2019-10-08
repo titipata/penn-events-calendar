@@ -60,7 +60,7 @@ const NavList = styled.ul`
 
     ${props => (props.hidden
     ? css`
-      animation: 0.5s ${props.animateHide} forwards;
+      animation: ${props.hideDuration || 0}s ${props.animateHide} forwards;
     ` : css`
       animation: 0.5s ${props.animateShow} forwards;
     `)}
@@ -81,11 +81,16 @@ const NavItem = styled.li`
 `;
 
 const Menus = ({ items, hidden }) => {
+  // workaround for hiding hiccup on first load
+  const [hideDuration, setHideDuration] = useState(false);
   const [menuHeight, setMenuHeight] = useState(null);
   const navListRef = useRef(null);
 
   useEffect(() => {
     setMenuHeight(navListRef.current.scrollHeight);
+    setTimeout(() => {
+      setHideDuration(0.5);
+    }, 500);
   }, [navListRef]);
 
   if (items.length === 0) {
@@ -97,6 +102,7 @@ const Menus = ({ items, hidden }) => {
       hidden={hidden}
       animateHide={animateMenu(menuHeight, 0)}
       animateShow={animateMenu(0, menuHeight)}
+      hideDuration={hideDuration}
       ref={navListRef}
     >
       {
