@@ -1,6 +1,7 @@
 # Events at the University of Pennsylvania
 
-All events happening at the University of Pennsylvania event with built-in search and recommendation engine.
+A web application that collects all events happening at the University of Pennsylvania 
+with built-in search and recommendation engine.
 
 
 ## Run web application
@@ -14,7 +15,7 @@ If it is the first time, you need to install `gatsby-cli`.
 npm install -g gatsby-cli
 ```
 
-and run front-end application from the `gatsby_site` folder as follows:
+and run frontend application from the `gatsby_site` folder as follows:
 
 ```sh
 cd gatsby_site
