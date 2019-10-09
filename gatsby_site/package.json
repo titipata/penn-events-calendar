@@ -35,6 +35,7 @@
     "rc-pagination": "^1.20.7",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
+    "react-spinners": "^0.6.1",
     "react-typography": "^0.16.19",
     "shortid": "^2.2.14",
     "styled-components": "^4.2.0",
