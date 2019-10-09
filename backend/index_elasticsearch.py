@@ -18,13 +18,15 @@ def generate_event(events):
     """
     for event in events:
         try:
-            event['timestamp'] = parse(
+            timestamp = parse(
                 event['date_dt'] + ' ' + event['starttime'], dayfirst=True)
+            event['timestamp'] = timestamp.strftime("%B %d")
         except:
-            event['timestamp'] = datetime.now()
+            timestamp = datetime.now()
+            event['timestamp'] = timestamp.strftime("%B %d")
         event_add = {
             k: event[k] for k in
-            ('date_dt', 'timestamp', 'location',
+            ('date', 'timestamp', 'location',
              'starttime', 'endtime', 'owner',
              'speaker', 'title', 'description',
              'url', 'speaker', 'summary')
