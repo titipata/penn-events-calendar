@@ -20,10 +20,10 @@ def generate_event(events):
         try:
             timestamp = parse(
                 event['date_dt'] + ' ' + event['starttime'], dayfirst=True)
-            event['timestamp'] = timestamp.strftime("%B %d")
         except:
             timestamp = datetime.now()
-            event['timestamp'] = timestamp.strftime("%B %d")
+        event['timestamp'] = timestamp
+        event['date'] = timestamp.strftime("%B %d %Y")
         event_add = {
             k: event[k] for k in
             ('date', 'timestamp', 'location',
