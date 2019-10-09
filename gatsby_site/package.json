@@ -10,6 +10,7 @@
     "serve": "gatsby serve",
     "hug-dev": "cd ../backend && hug -f hug_api.py -p 8888",
     "gatsby-prod": "gatsby build && gatsby serve",
+    "gatsby-prod-prefix": "gatsby build --prefix-paths && gatsby serve --prefix-paths",
     "elasticsearch": "cd ../backend && ./serve_elasticsearch.sh",
     "index-elastic": "cd ../backend && python index_elasticsearch.py",
     "start": "concurrently -n 'hug,gatsby,elasticsearch' -c 'bgBlue,bgMagenta,bgGreen' 'npm run hug-dev' 'gatsby develop' 'npm run elasticsearch'",
