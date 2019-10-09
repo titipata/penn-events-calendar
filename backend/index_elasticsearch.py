@@ -26,7 +26,7 @@ def generate_event(events):
         event['date'] = timestamp.strftime("%B %d %Y")
         event_add = {
             k: event[k] for k in
-            ('date', 'timestamp', 'location',
+            ('date', 'date_dt', 'timestamp', 'location',
              'starttime', 'endtime', 'owner',
              'speaker', 'title', 'description',
              'url', 'speaker', 'summary')
