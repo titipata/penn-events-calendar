@@ -1,7 +1,7 @@
 {
-  "name": "gatsby-starter-hello-world",
+  "name": "penn-events-calendar",
   "private": true,
-  "description": "A simplified bare-bones starter for Gatsby",
+  "description": "A web application that collects all events happening at the University of Pennsylvania with built-in search and recommendation engine.",
   "version": "0.1.0",
   "license": "MIT",
   "scripts": {
