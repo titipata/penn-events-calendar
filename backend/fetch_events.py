@@ -102,7 +102,11 @@ class NoIndent:
 
 
 class MyEncoder(json.JSONEncoder):
+    """
+    Class to save JSON where dictionary is stored per line
 
+    ref: https://stackoverflow.com/questions/58327845/save-dictionary-of-list-and-key-to-json-where-one-dictionary-is-stored-per-lin
+    """
     def __init__(self, *args, **kwargs):
         super(MyEncoder, self).__init__(*args, **kwargs)
         self._literal = []
@@ -2356,9 +2360,9 @@ def drop_duplicate_events(df):
     Function to group dataframe, use all new information from the latest row
     but keep the ``event_index`` from the first one
     """
-    df = df.sort_values('event_index', na_position='last', inplace=True)
+    df = df.sort_values('event_index', na_position='last')
     event_index = df.event_index.iloc[0]
-    r = df.iloc[-1]
+    r = df.iloc[-1].to_dict()
     r['event_index'] = event_index
     return pd.Series(r)
 
@@ -2403,6 +2407,7 @@ def fetch_all_events():
         events_df['event_index'] = np.arange(len(events_df))
 
         events_json = {}
+        events_json['name'] = "Penn Events"
         events_json['refresh_count'] = 1
         events_json['fetch_date'] = datetime.now().strftime('%d-%m-%Y')
         events_json['modified_date'] = ''
@@ -2410,16 +2415,17 @@ def fetch_all_events():
         save_json(events_json, PATH_DATA)
     # if data already exist, append new fetched data to an existing data
     else:
-        events_former_json = json.loads(open(PATH_DATA, 'r').read())
-        events_former_df = pd.DataFrame(events_former_json['data'])
+        events_json = json.loads(open(PATH_DATA, 'r').read())
+        events_former_df = pd.DataFrame(events_json['data'])
         events_df = pd.concat(
             (events_former_df, events_df), axis=0, sort=False)
         events_df = events_df.groupby(group_columns, as_index=False, level=0).apply(drop_duplicate_events)
         events_df.sort_values('event_index', na_position='last', inplace=True)
         event_idx_begin = events_former_df['event_index'].max() + 1
         event_idx_end = event_idx_begin + events_df.event_index.isnull().sum()
-        events_df.loc[pd.isnull(events_df.event_index), 'event_index'] = np.arange(
-            event_idx_begin, event_idx_end)
+        events_df.loc[pd.isnull(events_df.event_index), 'event_index'] = list(
+            range(event_idx_begin, event_idx_end)
+        )
         events_df.loc[:, 'event_index'] =  events_df.loc[:, 'event_index'].astype(int)
 
         events_json['refresh_count'] = events_json['refresh_count'] + 1

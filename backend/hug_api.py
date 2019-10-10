@@ -1,3 +1,4 @@
+import os
 import hug
 import json
 import numpy as np
@@ -13,11 +14,13 @@ api = hug.API(__name__)
 api.http.add_middleware(hug.middleware.CORSMiddleware(api))
 
 
-path_data, path_vector = 'data/events.json', 'data/events_vector.json'
+path_data, path_vector = os.path.join('data', 'events.json'), os.path.join('data', 'events_vector.json')
 event_vectors = json.load(open(path_vector, 'r'))
 events = json.load(open(path_data, 'r'))['data']
-event_vectors_map = {e['event_index']: e['event_vector']
-                     for e in event_vectors}
+event_vectors_map = {
+    e['event_index']: e['event_vector']
+    for e in event_vectors
+}
 
 
 # elasticsearch
