@@ -1,7 +1,7 @@
 {
-  "name": "gatsby-starter-hello-world",
+  "name": "penn-events-calendar",
   "private": true,
-  "description": "A simplified bare-bones starter for Gatsby",
+  "description": "A web application that collects all events happening at the University of Pennsylvania with built-in search and recommendation engine.",
   "version": "0.1.0",
   "license": "MIT",
   "scripts": {
@@ -10,6 +10,7 @@
     "serve": "gatsby serve",
     "hug-dev": "cd ../backend && hug -f hug_api.py -p 8888",
     "gatsby-prod": "gatsby build && gatsby serve",
+    "gatsby-prod-prefix": "gatsby build --prefix-paths && gatsby serve --prefix-paths",
     "elasticsearch": "cd ../backend && ./serve_elasticsearch.sh",
     "index-elastic": "cd ../backend && python index_elasticsearch.py",
     "start": "concurrently -n 'hug,gatsby,elasticsearch' -c 'bgBlue,bgMagenta,bgGreen' 'npm run hug-dev' 'gatsby develop' 'npm run elasticsearch'",
@@ -34,6 +35,7 @@
     "rc-pagination": "^1.20.7",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
+    "react-spinners": "^0.6.1",
     "react-typography": "^0.16.19",
     "shortid": "^2.2.14",
     "styled-components": "^4.2.0",

@@ -1,30 +1,27 @@
 
 # Frontend for Penn events
 
-You can run front-end site by the following
+You can run frontend site by the following:
 
 ```sh
 # only once on first time
 npm install -g gatsby-cli
-```
 
-```sh
+# run the frontend app
 npm install
 npm start
 ```
 
-By default, this will concurrently run Gatsby frontend site at port `8000`, hug API backend at port `8888`, 
-and ElasticSearch at port `9200`. For deployment, use `npm run deploy` instead. This will run the site at port `9000`.
-
+By default, this will concurrently run Gatsby frontend site at port `8000`, hug API backend at port `8888`, and ElasticSearch at port `9200`.
 
 ## Running on remote server
 
-To make it run on a remote server, you can do the following
+To make it run on a remote server, you can do the following:
 
-- Change hostname is `package.json`
+- Run `npm` command with an extra arguments:
 
 ```js
-"gatsby-prod": "gatsby build && gatsby serve -H bleen.seas.upenn.edu"
+npm run gatsby-prod -- -H <host_name>
 ```
 
 

@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import { Link } from 'gatsby';
 import PropTypes from 'prop-types';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { NavContainer } from '../BaseComponents/container';
 import Burger from '../BaseComponents/BurgerMenu';
+import { NavContainer } from '../BaseComponents/container';
 import Menus from './Menus';
 
 // get logo image using require
@@ -27,7 +28,7 @@ const NavPadder = styled.div`
   height: ${navHeight}px;
 `;
 
-const LogoWrapper = styled.div`
+const LogoWrapper = styled(Link)`
   display: flex;
   /* determine image size here */
   height: ${navHeight}px;
@@ -49,7 +50,7 @@ const NavbarComponent = ({ children }) => {
     <>
       <Navbar>
         <NavContainer>
-          <LogoWrapper>
+          <LogoWrapper to="/">
             <StyledImg src={pennLogoURI} alt="Penn Logo" />
           </LogoWrapper>
           <Burger handlePress={() => setHideMenu(!hideMenu)} />

@@ -90,7 +90,7 @@ const Menus = ({ items, hidden }) => {
     setMenuHeight(navListRef.current.scrollHeight);
     setTimeout(() => {
       setHideDuration(0.5);
-    }, 500);
+    }, 1500);
   }, [navListRef]);
 
   if (items.length === 0) {
