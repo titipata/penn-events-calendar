@@ -5,18 +5,20 @@ We use [Supervisor](http://supervisord.org/index.html) to control all the proces
 - `supervisor-gatsby`: build and serve Gatsby frontend.
 - `supervisor-hug`: serve Hug API.
 - `supervisor-elasticsearch`: serve Elasticsearch.
+- `supervisor-grobid`: serve [GROBID](https://github.com/kermitt2/grobid) to parse PDFs.
+- `supervisor-fetch-events`: set up `schedule` to fetch events weekly
 
 
 ## Usage
 
 - Activate `hug` environment with `source activate hug`.
-- Make sure there is no `supervisord` process running, kill it if there is:
+- Make sure you stop the previous `supervisord` by enter interactive mode with `supervisorctl` and 
+stop using `stop all`. Moreover, you have to check is no `supervisord` process running, kill it if there is:
 
 ```sh
-ps aux | grep supervisord
+ps aux | grep supervisord # check previous supervisord process
 
-# kill
-kill -9 <supervisord_pid>
+kill -9 <supervisord_pid> # kill
 ```
 
 - Start `supervisord` process in the root of the project.
@@ -26,7 +28,8 @@ kill -9 <supervisord_pid>
 supervisord -c devops/penn-calendar.supervisor.conf
 ```
 
-- Run all programs with `supervisorctl start all` or enter interactive mode with `supervisorctl`.
+- Run all programs with `supervisorctl start all` or enter interactive mode with `supervisorctl` 
+(check process using `start all`, `status`).
 - All programs are set to auto-restart. They should restart themselves if anything goes wrong.
 
 

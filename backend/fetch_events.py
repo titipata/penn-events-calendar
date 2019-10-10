@@ -101,14 +101,15 @@ class NoIndent:
         self.o = o
 
 
-class MyEncoder(json.JSONEncoder):
+class EventEncoder(json.JSONEncoder):
     """
     Class to save JSON where dictionary is stored per line
 
     ref: https://stackoverflow.com/questions/58327845/save-dictionary-of-list-and-key-to-json-where-one-dictionary-is-stored-per-lin
     """
+
     def __init__(self, *args, **kwargs):
-        super(MyEncoder, self).__init__(*args, **kwargs)
+        super(EventEncoder, self).__init__(*args, **kwargs)
         self._literal = []
 
     def default(self, o):
@@ -117,10 +118,10 @@ class MyEncoder(json.JSONEncoder):
             self._literal.append(json.dumps(o.o))
             return '__%d__' % i
         else:
-            return super(MyEncoder, self).default(o)
+            return super(EventEncoder, self).default(o)
 
     def encode(self, o):
-        s = super(MyEncoder, self).encode(o)
+        s = super(EventEncoder, self).encode(o)
         for i, literal in enumerate(self._literal):
             s = s.replace('"__%d__"' % i, literal)
         return s
@@ -143,7 +144,7 @@ def save_json(events_json, file_path):
     where dictionary is saved per line
     """
     events_json['data'] = [NoIndent(d) for d in events_json['data']]
-    s = json.dumps(events_json, indent=2, cls=MyEncoder)
+    s = json.dumps(events_json, indent=2, cls=EventEncoder)
     with open(file_path, 'w') as fp:
         fp.write(s)
 
@@ -174,7 +175,6 @@ def convert_event_to_dict(event):
             value = unidecode(value)
         event_dict[key] = value
     return event_dict
-
 
 
 def stringify_children(node):
@@ -2316,27 +2316,37 @@ def fetch_events_gse(base_url='https://www.gse.upenn.edu/event'):
     year_next, month_next = date_next.year, date_next.month
     for (y, m) in [(year, month), (year_next, month_next)]:
         event_extension = '?date={}-{}'.format(y, m)
-        page_soup = BeautifulSoup(requests.get(base_url + event_extension).content, 'html.parser')
-        event_page = page_soup.find('div', attrs={'class': 'region region-content'})
-        event_content = event_page.find_all('div', attrs={'class': 'view-content'})[1]
-        all_events = event_content.find_all('div', attrs={'class': 'views-row'})
+        page_soup = BeautifulSoup(requests.get(
+            base_url + event_extension
+        ).content, 'html.parser')
+        event_page = page_soup.find(
+            'div', attrs={'class': 'region region-content'})
+        event_content = event_page.find_all(
+            'div', attrs={'class': 'view-content'})[1]
+        all_events = event_content.find_all(
+            'div', attrs={'class': 'views-row'})
 
         for event_post in all_events:
             title = event_post.find('span', attrs={'class': '_summary'})
             title = title.text.strip() if title is not None else ''
-            description = event_post.find('span', attrs={'class': '_description'})
+            description = event_post.find(
+                'span', attrs={'class': '_description'})
             description = description.text.strip() if description is not None else ''
             date = event_post.find('span', attrs={'class': '_start'})
             date = date.text.split(' ')[0] if date is not None else ''
-            starttime = event_post.find('span', attrs={'class': 'date-display-start'})
+            starttime = event_post.find(
+                'span', attrs={'class': 'date-display-start'})
             starttime = starttime.text.strip() if starttime is not None else ''
-            endtime = event_post.find('span', attrs={'class': 'date-display-end'})
+            endtime = event_post.find(
+                'span', attrs={'class': 'date-display-end'})
             endtime = endtime.text.strip() if endtime is not None else ''
             speaker = event_post.find('span', attrs={'class': '_organizer'})
             speaker = speaker.text.strip() if speaker is not None else ''
-            location = event_post.find('div', attrs={'class': 'views-field-field-location-1'})
+            location = event_post.find(
+                'div', attrs={'class': 'views-field-field-location-1'})
             location = location.text.strip() if location is not None else ''
-            event_url_match = re.findall('https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', description)
+            event_url_match = re.findall(
+                'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', description)
             if len(event_url_match) >= 1:
                 event_url = event_url_match[0]
             else:
@@ -2397,7 +2407,8 @@ def fetch_all_events():
     events_df.loc[:, 'starttime'] = events_df.apply(clean_starttime, axis=1)
     if len(events_df.loc[events_df.endtime == '']) > 0:
         events_df.loc[events_df.endtime == '', 'endtime'] = events_df.loc[events_df.endtime == ''].apply(
-            clean_endtime, axis=1)
+            clean_endtime, axis=1
+        )
 
     # save data to json if not data in ``data`` folder
     group_columns = ['owner', 'title', 'url', 'date', 'starttime']
@@ -2418,15 +2429,18 @@ def fetch_all_events():
         events_json = json.loads(open(PATH_DATA, 'r').read())
         events_former_df = pd.DataFrame(events_json['data'])
         events_df = pd.concat(
-            (events_former_df, events_df), axis=0, sort=False)
-        events_df = events_df.groupby(group_columns, as_index=False, level=0).apply(drop_duplicate_events)
+            (events_former_df, events_df), axis=0, sort=False
+        )
+        events_df = events_df.groupby(
+            group_columns, as_index=False, level=0
+        ).apply(drop_duplicate_events)
         events_df.sort_values('event_index', na_position='last', inplace=True)
         event_idx_begin = events_former_df['event_index'].max() + 1
         event_idx_end = event_idx_begin + events_df.event_index.isnull().sum()
         events_df.loc[pd.isnull(events_df.event_index), 'event_index'] = list(
             range(event_idx_begin, event_idx_end)
         )
-        events_df.loc[:, 'event_index'] =  events_df.loc[:, 'event_index'].astype(int)
+        events_df.loc[:, 'event_index'] = events_df.loc[:, 'event_index'].astype(int)
 
         events_json['refresh_count'] = events_json['refresh_count'] + 1
         events_json['modified_date'] = datetime.now().strftime('%d-%m-%Y')
