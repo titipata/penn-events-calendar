@@ -6,6 +6,7 @@ import useGlobal from '../store';
 import useLocalStorage from '../hooks/useLocalStorage';
 import useStaticResources from '../hooks/useStaticResources';
 import { Events as evUtil } from '../utils';
+import useLoadingAllEvents from '../hooks/useLoadingAllEvents';
 
 export default ({ data, location }) => {
   // use this to retrieve data and rehydrate before globalState is used
@@ -70,10 +71,14 @@ export default ({ data, location }) => {
       .catch(err => console.log(err));
   }, [data.allEventsJson.edges, hostname, selectedEventsIndexes]);
 
+  // use custom hook to check if it is loading
+  const isLoading = useLoadingAllEvents(recommendedEvents);
+
   return (
     <Layout>
       <h1>Recommendations</h1>
       <EventsContainer
+        isLoading={isLoading}
         allEvents={recommendedEvents}
         noEventDefaultText="Add some events to your library to see our recommendations."
       />

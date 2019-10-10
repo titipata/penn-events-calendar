@@ -7,6 +7,7 @@ import styled from 'styled-components';
 import { Events as evUtil, Key } from '../../utils';
 import EventList from './EventList';
 import { media } from '../../utils/ui';
+import LoadingView from '../BaseComponents/LoadingView';
 
 const StyledContainer = styled.div`
   margin-bottom: 2rem;
@@ -47,7 +48,7 @@ const PaginationWrapper = styled.div`
   align-items: center;
 `;
 
-const EventsContainer = ({ allEvents, noEventDefaultText }) => {
+const EventsContainer = ({ allEvents, noEventDefaultText, isLoading }) => {
   // local state
   const [currentPage, setCurrentPage] = useState(1);
   const [currentPageData, setCurrentPageData] = useState([]);
@@ -68,6 +69,14 @@ const EventsContainer = ({ allEvents, noEventDefaultText }) => {
   }, [currentPage, paginatedEvents]);
 
   // ---- render no data screen
+  if (isLoading) {
+    return (
+      <StyledContainer>
+        <LoadingView />
+      </StyledContainer>
+    );
+  }
+
   if (allEvents.length === 0) {
     return (
       <StyledContainer>
@@ -116,6 +125,7 @@ EventsContainer.propTypes = {
   // including filter incomplete data out and sort by date ascendingly
   allEvents: PropTypes.arrayOf(Object).isRequired,
   noEventDefaultText: PropTypes.string,
+  isLoading: PropTypes.bool.isRequired,
 };
 
 EventsContainer.defaultProps = {
