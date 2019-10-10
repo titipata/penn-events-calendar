@@ -91,14 +91,16 @@ def query(search_query: hug.types.text):
         query=search_query,
         fields=fields
     )
-    search_responses = responses[0:n_results].execute().to_dict()['hits']['hits']
+    search_responses = responses[0:n_results].execute()
+    search_responses = search_responses.to_dict()['hits']['hits']
 
     # return future events for a given query
     future_events_indices, relevances = [], []
     for response in filter(lambda r: get_future_event(r['_source']['date_dt']), search_responses):
         future_events_indices.append(response['_id'])
         relevances.append(response['_score'])
-    relevances = [int(100 * (r / max(relevances))) for r in relevances] # normalize to range 0 - 100
+    relevances = [int(100 * (r / max(relevances)))
+                  for r in relevances]  # normalize by the maximum relevance
     search_relevances = [{'event_index': int(i), 'relevance': r}
                          for i, r in zip(future_events_indices, relevances)]
 

@@ -96,25 +96,52 @@ def find_startend_time(s):
     return starttime, endtime
 
 
-def read_json(file_path):
-    """
-    Read collected file from path
-    """
-    if not os.path.exists(file_path):
-        events = []
-        return events
-    else:
-        with open(file_path, 'r') as fp:
-            events = [json.loads(line) for line in fp]
-        return events
+class NoIndent:
+    def __init__(self, o):
+        self.o = o
 
 
-def save_json(ls, file_path):
+class MyEncoder(json.JSONEncoder):
+
+    def __init__(self, *args, **kwargs):
+        super(MyEncoder, self).__init__(*args, **kwargs)
+        self._literal = []
+
+    def default(self, o):
+        if isinstance(o, NoIndent):
+            i = len(self._literal)
+            self._literal.append(json.dumps(o.o))
+            return '__%d__' % i
+        else:
+            return super(MyEncoder, self).default(o)
+
+    def encode(self, o):
+        s = super(MyEncoder, self).encode(o)
+        for i, literal in enumerate(self._literal):
+            s = s.replace('"__%d__"' % i, literal)
+        return s
+
+
+def save_json(events_json, file_path):
     """
-    Save list of dictionary to JSON
+    Save a dictionary with key and list inside the key in the following format
+
+    events_json = {
+        'refresh_count': 1,
+        'fetch_date': '10-10-2019',
+        'modified_date': '',
+        'data': [
+            {'date': '10-10-2019', 'title': 'title1', ...},
+            {'date': '11-10-2019', 'title': 'title2', ...},
+        ]
+    }
+
+    where dictionary is saved per line
     """
+    events_json['data'] = [NoIndent(d) for d in events_json['data']]
+    s = json.dumps(events_json, indent=2, cls=MyEncoder)
     with open(file_path, 'w') as fp:
-        fp.write('[\n  ' + ',\n  '.join(json.dumps(i) for i in ls) + '\n]')
+        fp.write(s)
 
 
 def convert_event_to_dict(event):
@@ -144,24 +171,6 @@ def convert_event_to_dict(event):
         event_dict[key] = value
     return event_dict
 
-
-def fetch_events():
-    """
-    Saving Penn events to JSON format
-    """
-    base_url = 'http://www.upenn.edu/calendar-export/?showndays=50'
-    page = requests.get(base_url)
-    tree = html.fromstring(page.content)
-    events = tree.findall('event')
-
-    events_list = []
-    for event in events:
-        try:
-            event_dict = convert_event_to_dict(event)
-            events_list.append(event_dict)
-        except:
-            pass
-    return events_list
 
 
 def stringify_children(node):
@@ -2347,6 +2356,7 @@ def drop_duplicate_events(df):
     Function to group dataframe, use all new information from the latest row
     but keep the ``event_index`` from the first one
     """
+    df = df.sort_values('event_index', na_position='last', inplace=True)
     event_index = df.event_index.iloc[0]
     r = df.iloc[-1]
     r['event_index'] = event_index
@@ -2385,16 +2395,23 @@ def fetch_all_events():
         events_df.loc[events_df.endtime == '', 'endtime'] = events_df.loc[events_df.endtime == ''].apply(
             clean_endtime, axis=1)
 
-    # save data
+    # save data to json if not data in ``data`` folder
     group_columns = ['owner', 'title', 'url', 'date', 'starttime']
     if not os.path.exists(PATH_DATA):
         events_df = events_df.drop_duplicates(
             subset=group_columns, keep='first')
         events_df['event_index'] = np.arange(len(events_df))
-        save_json(events_df.to_dict(orient='records'), PATH_DATA)
+
+        events_json = {}
+        events_json['refresh_count'] = 1
+        events_json['fetch_date'] = datetime.now().strftime('%d-%m-%Y')
+        events_json['modified_date'] = ''
+        events_json['data'] = events_df.to_dict(orient='records')
+        save_json(events_json, PATH_DATA)
+    # if data already exist, append new fetched data to an existing data
     else:
-        events_former_df = pd.DataFrame(
-            json.loads(open(PATH_DATA, 'r').read()))
+        events_former_json = json.loads(open(PATH_DATA, 'r').read())
+        events_former_df = pd.DataFrame(events_former_json['data'])
         events_df = pd.concat(
             (events_former_df, events_df), axis=0, sort=False)
         events_df = events_df.groupby(group_columns, as_index=False, level=0).apply(drop_duplicate_events)
@@ -2404,7 +2421,11 @@ def fetch_all_events():
         events_df.loc[pd.isnull(events_df.event_index), 'event_index'] = np.arange(
             event_idx_begin, event_idx_end)
         events_df.loc[:, 'event_index'] =  events_df.loc[:, 'event_index'].astype(int)
-        save_json(events_df.fillna('').to_dict(orient='records'), PATH_DATA)
+
+        events_json['refresh_count'] = events_json['refresh_count']
+        events_json['modified_date'] = datetime.now().strftime('%d-%m-%Y')
+        events_json['data'] = events_df.to_dict(orient='records')
+        save_json(events_json, PATH_DATA)
 
 
 if __name__ == '__main__':
