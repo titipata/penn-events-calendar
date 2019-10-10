@@ -15,7 +15,7 @@ api.http.add_middleware(hug.middleware.CORSMiddleware(api))
 
 path_data, path_vector = 'data/events.json', 'data/events_vector.json'
 event_vectors = json.load(open(path_vector, 'r'))
-events = json.load(open(path_data, 'r'))
+events = json.load(open(path_data, 'r'))['data']
 event_vectors_map = {e['event_index']: e['event_vector']
                      for e in event_vectors}
 

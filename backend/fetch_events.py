@@ -2422,7 +2422,7 @@ def fetch_all_events():
             event_idx_begin, event_idx_end)
         events_df.loc[:, 'event_index'] =  events_df.loc[:, 'event_index'].astype(int)
 
-        events_json['refresh_count'] = events_json['refresh_count']
+        events_json['refresh_count'] = events_json['refresh_count'] + 1
         events_json['modified_date'] = datetime.now().strftime('%d-%m-%Y')
         events_json['data'] = events_df.to_dict(orient='records')
         save_json(events_json, PATH_DATA)
