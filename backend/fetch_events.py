@@ -2415,7 +2415,7 @@ def fetch_all_events():
     if not os.path.exists(PATH_DATA):
         events_df = events_df.drop_duplicates(
             subset=group_columns, keep='first')
-        events_df['event_index'] = np.arange(len(events_df))
+        events_df['event_index'] = list(range(len(events_df)))
 
         events_json = {}
         events_json['name'] = "Penn Events"
