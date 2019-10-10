@@ -6,7 +6,7 @@ import useGlobal from '../store';
 import useLocalStorage from '../hooks/useLocalStorage';
 import { Events as evUtil } from '../utils';
 import useStaticResources from '../hooks/useStaticResources';
-import useLoadingAllEvents from '../hooks/useLoadingAllEvents';
+import useLoadingAllEvents from '../hooks/useLoadingEvents';
 
 export default ({ data, location }) => {
   // use this to retrieve data and rehydrate before globalState is used

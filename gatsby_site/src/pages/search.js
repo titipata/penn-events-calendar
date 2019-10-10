@@ -8,7 +8,7 @@ import useStaticResources from '../hooks/useStaticResources';
 import { Events as evUtil } from '../utils';
 import SearchButton from '../components/BaseComponents/SearchButton';
 import useGlobal from '../store';
-import useLoadingAllEvents from '../hooks/useLoadingAllEvents';
+import useLoadingAllEvents from '../hooks/useLoadingEvents';
 
 const HeaderWrapper = styled.div`
   display: flex;
