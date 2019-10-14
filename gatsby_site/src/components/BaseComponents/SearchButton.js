@@ -57,6 +57,7 @@ const slideOutAnimation = keyframes`
 
 const StyledInput = styled.input`
   width: 0;
+  opacity: 0;
   outline: none;
   border: none;
   border-bottom: 2px solid #333;
@@ -67,7 +68,7 @@ const StyledInput = styled.input`
       animation: 0.45s ${slideInAnimation} ease-out forwards;
     `
     : css`
-      animation: 0.4s ${slideOutAnimation} ease-in forwards;
+      animation: ${props.hideDuration}s ${slideOutAnimation} ease-in forwards;
     `)}
 `;
 
@@ -174,6 +175,7 @@ const SearchButton = () => {
   const [active, setActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [suggestionList, setSuggestionList] = useState([]);
+  const [hideDuration, setHideDuration] = useState(0);
 
   const handleQueryChange = (event) => {
     setSearchQuery(event.target.value);
@@ -184,6 +186,11 @@ const SearchButton = () => {
     if (inputRef) {
       inputRef.current.focus();
     }
+
+    // set hide duration
+    setTimeout(() => {
+      setHideDuration(0.4);
+    }, 1500);
   }, [active]);
 
   useEffect(() => {
@@ -220,6 +227,7 @@ const SearchButton = () => {
         value={searchQuery}
         onChange={handleQueryChange}
         active={active}
+        hideDuration={hideDuration}
         ref={inputRef}
       />
       <SuggestionList

@@ -1,11 +1,11 @@
 # Running processes with Supervisor
 
-We use [Supervisor](http://supervisord.org/index.html) to control all the processes for the Penn Events Calendar. There are 3 programs in the `penn-calendar.supervisor.conf` at the moment.
+We use [Supervisor](http://supervisord.org/index.html) to control all the processes for the Penn Events Calendar. There are 4 programs in the `penn-calendar.supervisor.conf` at the moment.
 
 - `supervisor-gatsby`: build and serve Gatsby frontend.
 - `supervisor-hug`: serve Hug API.
-- `supervisor-elasticsearch`: serve Elasticsearch.
-
+- `supervisor-elasticsearch`: serve ElasticSearch.
+- `supervisor-fetch-events`: run scheduled events fetching.
 
 ## Usage
 
@@ -28,7 +28,6 @@ supervisord -c devops/penn-calendar.supervisor.conf
 
 - Run all programs with `supervisorctl start all` or enter interactive mode with `supervisorctl`.
 - All programs are set to auto-restart. They should restart themselves if anything goes wrong.
-
 
 ## Logs
 

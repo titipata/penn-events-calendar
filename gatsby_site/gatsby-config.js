@@ -1,4 +1,5 @@
 module.exports = {
+  pathPrefix: '/penn-events',
   siteMetadata: {
     title: 'Penn Event Calendar',
   },
