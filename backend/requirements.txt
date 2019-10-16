@@ -10,3 +10,4 @@ schedule
 spacy
 scikit-learn
 nltk
+unidecode
