@@ -2365,6 +2365,113 @@ def fetch_events_gse(base_url='https://www.gse.upenn.edu/event'):
     return events
 
 
+def fetch_events_grasp(base_url='https://www.grasp.upenn.edu'):
+    """
+    Fetch events from General Robotics, Automation,
+    Sensing & Perception laboratory (GRASP) seminar
+    """
+    events = []
+    event_page = requests.get(urljoin(base_url, 'events'))
+    event_soup = BeautifulSoup(event_page.content, 'html.parser')
+
+    event_panel = event_soup.find('div', attrs={'class': 'view-content'})
+    all_events = event_panel.find_all('div', attrs={'class': 'views-row'})
+    for event in all_events:
+        title = event.find('div', attrs={'class': 'field-title'})
+        title = title.text.strip() if title is not None else ''
+        date = event.find(
+            'div', attrs={'class': 'calendar-tile'}).attrs['content'].split('T')[0]
+        event_url = urljoin(base_url, event.find('div').attrs.get('about'))
+        if ':' in title:
+            speaker = title.split(':')[-1]
+        else:
+            speaker = ''
+
+        start_end_time = event.find(
+            'span', attrs={'class': 'date-display-single'})
+        if start_end_time is not None:
+            starttime = start_end_time.find(
+                'span', attrs={'class': 'date-display-start'})
+            starttime = starttime.text.strip() if starttime is not None else ''
+            endtime = start_end_time.find(
+                'span', attrs={'class': 'date-display-end'})
+            endtime = endtime.text.strip() if endtime is not None else ''
+
+        event_detail_page = requests.get(event_url)
+        event_detail_soup = BeautifulSoup(
+            event_detail_page.content, 'html.parser')
+        description = event_detail_soup.find(
+            'div', attrs={'class': 'field-body'})
+        description = description.text.strip() if description is not None else ''
+        location = event_detail_soup.find(
+            'div', attrs={'class': 'street-block'})
+        location = location.text.strip() if location is not None else ''
+
+        events.append({
+            'title': title,
+            'date': date,
+            'location': location,
+            'description': description,
+            'starttime': starttime,
+            'endtime': endtime,
+            'speaker': speaker,
+            'url': event_url,
+            'owner': 'General Robotics, Automation, Sensing & Perception laboratory (GRASP)'
+        })
+    return events
+
+
+def fetch_events_wharton_stats(base_url='https://statistics.wharton.upenn.edu/research/seminars-conferences/'):
+    """
+    Fetch events from Wharton Statistics Seminars
+    """
+    events = []
+    event_page = requests.get(base_url)
+    event_soup = BeautifulSoup(event_page.content, 'html.parser')
+    table = event_soup.find('table')
+    if table is not None:
+        all_events = table.find_all('tr')[1::]
+        for event_tr in all_events:
+            event_loc, speaker, title_desc = event_tr.find_all('td')
+            speaker = speaker.text.strip() if speaker is not None else ''
+            title = title_desc.text.strip() if title_desc is not None else ''
+            event_url = title_desc.find('a')
+            event_url = event_url.attrs['href'] if event_url is not None else base_url
+
+            if event_url is not base_url:
+                event_soup = BeautifulSoup(requests.get(
+                    event_url).content, 'html.parser')
+                try:
+                    description = event_soup.find(
+                        'div', attrs={'class': 'wpb_wrapper'}).find_all('p')
+                    description = ' '.join([p.text.strip()
+                                            for p in description])
+                except:
+                    description = ''
+            else:
+                description = ''
+
+            if len(event_loc.text.split('\n')) == 3:
+                date, start_end_time, location = event_loc.text.split('\n')
+                start_end_time = start_end_time.replace(
+                    'Time: ', '').replace('*', '')
+                starttime, endtime = start_end_time.split('-')
+                starttime = starttime + endtime.split(' ')[-1]
+                location = location.replace('Location: ', '').replace('*', '')
+            events.append({
+                'title': title,
+                'date': date,
+                'location': location,
+                'description': description,
+                'starttime': starttime,
+                'endtime': endtime,
+                'speaker': speaker,
+                'url': event_url,
+                'owner': 'Wharton Statistics Seminars'
+            })
+    return events
+
+
 def drop_duplicate_events(df):
     """
     Function to group dataframe, use all new information from the latest row
@@ -2394,7 +2501,8 @@ def fetch_all_events():
         fetch_events_annenberg, fetch_events_religious_studies, fetch_events_AHEAD,
         fetch_events_SPP, fetch_events_ortner_center, fetch_events_penn_today,
         fetch_events_mins, fetch_events_mindcore, fetch_events_seas,
-        fetch_events_vet, fetch_events_gse
+        fetch_events_vet, fetch_events_gse, fetch_events_grasp,
+        fetch_events_wharton_stats
     ]
     for f in tqdm(fetch_fns):
         try:
