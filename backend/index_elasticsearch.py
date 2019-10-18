@@ -10,6 +10,7 @@ es = Elasticsearch([
     {'host': 'localhost', 'port': 9200},
 ])
 INDEX_NAME = 'penn-events'
+path_data, path_vector = 'data/events.json', 'data/events_vector.json'
 
 
 def generate_event(events):
@@ -18,13 +19,15 @@ def generate_event(events):
     """
     for event in events:
         try:
-            event['timestamp'] = parse(
+            timestamp = parse(
                 event['date_dt'] + ' ' + event['starttime'], dayfirst=True)
         except:
-            event['timestamp'] = datetime.now()
+            timestamp = datetime.now()
+        event['timestamp'] = timestamp
+        event['date'] = timestamp.strftime("%B %d %Y")
         event_add = {
             k: event[k] for k in
-            ('date_dt', 'timestamp', 'location',
+            ('date', 'date_dt', 'timestamp', 'location',
              'starttime', 'endtime', 'owner',
              'speaker', 'title', 'description',
              'url', 'speaker', 'summary')
@@ -103,7 +106,7 @@ settings = {
 
 def index_events_elasticsearch():
     print('Indexing events to ElasticSearch...')
-    events = json.loads(open('data/events.json', 'r').read())
+    events = json.loads(open(path_data, 'r').read())['data']
     events = pd.DataFrame(events).fillna('').to_dict(orient='records')
 
     es.indices.delete(index=INDEX_NAME, ignore=[
@@ -120,7 +123,7 @@ def index_events_elasticsearch():
     print('Done indexing events to ElasticSearch!')
 
     print('Updating elasticsearch index...\n')
-    events_feature = json.loads(open('data/events_vector.json', 'r').read())
+    events_feature = json.loads(open(path_vector, 'r').read())
     events_feature_df = pd.DataFrame(events_feature).fillna('')
     for _, r in tqdm(
         events_feature_df.iterrows(),

@@ -133,7 +133,8 @@ def generate_owner_candidate(event):
 def create_events_features():
     # produce topic vectors using tf-idf and Laten Semantic Analysis (LSA) and search candidate list
     print('Compute LSA vectors...')
-    events_df = pd.DataFrame(json.loads(open(PATH_DATA, 'r').read()))
+    events_json = json.loads(open(PATH_DATA, 'r').read())
+    events_df = pd.DataFrame(events_json['data'])
     events_text = [' '.join([e[1] for e in r.items()])
                    for _, r in events_df[['title', 'description', 'location', 'owner']].iterrows()]
     events_preprocessed_text = [preprocess(text) for text in events_text]

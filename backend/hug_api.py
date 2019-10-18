@@ -1,3 +1,4 @@
+import os
 import hug
 import json
 import numpy as np
@@ -13,11 +14,13 @@ api = hug.API(__name__)
 api.http.add_middleware(hug.middleware.CORSMiddleware(api))
 
 
-path_data, path_vector = 'data/events.json', 'data/events_vector.json'
+path_data, path_vector = os.path.join('data', 'events.json'), os.path.join('data', 'events_vector.json')
 event_vectors = json.load(open(path_vector, 'r'))
-events = json.load(open(path_data, 'r'))
-event_vectors_map = {e['event_index']: e['event_vector']
-                     for e in event_vectors}
+events = json.load(open(path_data, 'r'))['data']
+event_vectors_map = {
+    e['event_index']: e['event_vector']
+    for e in event_vectors
+}
 
 
 # elasticsearch
@@ -91,14 +94,16 @@ def query(search_query: hug.types.text):
         query=search_query,
         fields=fields
     )
-    search_responses = responses[0:n_results].execute().to_dict()['hits']['hits']
+    search_responses = responses[0:n_results].execute()
+    search_responses = search_responses.to_dict()['hits']['hits']
 
     # return future events for a given query
     future_events_indices, relevances = [], []
     for response in filter(lambda r: get_future_event(r['_source']['date_dt']), search_responses):
         future_events_indices.append(response['_id'])
         relevances.append(response['_score'])
-    relevances = [int(100 * (r / max(relevances))) for r in relevances] # normalize to range 0 - 100
+    relevances = [int(100 * (r / max(relevances)))
+                  for r in relevances]  # normalize by the maximum relevance
     search_relevances = [{'event_index': int(i), 'relevance': r}
                          for i, r in zip(future_events_indices, relevances)]
 
