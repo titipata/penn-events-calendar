@@ -90,7 +90,6 @@ EventItem.propTypes = {
       PropTypes.number,
       PropTypes.string,
     ]),
-    id: PropTypes.string,
     event_index: PropTypes.oneOfType([
       PropTypes.number,
       PropTypes.string,
