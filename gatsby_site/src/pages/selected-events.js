@@ -23,9 +23,9 @@ export default ({ data, location }) => {
   const { selectedEvents: selectedEventsIndexes } = globalState;
   // filter only selected event to pass to container
   const selectedEvents = evUtil.getPreprocessedEvents(
-    data.allEventsJson.edges,
+    data.dataJson.data,
   ).filter(
-    x => selectedEventsIndexes.includes(x.node.event_index),
+    x => selectedEventsIndexes.includes(x.event_index),
   );
 
   // use custom hook to check if it is loading
@@ -45,21 +45,20 @@ export default ({ data, location }) => {
 
 export const query = graphql`
   query {
-    allEventsJson {
-      edges {
-        node {
-          id
-          event_index
-          date_dt
-          title
-          description
-          starttime
-          endtime
-          speaker
-          owner
-          location
-          url
-        }
+    dataJson {
+      modified_date
+      data {
+        date_dt
+        description
+        endtime
+        event_id
+        event_index
+        location
+        owner
+        speaker
+        starttime
+        title
+        url
       }
     }
   }
