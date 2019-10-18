@@ -69,9 +69,9 @@ export default ({ data, location }) => {
   // for searchResultsEvents
   useEffect(() => {
     // filter only selected event to pass to container
-    const filteredEvent = evUtil.getPreprocessedEvents(data.allEventsJson.edges)
+    const filteredEvent = evUtil.getPreprocessedEvents(data.dataJson.data)
       .filter(
-        event => searchResultIndexes.find(sri => sri.event_index === event.node.event_index),
+        event => searchResultIndexes.find(sri => sri.event_index === event.event_index),
       )
       // recommended events should contain relevance value:
       // {
@@ -83,13 +83,13 @@ export default ({ data, location }) => {
         {
           ...cur,
           relevance: searchResultIndexes.find(
-            rec => rec.event_index === cur.node.event_index,
+            rec => rec.event_index === cur.event_index,
           ).relevance,
         },
       ]), []);
 
     setSearchResultEvents(filteredEvent);
-  }, [data.allEventsJson.edges, searchResultIndexes]);
+  }, [data.dataJson.data, searchResultIndexes]);
 
   // use custom hook to check if it is loading
   const isLoading = useLoadingAllEvents(searchResultEvents);
@@ -115,21 +115,20 @@ export default ({ data, location }) => {
 
 export const query = graphql`
   query {
-    allEventsJson {
-      edges {
-        node {
-          id
-          event_index
-          date_dt
-          title
-          description
-          starttime
-          endtime
-          speaker
-          owner
-          location
-          url
-        }
+    dataJson {
+      modified_date
+      data {
+        date_dt
+        description
+        endtime
+        event_id
+        event_index
+        location
+        owner
+        speaker
+        starttime
+        title
+        url
       }
     }
   }
