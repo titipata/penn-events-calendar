@@ -5,10 +5,14 @@ function useLoadingAllEvents(allEvents) {
 
   useEffect(() => {
     if (allEvents.length > 0) {
-      setTimeout(() => {
+      const timeoutRef = setTimeout(() => {
         setIsLoading(false);
       }, 750);
+
+      return () => clearTimeout(timeoutRef);
     }
+
+    return undefined;
   }, [allEvents]);
 
   return isLoading;

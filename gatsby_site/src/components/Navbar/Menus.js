@@ -88,9 +88,11 @@ const Menus = ({ items, hidden }) => {
 
   useEffect(() => {
     setMenuHeight(navListRef.current.scrollHeight);
-    setTimeout(() => {
+    const timeoutRef = setTimeout(() => {
       setHideDuration(0.5);
     }, 1500);
+
+    return () => clearTimeout(timeoutRef);
   }, [navListRef]);
 
   if (items.length === 0) {

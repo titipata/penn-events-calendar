@@ -188,9 +188,11 @@ const SearchButton = () => {
     }
 
     // set hide duration
-    setTimeout(() => {
+    const timeoutRef = setTimeout(() => {
       setHideDuration(0.4);
     }, 1500);
+
+    return () => clearTimeout(timeoutRef);
   }, [active]);
 
   useEffect(() => {
