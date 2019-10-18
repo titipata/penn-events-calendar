@@ -72,7 +72,7 @@ export default ({ data, location }) => {
   }, [data.dataJson.data, hostname, selectedEventsIndexes]);
 
   // use custom hook to check if it is loading
-  const isLoading = useLoadingAllEvents(recommendedEvents);
+  const isLoading = useLoadingAllEvents(data.dataJson.data);
 
   return (
     <Layout>

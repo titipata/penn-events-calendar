@@ -29,7 +29,7 @@ export default ({ data, location }) => {
   );
 
   // use custom hook to check if it is loading
-  const isLoading = useLoadingAllEvents(selectedEvents);
+  const isLoading = useLoadingAllEvents(data.dataJson.data);
 
   return (
     <Layout>
