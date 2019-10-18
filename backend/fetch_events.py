@@ -149,34 +149,6 @@ def save_json(events_json, file_path):
         fp.write(s)
 
 
-def convert_event_to_dict(event):
-    """
-    Convert event XML to dictionary
-    """
-    event_dict = {}
-    keys = [
-        'date', 'starttime', 'endtime',
-        'title', 'description', 'location',
-        'room', 'url', 'student', 'privacy',
-        'category', 'school', 'owner',
-    ]
-    for key in keys:
-        value = event.find(key).text or ''
-        if key == 'description':
-            value = BeautifulSoup(value, 'html.parser').text  # description
-        elif key in ('starttime', 'endtime'):
-            value = datetime.strptime(value, "%H:%M:%S").strftime("%I:%M %p")
-        elif key == 'url':
-            if len(value) > 0:
-                event_dict['event_id'] = str(int(value.rsplit('/')[-1]))
-            else:
-                event_dict['event_id'] = ''
-        else:
-            value = unidecode(value)
-        event_dict[key] = value
-    return event_dict
-
-
 def stringify_children(node):
     """
     Filters and removes possible Nones in texts and tails
@@ -1634,15 +1606,15 @@ def fetch_events_law(base_url='https://www.law.upenn.edu/institutes/legalhistory
         event_time = BeautifulSoup(
             event_detail['event']['date_time'], 'html.parser').text
         starttime, endtime = find_startend_time(event_time)
+        description = BeautifulSoup(event_detail['event'].get('description', ''), 'html.parser')
+        description = description.text.strip() if description is not None else ''
         events.append({
             'date': event_detail['title'],
             'title': event_detail['event']['title'],
             'starttime': starttime,
             'endtime': endtime,
-            'event_id': event_id,
-            'summary': BeautifulSoup(event_detail['event'].get('summary', ''), 'html.parser').text.strip(),
             'location': event_detail['event']['location'],
-            'description': BeautifulSoup(event_detail['event'].get('description', ''), 'html.parser').text.strip(),
+            'description': description,
             'url': 'https://www.law.upenn.edu/newsevents/calendar.php#event_id/{}/view/event'.format(event_id),
             'owner': 'Law School'
         })
@@ -2025,7 +1997,7 @@ def fetch_events_penn_today(base_url='https://penntoday.upenn.edu'):
     events_list = []
     for event in events:
         events_list.append({
-            'event_id': event['id'],
+            # 'event_id': event['id'],
             'title': event['title'],
             'description': BeautifulSoup(event['body'], 'html.parser').text.strip(),
             'date': event['start'],
@@ -2519,7 +2491,7 @@ def fetch_all_events():
         )
 
     # save data to json if not data in ``data`` folder
-    group_columns = ['owner', 'title', 'url', 'date', 'starttime']
+    group_columns = ['owner', 'title', 'date_dt', 'starttime']
     if not os.path.exists(PATH_DATA):
         events_df = events_df.drop_duplicates(
             subset=group_columns, keep='first')
