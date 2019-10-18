@@ -6,6 +6,7 @@ import useGlobal from '../store';
 import useLocalStorage from '../hooks/useLocalStorage';
 import { Events as evUtil } from '../utils';
 import useStaticResources from '../hooks/useStaticResources';
+import useLoadingAllEvents from '../hooks/useLoadingEvents';
 
 export default ({ data, location }) => {
   // use this to retrieve data and rehydrate before globalState is used
@@ -27,10 +28,14 @@ export default ({ data, location }) => {
     x => selectedEventsIndexes.includes(x.node.event_index),
   );
 
+  // use custom hook to check if it is loading
+  const isLoading = useLoadingAllEvents(selectedEvents);
+
   return (
     <Layout>
       <h1>Selected Events</h1>
       <EventsContainer
+        isLoading={isLoading}
         allEvents={selectedEvents}
         noEventDefaultText="You don't have selected events in your library."
       />

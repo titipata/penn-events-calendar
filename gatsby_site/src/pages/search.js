@@ -8,6 +8,7 @@ import useStaticResources from '../hooks/useStaticResources';
 import { Events as evUtil } from '../utils';
 import SearchButton from '../components/BaseComponents/SearchButton';
 import useGlobal from '../store';
+import useLoadingAllEvents from '../hooks/useLoadingEvents';
 
 const HeaderWrapper = styled.div`
   display: flex;
@@ -45,6 +46,7 @@ export default ({ data, location }) => {
   const [globalState, globalActions] = useGlobal();
   const { hostname } = globalState;
 
+  // TODO, move this to gatsby config instead
   useEffect(() => {
     globalActions.setHostName(location.hostname);
   }, [globalActions, location.hostname]);
@@ -89,6 +91,9 @@ export default ({ data, location }) => {
     setSearchResultEvents(filteredEvent);
   }, [data.allEventsJson.edges, searchResultIndexes]);
 
+  // use custom hook to check if it is loading
+  const isLoading = useLoadingAllEvents(searchResultEvents);
+
   return (
     <Layout>
       <HeaderWrapper>
@@ -100,6 +105,7 @@ export default ({ data, location }) => {
         {` ${searchQuery}`}
       </p>
       <EventsContainer
+        isLoading={isLoading}
         allEvents={searchResultEvents}
         noEventDefaultText={`Sorry, there are no events matched from your search query "${searchQuery}".`}
       />
