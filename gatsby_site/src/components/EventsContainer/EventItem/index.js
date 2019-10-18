@@ -38,7 +38,7 @@ const EventItem = ({ eventData }) => {
     owner,
     location,
     url,
-  } = eventData.node;
+  } = eventData;
 
   // handle functions
   const _handleCardClick = () => {
@@ -90,22 +90,20 @@ EventItem.propTypes = {
       PropTypes.number,
       PropTypes.string,
     ]),
-    node: PropTypes.shape({
-      id: PropTypes.string,
-      event_index: PropTypes.oneOfType([
-        PropTypes.number,
-        PropTypes.string,
-      ]),
-      date_dt: PropTypes.string,
-      title: PropTypes.string,
-      description: PropTypes.string,
-      starttime: PropTypes.string,
-      endtime: PropTypes.string,
-      speaker: PropTypes.string,
-      owner: PropTypes.string,
-      location: PropTypes.string,
-      url: PropTypes.string,
-    }),
+    id: PropTypes.string,
+    event_index: PropTypes.oneOfType([
+      PropTypes.number,
+      PropTypes.string,
+    ]),
+    date_dt: PropTypes.string,
+    title: PropTypes.string,
+    description: PropTypes.string,
+    starttime: PropTypes.string,
+    endtime: PropTypes.string,
+    speaker: PropTypes.string,
+    owner: PropTypes.string,
+    location: PropTypes.string,
+    url: PropTypes.string,
   }).isRequired,
 };
 

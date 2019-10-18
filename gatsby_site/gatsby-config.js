@@ -20,8 +20,7 @@ module.exports = {
     {
       resolve: 'gatsby-source-filesystem',
       options: {
-        name: 'data',
-        path: `${__dirname}/../backend/data/`,
+        path: `${__dirname}/../backend/data`,
       },
     },
     'gatsby-transformer-json',
