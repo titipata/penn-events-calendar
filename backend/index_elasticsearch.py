@@ -30,7 +30,7 @@ def generate_event(events):
             ('date', 'date_dt', 'timestamp', 'location',
              'starttime', 'endtime', 'owner',
              'speaker', 'title', 'description',
-             'url', 'speaker', 'summary')
+             'url', 'speaker')
         }
         yield {
             "_index": "penn-events",
