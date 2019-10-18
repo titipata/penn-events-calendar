@@ -51,7 +51,6 @@ export const query = graphql`
         date_dt
         description
         endtime
-        event_id
         event_index
         location
         owner
