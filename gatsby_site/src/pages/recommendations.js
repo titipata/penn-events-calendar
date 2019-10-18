@@ -45,13 +45,13 @@ export default ({ data, location }) => {
           return;
         }
 
-        const filteredData = evUtil.getPreprocessedEvents(data.allEventsJson.edges)
+        const filteredData = evUtil.getPreprocessedEvents(data.dataJson.data)
           .filter(
-            event => recommendedIndexes.find(rec => rec.event_index === event.node.event_index),
+            event => recommendedIndexes.find(rec => rec.event_index === event.event_index),
           )
           // recommended events should contain relevance value:
           // {
-          //   node: { `event_data` },
+          //   `...event_data`,
           //   relevance: `relevance_value`
           // }
           .reduce((acc, cur) => ([
@@ -59,7 +59,7 @@ export default ({ data, location }) => {
             {
               ...cur,
               relevance: recommendedIndexes.find(
-                rec => rec.event_index === cur.node.event_index,
+                rec => rec.event_index === cur.event_index,
               ).relevance,
             },
           ]), []);
@@ -69,7 +69,7 @@ export default ({ data, location }) => {
       })
       // eslint-disable-next-line
       .catch(err => console.log(err));
-  }, [data.allEventsJson.edges, hostname, selectedEventsIndexes]);
+  }, [data.dataJson.data, hostname, selectedEventsIndexes]);
 
   // use custom hook to check if it is loading
   const isLoading = useLoadingAllEvents(recommendedEvents);
@@ -88,21 +88,20 @@ export default ({ data, location }) => {
 
 export const query = graphql`
   query {
-    allEventsJson {
-      edges {
-        node {
-          id
-          event_index
-          date_dt
-          title
-          description
-          starttime
-          endtime
-          speaker
-          owner
-          location
-          url
-        }
+    dataJson {
+      modified_date
+      data {
+        date_dt
+        description
+        endtime
+        event_id
+        event_index
+        location
+        owner
+        speaker
+        starttime
+        title
+        url
       }
     }
   }

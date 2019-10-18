@@ -100,8 +100,6 @@ class Events {
 
   // normally just call this function should be enough
   static getPreprocessedEvents(eventArr, futureOnly = false) {
-    console.log(eventArr);
-
     return futureOnly
       ? Events.getFutureEvents(eventArr)
       : Events.sortEvents(eventArr);
