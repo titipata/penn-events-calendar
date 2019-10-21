@@ -1606,7 +1606,8 @@ def fetch_events_law(base_url='https://www.law.upenn.edu/institutes/legalhistory
         event_time = BeautifulSoup(
             event_detail['event']['date_time'], 'html.parser').text
         starttime, endtime = find_startend_time(event_time)
-        description = BeautifulSoup(event_detail['event'].get('description', ''), 'html.parser')
+        description = BeautifulSoup(
+            event_detail['event'].get('description', ''), 'html.parser')
         description = description.text.strip() if description is not None else ''
         events.append({
             'date': event_detail['title'],
@@ -2317,12 +2318,21 @@ def fetch_events_gse(base_url='https://www.gse.upenn.edu/event'):
             location = event_post.find(
                 'div', attrs={'class': 'views-field-field-location-1'})
             location = location.text.strip() if location is not None else ''
-            event_url_match = re.findall(
-                'https?://(?:[-\w.]|(?:%[\da-fA-F]{2}))+', description)
-            if len(event_url_match) >= 1:
-                event_url = event_url_match[0]
-            else:
-                event_url = ''
+
+            event_url = description.split('\n')[-1]
+            try:
+                event_soup = BeautifulSoup(requests.get(
+                    event_url).content, 'html.parser')
+                description = event_soup.find(
+                    'div', attrs={'class': 'node-event'})
+                description = description.find(
+                    'div', attrs={'class': 'content'})
+                description = description.find(
+                    'div', attrs={'class': 'field-items'})
+                description = description.text.strip() if description is not None else ''
+            except:
+                description = ''
+
             events.append({
                 'title': title,
                 'date': date,
