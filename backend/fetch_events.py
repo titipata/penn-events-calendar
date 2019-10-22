@@ -2515,6 +2515,49 @@ def fetch_events_school_design(base_url='https://www.design.upenn.edu'):
     return events
 
 
+def fetch_events_penn_museum(base_url='https://www.penn.museum/calendar'):
+    """
+    Fetch events from Penn Museum, we select only lecture
+    """
+    event_page = requests.get(base_url)
+    all_event_soup = BeautifulSoup(event_page.content, 'html.parser')
+    event_table = all_event_soup.find('table', attrs={'class': 'table'})
+
+    events = []
+    for event in event_table.find('tbody').find_all('tr'):
+        try:
+            date, title, event_type = event.find_all('td')
+            if title is not None:
+                event_url = urljoin(base_url, title.find('a').attrs['href'])
+                title = title.text.strip() if title is not None else ''
+                if 'lecture' in event_type.text.lower().strip():
+                    event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+
+                    event_details = event_soup.find('div', attrs={'itemscope': 'itemscope'})
+                    title = event_details.find('h2')
+                    title = title.text.strip() if title is not None else ''
+                    date, time, location, category = event_details.find('dl', attrs={'class': 'dl-horizontal'}).find_all('dd')
+                    date = date.text.strip() if date is not None else ''
+                    starttime, endtime = find_startend_time(time.text)
+                    location = location.text.strip() if location is not None else ''
+                    description = event_soup.find('div', attrs={'itemprop': 'description'})
+                    description = '\n'.join([p.text.strip() for p in description.find_all('p') if p is not None]).strip()
+
+                    events.append({
+                        'title': title,
+                        'date': date,
+                        'starttime': starttime,
+                        'endtime': endtime,
+                        'location': location,
+                        'description': description,
+                        'url': event_url,
+                        'owner': 'Penn Museum (lecture)'
+                    })
+        except:
+            pass
+    return events
+
+
 def drop_duplicate_events(df):
     """
     Function to group dataframe, use all new information from the latest row
@@ -2545,7 +2588,7 @@ def fetch_all_events():
         fetch_events_SPP, fetch_events_ortner_center, fetch_events_penn_today,
         fetch_events_mins, fetch_events_mindcore, fetch_events_seas,
         fetch_events_vet, fetch_events_gse, fetch_events_grasp,
-        fetch_events_wharton_stats, fetch_events_school_design
+        fetch_events_wharton_stats, fetch_events_school_design, fetch_events_penn_museum
     ]
     for f in tqdm(fetch_fns):
         try:
