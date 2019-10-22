@@ -16,7 +16,7 @@ from urllib.parse import urljoin
 from tqdm import tqdm
 
 
-PATH_DATA = os.path.join('data', 'events.json')  # path to save events
+PATH_DATA = os.path.join('data', 'events.json') # path to save events
 GROBID_URL = 'http://localhost:8070'
 GROBID_PDF_URL = '{}/api/processFulltextDocument'.format(GROBID_URL)
 
@@ -2454,6 +2454,67 @@ def fetch_events_wharton_stats(base_url='https://statistics.wharton.upenn.edu/re
     return events
 
 
+def fetch_events_school_design(base_url='https://www.design.upenn.edu'):
+    """
+    Fetch events from Weitzman School of Design
+
+    url: https://www.design.upenn.edu/events-exhibitions
+    """
+    event_page = requests.get(urljoin(base_url, 'events-exhibitions'))
+    event_soup = BeautifulSoup(event_page.content, 'html.parser')
+    all_event_page = event_soup.find('div', attrs={'class': 'zone-content'})
+    all_events = all_event_page.find_all('div', attrs={'class': 'masonry-item'})
+
+    events = []
+    for event_pane in all_events:
+        try:
+            title = event_pane.find('h4', attrs={'class': 'field-content'})
+            event_url = title.find('a').attrs.get('href')
+            if event_url is not None:
+                title = title.text.strip() if title is not None else ''
+                event_url = urljoin(base_url, event_url)
+
+                date = event_pane.find('span', attrs={'class': 'date-display-start'})
+                if date is None:
+                    date = event_pane.find('span', attrs={'class': 'date-display-single'})
+                date = date.attrs['content']
+                date = date.split('T')[0]
+
+                event_page = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+                details = event_page.find_all('h2', attrs={'class': 'odd'})
+                if len(details) >= 2:
+                    location = details[1]
+                    location = location.text.strip() if location is not None else ''
+                else:
+                    location = ''
+
+                if len(details) >= 1:
+                    starttime = event_page.find_all('h2', attrs={'class': 'odd'})[0]
+                    starttime, endtime = find_startend_time(starttime.text.strip())
+                else:
+                    starttime, endtime = '', ''
+
+                descriptions = event_page.find_all('div', attrs={'class': 'field-items'})[1:]
+                description = ''
+                for d in descriptions:
+                    description += '\n'.join([p.text.strip() for p in d.find_all('p')])
+                description = ' '.join(description.split(' ')[0:500])
+
+                events.append({
+                    'title': title,
+                    'date': date,
+                    'starttime': starttime,
+                    'endtime': endtime,
+                    'location': location,
+                    'description': description,
+                    'url': event_url,
+                    'owner': 'School of Design (Weitzman)'
+                })
+        except:
+            pass
+    return events
+
+
 def drop_duplicate_events(df):
     """
     Function to group dataframe, use all new information from the latest row
@@ -2484,7 +2545,7 @@ def fetch_all_events():
         fetch_events_SPP, fetch_events_ortner_center, fetch_events_penn_today,
         fetch_events_mins, fetch_events_mindcore, fetch_events_seas,
         fetch_events_vet, fetch_events_gse, fetch_events_grasp,
-        fetch_events_wharton_stats
+        fetch_events_wharton_stats, fetch_events_school_design
     ]
     for f in tqdm(fetch_fns):
         try:

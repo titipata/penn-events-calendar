@@ -52,7 +52,9 @@ PENN_LOCATIONS = [
     'Van Pelt Library',
     'College Green',
     'Locust Walk',
-    'National Mechanics'
+    'National Mechanics',
+    'Kroiz Gallery',
+    'Fisher Fine Arts Library'
 ]
 
 
