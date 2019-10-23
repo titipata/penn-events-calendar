@@ -29,7 +29,7 @@ We use [Supervisor](http://supervisord.org/index.html) to control all the proces
 
 - `supervisor-gatsby`: build and serve Gatsby frontend.
 - `supervisor-hug`: serve Hug API.
-- `supervisor-elasticsearch`: serve Elasticsearch.
+- `supervisor-elasticsearch`: serve `Elasticsearch`.
 - `supervisor-grobid`: serve [GROBID](https://github.com/kermitt2/grobid) to parse PDFs.
 - `supervisor-fetch-events`: set up `schedule` to fetch events weekly
 

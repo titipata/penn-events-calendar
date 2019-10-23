@@ -83,7 +83,7 @@ def query(search_query: hug.types.text):
     Search events from index,
     this function will return empty list if no events are found
 
-    example query: http://localhost:8888/query?search_query=CNI
+    example query: http://localhost:8888/api/query?search_query=CNI
 
     See more query examples at: https://elasticsearch-dsl.readthedocs.io/en/latest/search_dsl.html
     """
@@ -115,7 +115,7 @@ def suggestion(text: hug.types.text):
     """
     For a given text, return possible terms from a suggest list in elastic search index
 
-    example query: http://localhost:8888/suggestion?text=department
+    example query: http://localhost:8888/api/suggestion?text=department
     """
     suggest_body = {
         "suggest": {

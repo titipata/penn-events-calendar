@@ -12,7 +12,7 @@ npm install
 npm start
 ```
 
-By default, this will concurrently run Gatsby frontend site at port `8000`, hug API backend at port `8888`, and ElasticSearch at port `9200`.
+By default, this will concurrently run Gatsby frontend site at port `8000`, hug API backend at port `8888`, and `Elasticsearch` at port `9200`.
 
 ## Running on remote server
 

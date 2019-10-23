@@ -19,13 +19,13 @@ npm install
 npm start
 ```
 
-Then index given example data to ElasticSearch located in [`backend/data`](https://github.com/titipata/penn-events-calendar/tree/master/backend/data) using:
+Then index given example data to `Elasticsearch` located in [`backend/data`](https://github.com/titipata/penn-events-calendar/tree/master/backend/data) using:
 
 ```sh
-npm run index-elastic # index data to elasticsearch
+npm run index-elastic # index data to Elasticsearch
 ```
 
-By default, this will concurrently run Gatsby frontend site at port `8000`, hug API backend at port `8888`, and ElasticSearch at port `9200`. For deployment, use `npm run deploy` instead. This will run the site at port `9000`. See [`gatsby_site`](https://github.com/titipata/penn-events-calendar/tree/master/gatsby_site#running-on-remote-server), to see how to run on a remote server.
+By default, this will concurrently run Gatsby frontend site at port `8000`, hug API backend at port `8888`, and `Elasticsearch` at port `9200`. For deployment, use `npm run deploy` instead. This will run the site at port `9000`. See [`gatsby_site`](https://github.com/titipata/penn-events-calendar/tree/master/gatsby_site#running-on-remote-server), to see how to run on a remote server.
 
 **For production** see [`devops`](https://github.com/titipata/penn-events-calendar/tree/master/devops) folder on how to set up [supervisord](http://supervisord.org).
 
