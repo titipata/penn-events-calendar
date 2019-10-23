@@ -24,7 +24,6 @@ To make it run on a remote server, you can do the following:
 npm run gatsby-prod -- -H <host_name>
 ```
 
-
 ## Gatsby documentation
 
 Full documentation for Gatsby can be found [here](https://www.gatsbyjs.org/).
