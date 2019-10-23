@@ -12,13 +12,7 @@ export default ({ data, location }) => {
   // use this to retrieve data and rehydrate before globalState is used
   useLocalStorage();
   useStaticResources();
-  // this is used to set origin hostname
-  const [globalState, globalActions] = useGlobal();
-  const { hostname } = globalState;
-
-  useEffect(() => {
-    globalActions.setHostName(location.hostname);
-  }, [globalActions, location.hostname]);
+  const [globalState] = useGlobal();
 
   // local state
   const [recommendedEvents, setRecommendedEvents] = useState([]);
@@ -27,8 +21,7 @@ export default ({ data, location }) => {
   const { selectedEvents: selectedEventsIndexes } = globalState;
 
   useEffect(() => {
-    if (!hostname) return;
-    fetch(`http://${hostname}:8888/recommendations`, {
+    fetch('/api/recommendations', {
       method: 'POST',
       mode: 'cors',
       headers: {
@@ -69,7 +62,7 @@ export default ({ data, location }) => {
       })
       // eslint-disable-next-line
       .catch(err => console.log(err));
-  }, [data.dataJson.data, hostname, selectedEventsIndexes]);
+  }, [data.dataJson.data, selectedEventsIndexes]);
 
   // use custom hook to check if it is loading
   const isLoading = useLoadingAllEvents(data.dataJson.data);

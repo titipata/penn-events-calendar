@@ -1,6 +1,6 @@
 # Backend for Penn events
 
-We use Python as our backend. Backend mainly contains scripts to fetch events from Penn, search and recommendation API using [hug](https://www.hug.rest/), and index fetched events to `elasticsearch`. The hug backend is set by default to run on port `8888` and elasticsearch is run on port `9200`. See `backend` folder on how to run the backend scripts.
+We use Python as our backend. Backend mainly contains scripts to fetch events from Penn, search and recommendation API using [hug](https://www.hug.rest/), and index fetched events to `Elasticsearch`. For development, the hug backend is set by default to run on port `8888` and `Elasticsearch` is run on port `9200`. See `backend` folder on how to run the backend scripts.
 
 ## Fetch events
 
@@ -12,25 +12,25 @@ python fetch_events.py # scrape data
 python create_events_features.py # create LSA vectors and search candidates
 ```
 
-## Serve and index events to ElasticSearch
+## Serve and index events to `Elasticsearch`
 
-Run the following to serve and index events to `elasticsearch`
+Run the following to serve and index events to `Elasticsearch`
 
 ```sh
-bash serve_elasticsearch.sh # this will run elasticsearch by default at port 9200
-python index_elasticsearch.py # index events and search candidates to elasticsearch
+bash serve_elasticsearch.sh # this will run Elasticsearch by default at port 9200
+python index_elasticsearch.py # index events and search candidates to Elasticsearch
 ```
 
 ## Running schedule to fetch, index events weekly
 
-We use [`scheudle`](https://github.com/dbader/schedule) to fetch events weekly from Penn using `fetch_events.py`.
+We use [`schedule`](https://github.com/dbader/schedule) to fetch events weekly from Penn using `fetch_events.py`.
 You can run
 
-```sh
+```**sh**
 python schedule_fetch_events.py
 ```
 
-in order to schedule the script for fetching, creating features, and indexing events to `elasticsearch`.
+in order to schedule the script for fetching, creating features, and indexing events to `Elasticsearch`.
 
 ## Running Hug API locally
 
@@ -43,7 +43,7 @@ hug -f hug_api.py -p 8888
 To serve hug with `uwsgi`, use the following command
 
 ```sh
-uwsgi --http 0.0.0.0:8888 --wsgi-file hug_api.py -p 2 --callable __hug_wsgi__
+uwsgi --http 127.0.0.1:8888 --wsgi-file hug_api.py -p 2 --callable __hug_wsgi__
 ```
 
 this will serve `uwsgi` with 2 processes. Before running, make sure that `uwsgi` is installed via `conda install -c conda-forge uwsgi`

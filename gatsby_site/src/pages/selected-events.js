@@ -1,5 +1,5 @@
 import { graphql } from 'gatsby';
-import React, { useEffect } from 'react';
+import React from 'react';
 import EventsContainer from '../components/EventsContainer';
 import Layout from '../components/layout';
 import useGlobal from '../store';
@@ -12,12 +12,7 @@ export default ({ data, location }) => {
   // use this to retrieve data and rehydrate before globalState is used
   useLocalStorage();
   useStaticResources();
-  // this is used to set origin hostname
-  const [globalState, globalActions] = useGlobal();
-
-  useEffect(() => {
-    globalActions.setHostName(location.hostname);
-  }, [globalActions, location.hostname]);
+  const [globalState] = useGlobal();
 
   // get selected event indexes from global state
   const { selectedEvents: selectedEventsIndexes } = globalState;

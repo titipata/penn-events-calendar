@@ -7,7 +7,6 @@ import useLocalStorage from '../hooks/useLocalStorage';
 import useStaticResources from '../hooks/useStaticResources';
 import { Events as evUtil } from '../utils';
 import SearchButton from '../components/BaseComponents/SearchButton';
-import useGlobal from '../store';
 import useLoadingAllEvents from '../hooks/useLoadingEvents';
 
 const HeaderWrapper = styled.div`
@@ -42,14 +41,6 @@ export default ({ data, location }) => {
   // use this to retrieve data and rehydrate before globalState is used
   useLocalStorage();
   useStaticResources();
-  // this is used to set origin hostname
-  const [globalState, globalActions] = useGlobal();
-  const { hostname } = globalState;
-
-  // TODO, move this to gatsby config instead
-  useEffect(() => {
-    globalActions.setHostName(location.hostname);
-  }, [globalActions, location.hostname]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResultIndexes, setSearchResultIndexes] = useState([]);
@@ -62,9 +53,8 @@ export default ({ data, location }) => {
 
   // for searchResultsIndexes
   useEffect(() => {
-    if (!hostname) return;
-    getSearchResults(`http://${hostname}:8888/query?search_query=${searchQuery}}`, x => setSearchResultIndexes(x));
-  }, [hostname, location.hostname, searchQuery]);
+    getSearchResults(`/api/query?search_query=${searchQuery}}`, x => setSearchResultIndexes(x));
+  }, [searchQuery]);
 
   // for searchResultsEvents
   useEffect(() => {

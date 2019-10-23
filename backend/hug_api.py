@@ -11,17 +11,17 @@ from elasticsearch_dsl import Search
 
 # enable CORS
 api = hug.API(__name__)
+api.http.base_url = '/api'
 api.http.add_middleware(hug.middleware.CORSMiddleware(api))
 
-
-path_data, path_vector = os.path.join('data', 'events.json'), os.path.join('data', 'events_vector.json')
+path_data, path_vector = os.path.join(
+    'data', 'events.json'), os.path.join('data', 'events_vector.json')
 event_vectors = json.load(open(path_vector, 'r'))
 events = json.load(open(path_data, 'r'))['data']
 event_vectors_map = {
     e['event_index']: e['event_vector']
     for e in event_vectors
 }
-
 
 # elasticsearch
 es = Elasticsearch([
@@ -86,7 +86,7 @@ def query(search_query: hug.types.text):
     Search events from index,
     this function will return empty list if no events are found
 
-    example query: http://localhost:8888/query?search_query=CNI
+    example query: http://localhost:8888/api/query?search_query=CNI
 
     See more query examples at: https://elasticsearch-dsl.readthedocs.io/en/latest/search_dsl.html
     """
@@ -118,7 +118,7 @@ def suggestion(text: hug.types.text):
     """
     For a given text, return possible terms from a suggest list in elastic search index
 
-    example query: http://localhost:8888/suggestion?text=department
+    example query: http://localhost:8888/api/suggestion?text=department
     """
     suggest_body = {
         "suggest": {

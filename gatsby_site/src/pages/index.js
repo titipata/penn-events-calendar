@@ -1,5 +1,5 @@
 import { graphql } from 'gatsby';
-import React, { useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import EventsContainer from '../components/EventsContainer';
 import Layout from '../components/layout';
@@ -7,7 +7,6 @@ import useLocalStorage from '../hooks/useLocalStorage';
 import useStaticResources from '../hooks/useStaticResources';
 import { Events as evUtil } from '../utils';
 import SearchButton from '../components/BaseComponents/SearchButton';
-import useGlobal from '../store';
 import useLoadingAllEvents from '../hooks/useLoadingEvents';
 
 const HeaderWrapper = styled.div`
@@ -21,15 +20,8 @@ export default ({ data, location }) => {
   useLocalStorage();
   useStaticResources();
 
-  // this is used to set origin hostname
-  const [, globalActions] = useGlobal();
-
   // use custom hook to check if it is loading
   const isLoading = useLoadingAllEvents(data.dataJson.data);
-
-  useEffect(() => {
-    globalActions.setHostName(location.hostname);
-  }, [globalActions, location.hostname]);
 
   // preprocess events before sending to events list
   const preprocessedEvents = evUtil.getPreprocessedEvents(

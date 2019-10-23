@@ -1,4 +1,8 @@
 module.exports = {
+  proxy: {
+    prefix: '/api',
+    url: 'http://localhost:8888',
+  },
   pathPrefix: '/penn-events',
   siteMetadata: {
     title: 'Penn Event Calendar',
