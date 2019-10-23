@@ -63,7 +63,7 @@ export default ({ data, location }) => {
   // for searchResultsIndexes
   useEffect(() => {
     if (!hostname) return;
-    getSearchResults(`http://${hostname}:8888/query?search_query=${searchQuery}}`, x => setSearchResultIndexes(x));
+    getSearchResults(`/api/query?search_query=${searchQuery}}`, x => setSearchResultIndexes(x));
   }, [hostname, location.hostname, searchQuery]);
 
   // for searchResultsEvents

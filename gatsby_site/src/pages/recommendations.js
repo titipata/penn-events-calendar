@@ -28,7 +28,7 @@ export default ({ data, location }) => {
 
   useEffect(() => {
     if (!hostname) return;
-    fetch(`http://${hostname}:8888/recommendations`, {
+    fetch('/api/recommendations', {
       method: 'POST',
       mode: 'cors',
       headers: {

@@ -197,7 +197,7 @@ const SearchButton = () => {
 
   useEffect(() => {
     if (!hostname || !searchQuery) return;
-    const url = `http://${hostname}:8888/suggestion?text=${searchQuery}`;
+    const url = `/api/suggestion?text=${searchQuery}`;
     getSuggestions(url, setSuggestionList);
   }, [hostname, searchQuery]);
 
