@@ -4,7 +4,6 @@ import { Link } from 'gatsby';
 import React, { useEffect, useRef, useState } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import { Key } from '../../utils';
-import useGlobal from '../../store';
 
 const Container = styled.form`
   height: 40px;
@@ -168,9 +167,6 @@ const getSuggestions = (suggestionUrl, callback) => {
 };
 
 const SearchButton = () => {
-  const [globalState] = useGlobal();
-  const { hostname } = globalState;
-
   const inputRef = useRef(null);
   const [active, setActive] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -196,10 +192,10 @@ const SearchButton = () => {
   }, [active]);
 
   useEffect(() => {
-    if (!hostname || !searchQuery) return;
+    if (!searchQuery) return;
     const url = `/api/suggestion?text=${searchQuery}`;
     getSuggestions(url, setSuggestionList);
-  }, [hostname, searchQuery]);
+  }, [searchQuery]);
 
   return (
     <Container
