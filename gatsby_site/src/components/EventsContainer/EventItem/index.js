@@ -14,6 +14,7 @@ const StyledListItem = styled.li`
   border-radius: 5px;
   cursor: ${props => (props.cursorPointer ? 'pointer' : 'default')};
 
+  /* remove blue highlight when being clicked (Chrome only) */
   /* https://stackoverflow.com/a/21003770/4010864 */
   -webkit-touch-callout: none;
   -webkit-user-select: none;
