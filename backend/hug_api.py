@@ -56,6 +56,9 @@ def recommendations(body):
     The body is then passed as an argument to this function, as a dictionary.
     """
     event_indices = body['payload']
+    # in case frond-end sending index out of range
+    event_indices = [event_idx for event_idx in event_indices
+                     if int(event_idx) in event_vectors_map.keys()]
 
     if len(event_indices) == 0:
         return []
