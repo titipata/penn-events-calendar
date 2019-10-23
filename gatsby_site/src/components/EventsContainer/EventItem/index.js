@@ -13,6 +13,15 @@ const StyledListItem = styled.li`
   border-left: 5px solid ${props => props.color};
   border-radius: 5px;
   cursor: ${props => (props.cursorPointer ? 'pointer' : 'default')};
+
+  /* https://stackoverflow.com/a/21003770/4010864 */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 `;
 
 const StyledContentWrapper = styled.div`
