@@ -1,8 +1,8 @@
 #!/bin/bash
 
-pkill -fl gatsby
-pkill -fl hug
-pkill -fl elasticsearch
-pkill -fl grobid
-pkill -fl fetch_events.py
-pkill -fl supervisord
+pkill -f gatsby
+pkill -f hug
+pkill -f elasticsearch
+pkill -f grobid
+pkill -f fetch_events.py
+pkill -f supervisord
