@@ -160,6 +160,27 @@ def stringify_children(node):
     return ''.join(filter(None, parts))
 
 
+def parse_pdf_abstract(pdf_url):
+    """
+    Parse title and abstract for a given pdf_url to scientific paper
+    """
+    try:
+        parsed_article = requests.post(
+            GROBID_PDF_URL, files={'input': requests.get(pdf_url).content}).text
+        pdf_soup = BeautifulSoup(parsed_article, 'lxml')
+        title = pdf_soup.find('title')
+        title = title.text if title is not None else ''
+        description = pdf_soup.find('abstract')
+        description = description.text.strip() if description is not None else ''
+        if description == '':
+            description = pdf_soup.find('div')
+            description = description.text.strip() if description is not None else ''
+        description = ' '.join(description.split(' ')[0:500])
+    except:
+        title, description = '', ''
+    return title, description
+
+
 def fetch_events_cni(base_url='https://cni.upenn.edu/events'):
     """
     Fetch events from Computational Neuroscience Initiative (CNI)
@@ -2558,6 +2579,285 @@ def fetch_events_penn_museum(base_url='https://www.penn.museum/calendar'):
     return events
 
 
+def fetch_events_wharton_marketing(base_url='https://marketing.wharton.upenn.edu/events/dpcolloquia/'):
+    """
+    Fetch events from Wharton marketing department (Decision Processes Colloquia)
+    """
+    events = []
+    event_page = requests.get(base_url)
+    all_event_soup = BeautifulSoup(event_page.content, 'html.parser')
+    event_lists = all_event_soup.find_all('tr')
+
+    date_location = all_event_soup.find_all('div', attrs={'class': 'wpb_wrapper'})[2]
+    date_location = '\n'.join([p.text for p in date_location.find_all('p')
+                               if 'location' in p.text.lower()])
+    location = ''.join([l for l in date_location.split('\n')
+                        if 'location' in l.lower()]).replace('Location: ', '')
+    time = ''.join([l for l in date_location.split('\n')
+                    if 'time' in l.lower()])
+    starttime = time.lower().replace('time:', '').split('–')[0]
+    endtime = time.lower().replace('time:', '').split('–')[-1]
+    endtime = find_startend_time(endtime)[0]
+
+    for event_list in event_lists:
+        if len(event_list.find_all('td')) == 3:
+            try:
+                pdf_url = event_list.find_next_sibling('ul').find('a').attrs['href']
+            except:
+                pdf_url = ''
+
+            if pdf_url is not '':
+                _, description = parse_pdf_abstract(pdf_url)
+            else:
+                description = ''
+
+            date, speaker, title = event_list.find_all('td')
+            date = date.text.strip() if date is not None else ''
+            speaker = speaker.text.strip() if speaker is not None else ''
+            title = title.text.strip() if title is not None else ''
+            if date != '' and title != 'TBD':
+                events.append({
+                    'date': date,
+                    'event_url': base_url,
+                    'speaker': speaker,
+                    'title': title,
+                    'location': location,
+                    'starttime': starttime,
+                    'endtime': endtime,
+                    'description': description,
+                    'owner': 'Decision Processes Colloquia (Wharton)'
+                })
+    return events
+
+
+def fetch_events_marketing_col(base_url='https://marketing.wharton.upenn.edu/events/marketing-colloquia-2019-2020/'):
+    """
+    Fetch events from Wharton Marketing Department (Marketing Colloquia)
+    """
+    events = []
+    event_page = requests.get(base_url)
+    all_event_soup = BeautifulSoup(event_page.content, 'html.parser')
+    all_events = all_event_soup.find_all('div', attrs={'class': 'vc_toggle'})
+
+    date_location = all_event_soup.find_all('div', attrs={'class': 'wpb_wrapper'})[0]
+    date_location = '\n'.join([p.text for p in date_location.find_all('p')
+                               if 'location' in p.text.lower()])
+    location = ''.join([l for l in date_location.split('\n')
+                        if 'location' in l.lower()]).replace('Location: ', '')
+    time = ''.join([l for l in date_location.split('\n')
+                    if 'time' in l.lower()])
+    starttime = time.lower().replace('time:', '').split('–')[0]
+    endtime = time.lower().replace('time:', '').split('–')[-1]
+    endtime = find_startend_time(endtime)[0]
+
+    for event in all_events:
+        date_speaker = event.find('div', attrs={'class': 'vc_toggle_title'})
+        if date_speaker is not None:
+            title = date_speaker.text.strip()
+            date, speaker = date_speaker.text.strip().split('~')
+            speaker = speaker.replace('Speaker:', '').strip()
+            pdf_url = event.find('a')['href'] if event.find('a') is not None else ''
+            if pdf_url != '':
+                _, description = parse_pdf_abstract(pdf_url)
+            else:
+                description = ''
+            if 'Speaker TBA' not in title:
+                events.append({
+                    'date': date,
+                    'event_url': base_url,
+                    'speaker': speaker,
+                    'title': title,
+                    'location': location,
+                    'starttime': starttime,
+                    'endtime': endtime,
+                    'description': description,
+                    'pdf_url': pdf_url,
+                    'owner': 'Marketing Department Colloquia (Wharton)'
+                })
+    return events
+
+
+def fetch_events_macro_seminar(base_url='https://fnce.wharton.upenn.edu/department-information/seminars/macro-seminars/'):
+    """
+    Fetch events from Macro Seminar, Wharton
+    """
+    events = []
+    event_page = requests.get(base_url)
+    all_event_soup = BeautifulSoup(event_page.content, 'html.parser')
+    date_location = all_event_soup.find_all('div', attrs={'class': 'wpb_wrapper'})[1]
+    date_location = date_location.text.strip()
+    location = ''.join([l for l in date_location.split('\n')
+                        if 'sh-dh' in l.lower()])
+    time = ''.join([l for l in date_location.split('\n')
+                    if ' to ' in l.lower()])
+    starttime = time.split(' ')[1] + ' ' + time.split(' ')[-1]
+    endtime = time.split(' ')[-2] + ' ' + time.split(' ')[-1]
+    year = date_location.split('\n')[1].split(' ')[-1]
+
+    event_lists = all_event_soup.find_all('tr')[1:]
+    for event_list in event_lists:
+        if len(event_list.find_all('td')) == 3:
+            date, speaker, title = event_list.find_all('td')
+            pdf_url = title.find('a')['href'] if title.find('a') is not None else ''
+            if pdf_url != '':
+                _, description = parse_pdf_abstract(pdf_url)
+            else:
+                description = ''
+            date = date.text.strip() if date is not None else ''
+            speaker = speaker.text.strip() if speaker is not None else ''
+            title = title.text.strip() if title is not None else ''
+            date = date + ' ' + year
+            if title.strip() is not '':
+                events.append({
+                    'date': date,
+                    'event_url': base_url,
+                    'speaker': speaker,
+                    'title': title,
+                    'location': location,
+                    'starttime': starttime,
+                    'endtime': endtime,
+                    'description': description,
+                    'owner': 'Finance Department, Macro Seminar (Wharton)'
+                })
+    return events
+
+
+def fetch_events_micro_seminar(base_url='https://fnce.wharton.upenn.edu/department-information/seminars/micro-seminars/'):
+    """
+    Fetch events from Micro Seminar, Wharton
+    """
+    events = []
+    event_page = requests.get(base_url)
+    all_event_soup = BeautifulSoup(event_page.content, 'html.parser')
+    date_location = all_event_soup.find_all('div', attrs={'class': 'wpb_wrapper'})[1]
+    date_location = date_location.text.strip()
+    location = ''.join([l for l in date_location.split('\n')
+                        if 'sh-dh' in l.lower()])
+    time = ''.join([l for l in date_location.split('\n')
+                    if ' to ' in l.lower()])
+    starttime = time.split(' ')[1] + ' ' + time.split(' ')[-1]
+    endtime = time.split(' ')[-2] + ' ' + time.split(' ')[-1]
+    year = date_location.split('\n')[1].split(' ')[-1]
+
+    event_lists = all_event_soup.find_all('tr')[1:]
+    for event_list in event_lists:
+        if len(event_list.find_all('td')) == 3:
+            date, speaker, title = event_list.find_all('td')
+            pdf_url = title.find('a')['href'] if title.find('a') is not None else ''
+            if pdf_url != '':
+                _, description = parse_pdf_abstract(pdf_url)
+            else:
+                description = ''
+            date = date.text.strip() if date is not None else ''
+            speaker = speaker.text.strip() if speaker is not None else ''
+            title = title.text.strip() if title is not None else ''
+            date = date + ' ' + year
+            if title.strip() is not '':
+                events.append({
+                    'date': date,
+                    'event_url': base_url,
+                    'speaker': speaker,
+                    'title': title,
+                    'location': location,
+                    'starttime': starttime,
+                    'endtime': endtime,
+                    'description': description,
+                    'owner': 'Finance Department, Micro Seminar (Wharton)'
+                })
+    return events
+
+
+def fetch_events_accounting_wharton(base_url='https://accounting.wharton.upenn.edu/research/workshops/'):
+    """
+    Fetch events from Wharton Accounting Department Workshop
+    """
+    events = []
+    event_page = requests.get(base_url)
+    all_event_soup = BeautifulSoup(event_page.content, 'html.parser')
+    event_lists = all_event_soup.find_all('tr')[1:]
+
+    date_location = all_event_soup.find_all('div', attrs={'class': 'wpb_wrapper'})[2]
+    date_location = '\n'.join([p.text for p in date_location.find_all('p')
+                               if 'location' in p.text.lower()])
+    location = ''.join([l for l in date_location.split('\n')
+                        if 'location' in l.lower()]).replace('Location:\xa0', '')
+    time = ''.join([l for l in date_location.split('\n')
+                    if 'time' in l.lower()])
+    starttime = time.lower().replace('time:', '').split('–')[0]
+    endtime = time.lower().replace('time:', '').split('–')[-1]
+    endtime = find_startend_time(endtime)[0]
+
+    for event_list in event_lists:
+        if len(event_list.find_all('td')) == 3:
+
+            date, speaker, title = event_list.find_all('td')
+            pdf_url = title.find('a')['href'] if title.find('a') is not None else ''
+            if pdf_url is not '':
+                _, description = parse_pdf_abstract(pdf_url)
+            else:
+                description = ''
+
+            date = date.text.strip() if date is not None else ''
+            speaker = speaker.text.strip() if speaker is not None else ''
+            title = title.text.strip() if title is not None else ''
+            if title is not '':
+                events.append({
+                    'date': date,
+                    'event_url': base_url,
+                    'speaker': speaker,
+                    'title': title,
+                    'location': location,
+                    'starttime': starttime,
+                    'endtime': endtime,
+                    'description': description,
+                    'owner': 'Accounting Department (Wharton)'
+                })
+    return events
+
+
+def fetch_events_lgst_wharton(base_url='https://lgst.wharton.upenn.edu/department-information/seminars-conferences-2/'):
+    """
+    Fetch events from Wharton Legal Studies & Business Ethic Department
+
+    **Note** that they attach PNG file instead of PDF so that we cannot scrape the data
+    """
+    events = []
+    event_page = requests.get(base_url)
+    all_event_soup = BeautifulSoup(event_page.content, 'html.parser')
+    event_lists = all_event_soup.find_all('tr')[1:]
+
+    location = '641 Jon M. Huntsman Hall '
+    starttime = '12:00 PM'
+    endtime = '1:00 PM'
+
+    for event_list in event_lists:
+        if len(event_list.find_all('td')) == 3:
+
+            date, speaker, title = event_list.find_all('td')
+            pdf_url = title.find('a')['href'] if title.find('a') is not None else ''
+            if pdf_url is not '':
+                _, description = parse_pdf_abstract(pdf_url)
+            else:
+                description = ''
+
+            date = date.text.strip() if date is not None else ''
+            speaker = speaker.text.strip() if speaker is not None else ''
+            title = title.text.strip() if title is not None else ''
+            if title is not '':
+                events.append({
+                    'date': date,
+                    'event_url': base_url,
+                    'speaker': speaker,
+                    'title': title,
+                    'location': location,
+                    'starttime': starttime,
+                    'endtime': endtime,
+                    'description': description,
+                    'owner': 'Legal Studies & Business Ethic Department (Wharton)'
+                })
+    return events
+
+
 def drop_duplicate_events(df):
     """
     Function to group dataframe, use all new information from the latest row
@@ -2588,7 +2888,9 @@ def fetch_all_events():
         fetch_events_SPP, fetch_events_ortner_center, fetch_events_penn_today,
         fetch_events_mins, fetch_events_mindcore, fetch_events_seas,
         fetch_events_vet, fetch_events_gse, fetch_events_grasp,
-        fetch_events_wharton_stats, fetch_events_school_design, fetch_events_penn_museum
+        fetch_events_wharton_stats, fetch_events_school_design, fetch_events_penn_museum,
+        fetch_events_wharton_marketing, fetch_events_marketing_col, fetch_events_macro_seminar,
+        fetch_events_micro_seminar
     ]
     for f in tqdm(fetch_fns):
         try:
