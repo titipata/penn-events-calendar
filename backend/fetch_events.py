@@ -2635,7 +2635,7 @@ def fetch_events_wharton_marketing(base_url='https://marketing.wharton.upenn.edu
             if date != '' and title != 'TBD':
                 events.append({
                     'date': date,
-                    'event_url': base_url,
+                    'url': base_url,
                     'speaker': speaker,
                     'title': title,
                     'location': location,
@@ -2683,14 +2683,13 @@ def fetch_events_marketing_col(base_url='https://marketing.wharton.upenn.edu/eve
             if 'Speaker TBA' not in title:
                 events.append({
                     'date': date,
-                    'event_url': base_url,
+                    'url': base_url,
                     'speaker': speaker,
                     'title': title,
                     'location': location,
                     'starttime': starttime,
                     'endtime': endtime,
                     'description': description,
-                    'pdf_url': pdf_url,
                     'owner': 'Marketing Department Colloquia (Wharton)'
                 })
     return events
@@ -2731,7 +2730,7 @@ def fetch_events_macro_seminar(base_url='https://fnce.wharton.upenn.edu/departme
             if title.strip() is not '':
                 events.append({
                     'date': date,
-                    'event_url': base_url,
+                    'url': base_url,
                     'speaker': speaker,
                     'title': title,
                     'location': location,
@@ -2778,7 +2777,7 @@ def fetch_events_micro_seminar(base_url='https://fnce.wharton.upenn.edu/departme
             if title.strip() is not '':
                 events.append({
                     'date': date,
-                    'event_url': base_url,
+                    'url': base_url,
                     'speaker': speaker,
                     'title': title,
                     'location': location,
@@ -2828,7 +2827,7 @@ def fetch_events_accounting_wharton(base_url='https://accounting.wharton.upenn.e
             if title is not '':
                 events.append({
                     'date': date,
-                    'event_url': base_url,
+                    'url': base_url,
                     'speaker': speaker,
                     'title': title,
                     'location': location,
@@ -2872,7 +2871,7 @@ def fetch_events_lgst_wharton(base_url='https://lgst.wharton.upenn.edu/departmen
             if title is not '':
                 events.append({
                     'date': date,
-                    'event_url': base_url,
+                    'url': base_url,
                     'speaker': speaker,
                     'title': title,
                     'location': location,
@@ -2924,7 +2923,7 @@ def fetch_events_energy_econ(base_url='https://bepp.wharton.upenn.edu/research/e
     for event in events_calendar:
         event['location'] = 'Kleinman Center classroom—Fisher Fine Arts Room 306'
         event['owner'] = 'Energy Economics & Finance Seminar'
-        event['event_url'] = base_url
+        event['url'] = base_url
         event['speaker'] = event['title']
         events.append(event)
     return events
@@ -2941,7 +2940,7 @@ def fetch_events_industrial_org(base_url='https://bepp.wharton.upenn.edu/researc
     for event in events_calendar:
         event['location'] = 'The Ronald O. Perelman Center for Political Science and Economics (PCPSE); 133 South 36th Street – Room 101'
         event['owner'] = 'Industrial Organization Seminar (Wharton)'
-        event['event_url'] = base_url
+        event['url'] = base_url
         event['speaker'] = event['title']
         events.append(event)
     return events
@@ -2958,7 +2957,7 @@ def fetch_events_applied_econ_workshop(base_url='https://bepp.wharton.upenn.edu/
     for event in events_calendar:
         event['location'] = '265 JMHH'
         event['owner'] = 'Applied Economics Workshop (Wharton)'
-        event['event_url'] = base_url
+        event['url'] = base_url
         event['speaker'] = event['title']
         events.append(event)
     return events
@@ -2991,7 +2990,7 @@ def fetch_events_public_policy(base_url='https://publicpolicy.wharton.upenn.edu/
         d = start_date.strftime('%Y%m%d')
         events.append({
             'date': date,
-            'event_url': base_url,
+            'url': base_url,
             'speaker': speaker,
             'title': title,
             'location': location,
