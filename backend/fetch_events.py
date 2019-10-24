@@ -2957,7 +2957,7 @@ def fetch_events_applied_econ_workshop(base_url='https://bepp.wharton.upenn.edu/
     events = []
     for event in events_calendar:
         event['location'] = '265 JMHH'
-        event['owner'] = 'Applied Economics Workshop'
+        event['owner'] = 'Applied Economics Workshop (Wharton)'
         event['event_url'] = base_url
         event['speaker'] = event['title']
         events.append(event)
