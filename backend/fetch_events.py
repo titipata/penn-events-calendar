@@ -496,7 +496,7 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
 
 def fetch_events_math(base_url='https://www.math.upenn.edu'):
     """
-    Fetch event from Math department
+    Fetch event from Department of Mathematics
     """
     events = []
     html_page = requests.get(urljoin(base_url, '/events'))
@@ -545,7 +545,7 @@ def fetch_events_math(base_url='https://www.math.upenn.edu'):
                     'location': location,
                     'description': description,
                     'url': event_url,
-                    'owner': 'Math Department',
+                    'owner': 'Department of Mathematics (Math)',
                     'starttime': date,
                     'endtime': ''
                 })
@@ -795,45 +795,51 @@ def fetch_events_sociology(base_url='https://sociology.sas.upenn.edu'):
     html_page = requests.get(urljoin(base_url, '/events'))
     page_soup = BeautifulSoup(html_page.content, 'html.parser')
 
-    range_pages = max([int(n_page.text) for n_page in
-                       page_soup.find('div', attrs={'class': 'item-list'}).find_all('li') if n_page.text.isdigit()])
+    pagination = page_soup.find('ul', attrs={'class': 'pagination'})
+    if pagination is not None:
+        range_pages = [l.text.replace('Page', '').replace('Current page', '').strip()
+                       for l in pagination.find_all('li')]
+        range_pages = max([int(n_page) for n_page in
+                           range_pages if n_page.isdigit()])
+    else:
+        range_pages = 1
 
     for n_page in range(range_pages):
         all_events_url = urljoin(base_url, '/events?page={}'.format(n_page))
         all_events_soup = BeautifulSoup(requests.get(
             all_events_url).content, 'html.parser')
-        all_events = all_events_soup.find('div', attrs={
-                                          'id': 'content-area'}).find('div', attrs={'class': 'view-content'}).find_all('li')
+        all_events = all_events_soup.find_all(
+            'div', attrs={'class': 'events-listing'})
         for event_section in all_events:
             event_url = urljoin(base_url, event_section.find(
                 'a')['href']) if event_section.find('a') is not None else ''
-            title = event_section.find('a')
+            title = event_section.find('h3', attrs={'class': 'events-title'})
+            event_url = urljoin(base_url, title.find('a')['href'] or '')
             title = title.text.strip() if title is not None else ''
 
-            date = event_section.find('p', attrs={'class': 'dateline'})
-            date = date.text.strip() if date is not None else ''
+            date = event_section.find('span', attrs={'class': 'news-date'})
+            date = date.text.strip().replace('\nat', '') if date is not None else ''
+            starttime, endtime = find_startend_time(date)
+            if date is not '':
+                date = date.split('\n')[0]
 
-            location = event_section.find('p', attrs={'class': 'location'})
-            location = location.text.strip() if location is not None else ''
-
-            if len(event_url) != 0:
+            if event_url is not base_url:
                 event_page = BeautifulSoup(requests.get(
                     event_url).content, 'html.parser')
-                try:
-                    description = event_page.find('div', attrs={
-                                                  'class': 'field field-type-text field-field-event-title'}).text.strip()
-                except:
+                location = event_page.find('span', attrs={'class': 'metainfo'})
+                if len(location.find_all('span')) >= 2:
+                    location = location.find_all('span')[-1]
+                    location = location.text.replace(
+                        '|', '').strip() if location is not None else ''
+                else:
+                    location = ''
+
+                description = event_page.find_all(
+                    'div', attrs={'class': 'body'})
+                if len(description) >= 2:
+                    description = description[1].get_text()
+                else:
                     description = ''
-                try:
-                    starttime = event_page.find(
-                        'span', attrs={'class': 'date-display-start'}).text.strip()
-                except:
-                    starttime = ''
-                try:
-                    endtime = event_page.find(
-                        'span', attrs={'class': 'date-display-end'}).text.strip()
-                except:
-                    endtime = ''
             events.append({
                 'title': title,
                 'date': date,
@@ -842,7 +848,7 @@ def fetch_events_sociology(base_url='https://sociology.sas.upenn.edu'):
                 'location': location,
                 'description': description,
                 'url': event_url,
-                'owner': 'Sociology Department'
+                'owner': 'Department of Sociology (Sociology)'
             })
     return events
 
@@ -3035,7 +3041,8 @@ def fetch_all_events():
         fetch_events_wharton_stats, fetch_events_school_design, fetch_events_penn_museum,
         fetch_events_wharton_marketing, fetch_events_marketing_col, fetch_events_macro_seminar,
         fetch_events_micro_seminar, fetch_events_energy_econ, fetch_events_industrial_org,
-        fetch_events_applied_econ_workshop, fetch_events_public_policy
+        fetch_events_applied_econ_workshop, fetch_events_public_policy,
+        fetch_events_math
     ]
     for f in tqdm(fetch_fns):
         try:
