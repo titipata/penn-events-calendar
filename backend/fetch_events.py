@@ -13,10 +13,12 @@ from dateutil import relativedelta
 from itertools import chain
 from bs4 import BeautifulSoup, NavigableString
 from urllib.parse import urljoin
+from urllib.request import urlopen
 from tqdm import tqdm
+from ics import Calendar
 
 
-PATH_DATA = os.path.join('data', 'events.json') # path to save events
+PATH_DATA = os.path.join('data', 'events.json')  # path to save events
 GROBID_URL = 'http://localhost:8070'
 GROBID_PDF_URL = '{}/api/processFulltextDocument'.format(GROBID_URL)
 
@@ -2484,7 +2486,8 @@ def fetch_events_school_design(base_url='https://www.design.upenn.edu'):
     event_page = requests.get(urljoin(base_url, 'events-exhibitions'))
     event_soup = BeautifulSoup(event_page.content, 'html.parser')
     all_event_page = event_soup.find('div', attrs={'class': 'zone-content'})
-    all_events = all_event_page.find_all('div', attrs={'class': 'masonry-item'})
+    all_events = all_event_page.find_all(
+        'div', attrs={'class': 'masonry-item'})
 
     events = []
     for event_pane in all_events:
@@ -2495,13 +2498,16 @@ def fetch_events_school_design(base_url='https://www.design.upenn.edu'):
                 title = title.text.strip() if title is not None else ''
                 event_url = urljoin(base_url, event_url)
 
-                date = event_pane.find('span', attrs={'class': 'date-display-start'})
+                date = event_pane.find(
+                    'span', attrs={'class': 'date-display-start'})
                 if date is None:
-                    date = event_pane.find('span', attrs={'class': 'date-display-single'})
+                    date = event_pane.find(
+                        'span', attrs={'class': 'date-display-single'})
                 date = date.attrs['content']
                 date = date.split('T')[0]
 
-                event_page = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+                event_page = BeautifulSoup(requests.get(
+                    event_url).content, 'html.parser')
                 details = event_page.find_all('h2', attrs={'class': 'odd'})
                 if len(details) >= 2:
                     location = details[1]
@@ -2510,15 +2516,19 @@ def fetch_events_school_design(base_url='https://www.design.upenn.edu'):
                     location = ''
 
                 if len(details) >= 1:
-                    starttime = event_page.find_all('h2', attrs={'class': 'odd'})[0]
-                    starttime, endtime = find_startend_time(starttime.text.strip())
+                    starttime = event_page.find_all(
+                        'h2', attrs={'class': 'odd'})[0]
+                    starttime, endtime = find_startend_time(
+                        starttime.text.strip())
                 else:
                     starttime, endtime = '', ''
 
-                descriptions = event_page.find_all('div', attrs={'class': 'field-items'})[1:]
+                descriptions = event_page.find_all(
+                    'div', attrs={'class': 'field-items'})[1:]
                 description = ''
                 for d in descriptions:
-                    description += '\n'.join([p.text.strip() for p in d.find_all('p')])
+                    description += '\n'.join([p.text.strip()
+                                              for p in d.find_all('p')])
                 description = ' '.join(description.split(' ')[0:500])
 
                 events.append({
@@ -2552,17 +2562,22 @@ def fetch_events_penn_museum(base_url='https://www.penn.museum/calendar'):
                 event_url = urljoin(base_url, title.find('a').attrs['href'])
                 title = title.text.strip() if title is not None else ''
                 if 'lecture' in event_type.text.lower().strip():
-                    event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+                    event_soup = BeautifulSoup(requests.get(
+                        event_url).content, 'html.parser')
 
-                    event_details = event_soup.find('div', attrs={'itemscope': 'itemscope'})
+                    event_details = event_soup.find(
+                        'div', attrs={'itemscope': 'itemscope'})
                     title = event_details.find('h2')
                     title = title.text.strip() if title is not None else ''
-                    date, time, location, category = event_details.find('dl', attrs={'class': 'dl-horizontal'}).find_all('dd')
+                    date, time, location, category = event_details.find(
+                        'dl', attrs={'class': 'dl-horizontal'}).find_all('dd')
                     date = date.text.strip() if date is not None else ''
                     starttime, endtime = find_startend_time(time.text)
                     location = location.text.strip() if location is not None else ''
-                    description = event_soup.find('div', attrs={'itemprop': 'description'})
-                    description = '\n'.join([p.text.strip() for p in description.find_all('p') if p is not None]).strip()
+                    description = event_soup.find(
+                        'div', attrs={'itemprop': 'description'})
+                    description = '\n'.join(
+                        [p.text.strip() for p in description.find_all('p') if p is not None]).strip()
 
                     events.append({
                         'title': title,
@@ -2588,7 +2603,8 @@ def fetch_events_wharton_marketing(base_url='https://marketing.wharton.upenn.edu
     all_event_soup = BeautifulSoup(event_page.content, 'html.parser')
     event_lists = all_event_soup.find_all('tr')
 
-    date_location = all_event_soup.find_all('div', attrs={'class': 'wpb_wrapper'})[2]
+    date_location = all_event_soup.find_all(
+        'div', attrs={'class': 'wpb_wrapper'})[2]
     date_location = '\n'.join([p.text for p in date_location.find_all('p')
                                if 'location' in p.text.lower()])
     location = ''.join([l for l in date_location.split('\n')
@@ -2602,7 +2618,8 @@ def fetch_events_wharton_marketing(base_url='https://marketing.wharton.upenn.edu
     for event_list in event_lists:
         if len(event_list.find_all('td')) == 3:
             try:
-                pdf_url = event_list.find_next_sibling('ul').find('a').attrs['href']
+                pdf_url = event_list.find_next_sibling(
+                    'ul').find('a').attrs['href']
             except:
                 pdf_url = ''
 
@@ -2639,7 +2656,8 @@ def fetch_events_marketing_col(base_url='https://marketing.wharton.upenn.edu/eve
     all_event_soup = BeautifulSoup(event_page.content, 'html.parser')
     all_events = all_event_soup.find_all('div', attrs={'class': 'vc_toggle'})
 
-    date_location = all_event_soup.find_all('div', attrs={'class': 'wpb_wrapper'})[0]
+    date_location = all_event_soup.find_all(
+        'div', attrs={'class': 'wpb_wrapper'})[0]
     date_location = '\n'.join([p.text for p in date_location.find_all('p')
                                if 'location' in p.text.lower()])
     location = ''.join([l for l in date_location.split('\n')
@@ -2656,7 +2674,8 @@ def fetch_events_marketing_col(base_url='https://marketing.wharton.upenn.edu/eve
             title = date_speaker.text.strip()
             date, speaker = date_speaker.text.strip().split('~')
             speaker = speaker.replace('Speaker:', '').strip()
-            pdf_url = event.find('a')['href'] if event.find('a') is not None else ''
+            pdf_url = event.find('a')['href'] if event.find(
+                'a') is not None else ''
             if pdf_url != '':
                 _, description = parse_pdf_abstract(pdf_url)
             else:
@@ -2684,7 +2703,8 @@ def fetch_events_macro_seminar(base_url='https://fnce.wharton.upenn.edu/departme
     events = []
     event_page = requests.get(base_url)
     all_event_soup = BeautifulSoup(event_page.content, 'html.parser')
-    date_location = all_event_soup.find_all('div', attrs={'class': 'wpb_wrapper'})[1]
+    date_location = all_event_soup.find_all(
+        'div', attrs={'class': 'wpb_wrapper'})[1]
     date_location = date_location.text.strip()
     location = ''.join([l for l in date_location.split('\n')
                         if 'sh-dh' in l.lower()])
@@ -2698,7 +2718,8 @@ def fetch_events_macro_seminar(base_url='https://fnce.wharton.upenn.edu/departme
     for event_list in event_lists:
         if len(event_list.find_all('td')) == 3:
             date, speaker, title = event_list.find_all('td')
-            pdf_url = title.find('a')['href'] if title.find('a') is not None else ''
+            pdf_url = title.find('a')['href'] if title.find(
+                'a') is not None else ''
             if pdf_url != '':
                 _, description = parse_pdf_abstract(pdf_url)
             else:
@@ -2729,7 +2750,8 @@ def fetch_events_micro_seminar(base_url='https://fnce.wharton.upenn.edu/departme
     events = []
     event_page = requests.get(base_url)
     all_event_soup = BeautifulSoup(event_page.content, 'html.parser')
-    date_location = all_event_soup.find_all('div', attrs={'class': 'wpb_wrapper'})[1]
+    date_location = all_event_soup.find_all(
+        'div', attrs={'class': 'wpb_wrapper'})[1]
     date_location = date_location.text.strip()
     location = ''.join([l for l in date_location.split('\n')
                         if 'sh-dh' in l.lower()])
@@ -2743,7 +2765,8 @@ def fetch_events_micro_seminar(base_url='https://fnce.wharton.upenn.edu/departme
     for event_list in event_lists:
         if len(event_list.find_all('td')) == 3:
             date, speaker, title = event_list.find_all('td')
-            pdf_url = title.find('a')['href'] if title.find('a') is not None else ''
+            pdf_url = title.find('a')['href'] if title.find(
+                'a') is not None else ''
             if pdf_url != '':
                 _, description = parse_pdf_abstract(pdf_url)
             else:
@@ -2776,7 +2799,8 @@ def fetch_events_accounting_wharton(base_url='https://accounting.wharton.upenn.e
     all_event_soup = BeautifulSoup(event_page.content, 'html.parser')
     event_lists = all_event_soup.find_all('tr')[1:]
 
-    date_location = all_event_soup.find_all('div', attrs={'class': 'wpb_wrapper'})[2]
+    date_location = all_event_soup.find_all(
+        'div', attrs={'class': 'wpb_wrapper'})[2]
     date_location = '\n'.join([p.text for p in date_location.find_all('p')
                                if 'location' in p.text.lower()])
     location = ''.join([l for l in date_location.split('\n')
@@ -2791,7 +2815,8 @@ def fetch_events_accounting_wharton(base_url='https://accounting.wharton.upenn.e
         if len(event_list.find_all('td')) == 3:
 
             date, speaker, title = event_list.find_all('td')
-            pdf_url = title.find('a')['href'] if title.find('a') is not None else ''
+            pdf_url = title.find('a')['href'] if title.find(
+                'a') is not None else ''
             if pdf_url is not '':
                 _, description = parse_pdf_abstract(pdf_url)
             else:
@@ -2834,7 +2859,8 @@ def fetch_events_lgst_wharton(base_url='https://lgst.wharton.upenn.edu/departmen
         if len(event_list.find_all('td')) == 3:
 
             date, speaker, title = event_list.find_all('td')
-            pdf_url = title.find('a')['href'] if title.find('a') is not None else ''
+            pdf_url = title.find('a')['href'] if title.find(
+                'a') is not None else ''
             if pdf_url is not '':
                 _, description = parse_pdf_abstract(pdf_url)
             else:
@@ -2855,6 +2881,125 @@ def fetch_events_lgst_wharton(base_url='https://lgst.wharton.upenn.edu/departmen
                     'description': description,
                     'owner': 'Legal Studies & Business Ethic Department (Wharton)'
                 })
+    return events
+
+
+def read_google_ics(ics_url):
+    """
+    Fetch events directly from Google calendar ICS file
+    """
+    events = []
+    try:
+        calendar = Calendar(unidecode(requests.get(ics_url).text))
+    except:
+        calendar = Calendar(
+            unidecode(urlopen(ics_url).read().decode('iso-8859-1')))
+    for event in calendar.events:
+        if event.begin.year >= datetime.today().year:
+            date = event.begin.strftime('%d-%m-%Y')
+            starttime = event.begin.strftime("%I:%M %p")
+            endtime = event.end.strftime("%I:%M %p")
+            description = event.description
+            description = BeautifulSoup(description, 'html.parser').get_text(
+                '\n') if description is not None else ''
+            title = event.name
+            events.append({
+                'title': title,
+                'date': date,
+                'starttime': starttime,
+                'endtime': endtime,
+                'description': description
+            })
+    return events
+
+
+def fetch_events_energy_econ(base_url='https://bepp.wharton.upenn.edu/research/energy-economics-finance-seminar/'):
+    """
+    Fetch events from Energy Economics & Finance Seminar, Wharton
+    """
+    google_calendar_url = 'https://calendar.google.com/calendar/ical/p6q3dfdoaja41dencu1geh66as%40group.calendar.google.com/public/basic.ics'
+    events_calendar = read_google_ics(google_calendar_url)
+
+    events = []
+    for event in events_calendar:
+        event['location'] = 'Kleinman Center classroom—Fisher Fine Arts Room 306'
+        event['owner'] = 'Energy Economics & Finance Seminar'
+        event['event_url'] = base_url
+        event['speaker'] = event['title']
+        events.append(event)
+    return events
+
+
+def fetch_events_industrial_org(base_url='https://bepp.wharton.upenn.edu/research/industrial-organization-workshop/'):
+    """
+    Fetch events from Industrial Organization Seminar, Wharton
+    """
+    google_calendar_url = 'https://www.google.com/calendar/ical/ogllsefq4duep5dgj9dprkvjqc%40group.calendar.google.com/public/basic.ics'
+    events_calendar = read_google_ics(google_calendar_url)
+
+    events = []
+    for event in events_calendar:
+        event['location'] = 'The Ronald O. Perelman Center for Political Science and Economics (PCPSE); 133 South 36th Street – Room 101'
+        event['owner'] = 'Industrial Organization Seminar (Wharton)'
+        event['event_url'] = base_url
+        event['speaker'] = event['title']
+        events.append(event)
+    return events
+
+
+def fetch_events_applied_econ_workshop(base_url='https://bepp.wharton.upenn.edu/research/seminars-conferences/'):
+    """
+    Fetch events from Applied Economics Workshop, Wharton
+    """
+    google_calendar_url = 'https://www.google.com/calendar/ical/beppwharton%40gmail.com/public/basic.ics'
+    events_calendar = read_google_ics(google_calendar_url)
+
+    events = []
+    for event in events_calendar:
+        event['location'] = '265 JMHH'
+        event['owner'] = 'Applied Economics Workshop'
+        event['event_url'] = base_url
+        event['speaker'] = event['title']
+        events.append(event)
+    return events
+
+
+def fetch_events_public_policy(base_url='https://publicpolicy.wharton.upenn.edu/calendar/#!view/all'):
+    """
+    Fetch events from Public Policy Initiative (Wharton)
+    """
+    events = []
+    text = """
+    https://publicpolicy.wharton.upenn.edu/live/calendar/view/all?user_tz=IT&syntax=%3Cwidget%20type%3D%22events_calendar%22%3E%3Carg%20id%3D%22thumb_width%22%3E138%3C%2Farg%3E%3Carg%20id%3D%22thumb_height%22%3E138%3C%2Farg%3E%3Carg%20id%3D%22modular%22%3Etrue%3C%2Farg%3E%3C%2Fwidget%3E
+    """.strip()
+    event_json = requests.get(text).json()
+
+    for event in list(event_json['events'].values()):
+        event = event[0]
+        start_date = datetime.utcfromtimestamp(event['ts_start'])
+        end_date = datetime.utcfromtimestamp(event['ts_end'])
+        date = start_date.strftime('%d-%m-%Y')
+        starttime = start_date.strftime("%I:%M %p")
+        endtime = end_date.strftime("%I:%M %p")
+        title = event.get('title', '')
+        description = event.get('summary', '')
+        description = BeautifulSoup(description, 'html.parser').get_text(
+            '\n') if description is not None else ''
+        location = event.get('location', '')
+        speaker = event.get('custom_professor', '')
+        speaker = BeautifulSoup(speaker, 'html.parser').get_text('\n')
+        d = start_date.strftime('%Y%m%d')
+        events.append({
+            'date': date,
+            'event_url': base_url,
+            'speaker': speaker,
+            'title': title,
+            'location': location,
+            'starttime': starttime,
+            'endtime': endtime,
+            'description': description,
+            'owner': 'Public Policy Initiative (Wharton)'
+        })
     return events
 
 
@@ -2890,7 +3035,8 @@ def fetch_all_events():
         fetch_events_vet, fetch_events_gse, fetch_events_grasp,
         fetch_events_wharton_stats, fetch_events_school_design, fetch_events_penn_museum,
         fetch_events_wharton_marketing, fetch_events_marketing_col, fetch_events_macro_seminar,
-        fetch_events_micro_seminar
+        fetch_events_micro_seminar, fetch_events_energy_econ, fetch_events_industrial_org,
+        fetch_events_applied_econ_workshop, fetch_events_public_policy
     ]
     for f in tqdm(fetch_fns):
         try:
@@ -2936,7 +3082,8 @@ def fetch_all_events():
         events_df.loc[pd.isnull(events_df.event_index), 'event_index'] = list(
             range(event_idx_begin, event_idx_end)
         )
-        events_df.loc[:, 'event_index'] = events_df.loc[:, 'event_index'].astype(int)
+        events_df.loc[:, 'event_index'] = events_df.loc[:,
+                                                        'event_index'].astype(int)
 
         events_json['refresh_count'] = events_json['refresh_count'] + 1
         events_json['modified_date'] = datetime.now().strftime('%d-%m-%Y')
