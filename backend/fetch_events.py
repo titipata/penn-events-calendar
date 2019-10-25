@@ -2990,7 +2990,7 @@ def fetch_events_json(base_url, json_url, owner):
         speaker = event.get('custom_professor', '')
         speaker = BeautifulSoup(speaker, 'html.parser').get_text('\n')
         d = start_date.strftime('%Y%m%d')
-        if not any([k in title.lower() for k in ['registration', 'break', 'schedule']]):
+        if not any([k in title.lower() for k in ['registration', 'break', 'schedule', ' tbd']]):
             events.append({
                 'date': date,
                 'url': base_url,
@@ -3012,7 +3012,11 @@ def fetch_events_public_policy(base_url='https://publicpolicy.wharton.upenn.edu/
     json_url = """
     https://publicpolicy.wharton.upenn.edu/live/calendar/view/all?user_tz=IT&syntax=%3Cwidget%20type%3D%22events_calendar%22%3E%3Carg%20id%3D%22thumb_width%22%3E138%3C%2Farg%3E%3Carg%20id%3D%22thumb_height%22%3E138%3C%2Farg%3E%3Carg%20id%3D%22modular%22%3Etrue%3C%2Farg%3E%3C%2Fwidget%3E
     """.strip()
-    events = fetch_events_json(base_url, json_url, 'Public Policy Initiative (Wharton)')
+    events = fetch_events_json(
+        base_url,
+        json_url,
+        'Public Policy Initiative (Wharton)'
+    )
     return events
 
 
@@ -3023,7 +3027,11 @@ def fetch_events_nursing(base_url='https://www.nursing.upenn.edu/calendar/#!view
     json_url = """
     https://www.nursing.upenn.edu/live/calendar/view/all?user_tz=IT&syntax=%3Cwidget%20type%3D%22events_calendar%22%3E%3Carg%20id%3D%22mini_cal_heat_map%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22thumb_width%22%3E200%3C%2Farg%3E%3Carg%20id%3D%22thumb_height%22%3E200%3C%2Farg%3E%3Carg%20id%3D%22modular%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22show_public%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22default_view%22%3Emonth%3C%2Farg%3E%3Carg%20id%3D%22exclude_group%22%3EWeb%20Admin%3C%2Farg%3E%3C%2Fwidget%3E
     """.strip()
-    events = fetch_events_json(base_url, json_url, 'Nursing')
+    events = fetch_events_json(
+        base_url,
+        json_url,
+        'Nursing'
+    )
     return events
 
 
@@ -3034,8 +3042,11 @@ def fetch_events_gcb(base_url='https://events.med.upenn.edu/gcb/#!view/all'):
     json_url = """
     https://events.med.upenn.edu/live/calendar/view/all?user_tz=IT&syntax=%3Cwidget%20type%3D%22events_calendar%22%3E%3Carg%20id%3D%22mini_cal_heat_map%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22thumb_width%22%3E200%3C%2Farg%3E%3Carg%20id%3D%22thumb_height%22%3E200%3C%2Farg%3E%3Carg%20id%3D%22hide_repeats%22%3Efalse%3C%2Farg%3E%3Carg%20id%3D%22show_groups%22%3Efalse%3C%2Farg%3E%3Carg%20id%3D%22show_tags%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22default_view%22%3Eday%3C%2Farg%3E%3Carg%20id%3D%22group%22%3EGenomics%20and%20Computational%20Biology%20Graduate%20Group%20%28GCB%29%3C%2Farg%3E%3Carg%20id%3D%22group%22%3EBiomedical%20Graduate%20Studies%20%28BGS%29%3C%2Farg%3E%3Carg%20id%3D%22tag%22%3EGCB%3C%2Farg%3E%3Carg%20id%3D%22webcal_feed_links%22%3Etrue%3C%2Farg%3E%3C%2Fwidget%3E
     """.strip()
-    event_json = requests.get(text).json()
-    events = fetch_events_json(base_url, json_url, 'Genomics and Computational Biology Graduate Group (GCB)')
+    events = fetch_events_json(
+        base_url,
+        json_url,
+        'Genomics and Computational Biology Graduate Group (GCB)'
+    )
     return events
 
 
@@ -3048,7 +3059,7 @@ def drop_duplicate_events(df):
     event_index = df.event_index.iloc[0]
     r = df.iloc[-1].to_dict()
     r['event_index'] = event_index
-    return pd.Series(r)
+    return r
 
 
 def fetch_all_events():
@@ -3110,15 +3121,15 @@ def fetch_all_events():
         events_df = pd.concat(
             (events_former_df, events_df), axis=0, sort=False
         )
-        events_df = events_df.groupby(
-            group_columns, as_index=False, level=0
-        ).apply(drop_duplicate_events)
+        events_df = pd.DataFrame([drop_duplicate_events(df_)
+                                 for _, df_ in events_df.groupby(group_columns)])
         events_df.sort_values('event_index', na_position='last', inplace=True)
         event_idx_begin = events_former_df['event_index'].max() + 1
         event_idx_end = event_idx_begin + events_df.event_index.isnull().sum()
-        events_df.loc[pd.isnull(events_df.event_index), 'event_index'] = list(
-            range(event_idx_begin, event_idx_end)
-        )
+        if event_idx_begin != event_idx_end:
+            events_df.loc[pd.isnull(events_df.event_index), 'event_index'] = list(
+                range(event_idx_begin, event_idx_end)
+            )
         events_df.loc[:, 'event_index'] = events_df.loc[:,
                                                         'event_index'].astype(int)
 
