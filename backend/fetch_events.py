@@ -3227,6 +3227,25 @@ def drop_duplicate_events(df):
 def fetch_all_events():
     events = []
     fetch_fns = [
+        fetch_events_cni, fetch_events_english_dept, fetch_events_crim,
+        fetch_events_mec, fetch_events_biology, fetch_events_economics,
+        fetch_events_philosophy, fetch_events_classical_studies, fetch_events_linguistic,
+        fetch_events_earth_enviromental_science, fetch_events_art_history, fetch_events_sociology,
+        fetch_events_cceb, fetch_events_cis, fetch_events_CURF,
+        fetch_events_upibi, fetch_events_ldi, fetch_events_korean_studies,
+        fetch_events_HIP, fetch_events_italian_studies, fetch_events_CEMB,
+        fetch_events_CEAS, fetch_events_CASI, fetch_events_african_studies,
+        fetch_events_business_ethics, fetch_events_law, fetch_events_penn_SAS,
+        fetch_events_physics_astronomy, fetch_events_wolf_humanities, fetch_events_music_dept,
+        fetch_events_annenberg, fetch_events_religious_studies, fetch_events_AHEAD,
+        fetch_events_SPP, fetch_events_ortner_center, fetch_events_penn_today,
+        fetch_events_mins, fetch_events_mindcore, fetch_events_seas,
+        fetch_events_vet, fetch_events_gse, fetch_events_grasp,
+        fetch_events_wharton_stats, fetch_events_school_design, fetch_events_penn_museum,
+        fetch_events_wharton_marketing, fetch_events_marketing_col, fetch_events_macro_seminar,
+        fetch_events_micro_seminar, fetch_events_energy_econ, fetch_events_industrial_org,
+        fetch_events_applied_econ_workshop, fetch_events_public_policy,
+        fetch_events_math, fetch_events_nursing, fetch_events_gcb,
         fetch_events_ppe, fetch_events_perry_world, fetch_events_psychology,
         fetch_events_neuro_wharton
     ]
