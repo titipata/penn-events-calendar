@@ -650,44 +650,39 @@ def fetch_events_linguistic(base_url='https://www.ling.upenn.edu'):
     events = []
     html_page = requests.get(urljoin(base_url, '/events'))
     page_soup = BeautifulSoup(html_page.content, 'html.parser')
-    for event in page_soup.find('div', attrs={'class': 'view-content'}).find_all('li'):
-        if event.find('a') is not None:
-            event_url = urljoin(base_url, event.find('a')['href'])
-            event_page = requests.get(event_url)
-            event_soup = BeautifulSoup(event_page.content, 'html.parser')
-            title = event_soup.find(
-                'h1', attrs={'class': 'title'}).text.strip()
-            try:
-                location = event.find(
-                    'div', attrs={'class': 'field field-type-text field-field-event-location'})
-                location = location.text.strip() if location is not None else ''
-            except:
-                location = ''
-            date = event_soup.find(
-                'span', attrs={'class': 'date-display-single'})
-            date = date.text.strip() if date is not None else ''
-            try:
-                starttime = event_soup.find(
-                    'span', attrs={'class': 'date-display-start'}).text.strip()
-            except:
-                starttime = ''
-            try:
-                endtime = event_soup.find(
-                    'span', attrs={'class': 'date-display-end'}).text.strip()
-            except:
-                endtime = ''
-            description = event_soup.find('div', attrs={
-                                          'id': 'content-area'}).find('div', attrs={'class': 'content'}).text.strip()
-            events.append({
-                'title': title,
-                'date': date,
-                'location': location,
-                'description': description,
-                'url': event_url,
-                'starttime': starttime,
-                'endtime': endtime,
-                'owner': 'Department of Linguistics'
-            })
+
+    event_pane = page_soup.find('div', attrs={'class': 'view-content'})
+    all_events = event_pane.find_all('div', attrs={'class': 'events-listing'})
+
+    for event in all_events:
+        title = event.find('h3', attrs={'class': 'events-title'})
+        if title is not None:
+            event_url = title.find('a')['href'] if title.find('a') is not None else ''
+            event_url = urljoin(base_url, event_url)
+            title = title.text.strip() if title is not None else ''
+
+        date_time = event.find('span', attrs={'class': 'news-date'})
+        starttime, endtime = find_startend_time(date_time.text)
+        date = date_time.text.replace('When:', '').strip().split('\n')[0]
+
+        location = event.find('span', attrs={'class': 'metainfo'}).find('p')
+        location = location.text.replace('Where:', '').strip() if location is not None else ''
+
+        event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+        description = event_soup.find('div', attrs={'class': 'body'})
+        description = description.get_text() if description is not None else ''
+
+        events.append({
+            'title': title,
+            'date': date,
+            'location': location,
+            'description': description,
+            'url': event_url,
+            'starttime': starttime,
+            'endtime': endtime,
+            'speaker': title.split(': ')[-1] if ': ' in title else '',
+            'owner': 'Department of Linguistics'
+        })
     return events
 
 
@@ -3050,6 +3045,173 @@ def fetch_events_gcb(base_url='https://events.med.upenn.edu/gcb/#!view/all'):
     return events
 
 
+def fetch_events_ppe(base_url='https://ppe.sas.upenn.edu/events'):
+    """
+    Fetch events from Philosophy Politics & Economics (PPE)
+    """
+    events = []
+    html_page = requests.get(urljoin(base_url, '/events'))
+    page_soup = BeautifulSoup(html_page.content, 'html.parser')
+    all_events = page_soup.find_all('ul', attrs={'class': 'unstyled'})[1]
+
+    for event in all_events.find_all('li'):
+        title = event.find('h3', attrs={'class': 'field-content'})
+        if title is not None:
+            event_url = title.find('a')['href'] if title.find('a') is not None else ''
+            event_url = urljoin(base_url, event_url)
+            title = title.text.strip() if title is not None else ''
+
+        date = event.find('p', attrs={'class': 'dateline'})
+        date = date.text.strip() if date is not None else ''
+
+        location = event.find('div', attrs={'class': 'location'})
+        location = location.text.strip() if location is not None else ''
+
+        if event_url is not base_url:
+            event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+            description = event_soup.find('div', attrs={'class': 'field-items'})
+            description = description.get_text() if description is not None else ''
+            date_time = event_soup.find('span', attrs={'class': 'date-display-single'})
+            starttime, endtime = find_startend_time(date_time.get_text())
+        else:
+            description, starttime, endtime = '', '', ''
+        events.append({
+            'date': date,
+            'url': event_url,
+            'speaker': '',
+            'title': title,
+            'location': location,
+            'starttime': starttime,
+            'endtime': endtime,
+            'description': description.strip(),
+            'owner': 'Philosophy Politics & Economics (PPE)'
+        })
+    return events
+
+
+def fetch_events_perry_world(base_url='https://global.upenn.edu/perryworldhouse/events'):
+    """
+    Fetch events from Perry World House
+    """
+    events = []
+    html_page = requests.get(base_url)
+    page_soup = BeautifulSoup(html_page.content, 'html.parser')
+    all_events = page_soup.find_all('article')
+
+    for event in all_events:
+        event_url = urljoin(base_url, event.attrs['about'])
+        title = event.find('span', attrs={'class': 'events-teaser__heading'})
+        title = title.text.strip() if title is not None else ''
+        date_time = event.find('div', attrs={'class': 'events-teaser__divider-text'})
+        starttime, endtime = find_startend_time(date_time.get_text())
+        date = date_time.get_text().strip().split('\n')[0].strip()
+
+        if event_url is not base_url:
+            event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+            description = event_soup.find('div', attrs={'class': 'events-details-page__content'})
+            description = description.get_text().strip() if description is not None else ''
+            description = ' '.join(description.split(' ')[0:500])
+            location = event_soup.find('div', attrs={'class': 'events-details-page__top__content__location'})
+            location = location.text.strip() if location is not None else ''
+        else:
+            description, location = '', '', ''
+
+        events.append({
+            'date': date,
+            'url': event_url,
+            'speaker': '',
+            'title': title,
+            'location': location,
+            'starttime': starttime,
+            'endtime': endtime,
+            'description': description.strip(),
+            'owner': 'Perry World House'
+        })
+    return events
+
+
+def fetch_events_psychology(base_url='https://psychology.sas.upenn.edu/calendar'):
+    """
+    Fetch events from Department of Psychology
+    """
+    events = []
+    html_page = requests.get(base_url)
+    page_soup = BeautifulSoup(html_page.content, 'html.parser')
+    all_events = page_soup.find_all('div', attrs={'class': 'calendar'})
+
+    for event in all_events:
+        title = event.find('a')
+        event_url = title['href'] if title is not None else ''
+        event_url = urljoin(base_url, event_url)
+        title = title.text.strip() if title is not None else ''
+        date_time = event.find('span', attrs={'class': 'date-display-single'})
+        starttime, endtime = find_startend_time(date_time.get_text())
+        date = date_time.get_text().strip().split('\n')[0].strip()
+
+        if event_url is not base_url:
+            event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+            description = event_soup.find('div', attrs={'class': 'field-name-body'})
+            description = description.get_text().strip() if description is not None else ''
+            description = ' '.join(description.split(' ')[0:500])
+            location = event_soup.find_all('div', attrs={'class': 'field-item even'})
+            location = location[1] if len(location) >=2 else ''
+        else:
+            description, location = '', ''
+
+        events.append({
+            'date': date,
+            'url': event_url,
+            'speaker': '',
+            'title': title,
+            'location': '',
+            'starttime': starttime,
+            'endtime': endtime,
+            'description': description.strip(),
+            'owner': 'Department of Psychology (Psychology)'
+        })
+    return events
+
+
+def fetch_events_neuro_wharton(base_url='https://neuro.wharton.upenn.edu/events/'):
+    """
+    Fetch events from Wharton Nueroscience Intiative
+    ref: https://neuro.wharton.upenn.edu/events/
+    """
+    events = []
+    html_page = requests.get(base_url)
+    page_soup = BeautifulSoup(html_page.content, 'html.parser')
+    all_events = page_soup.find('div', attrs={'class': 'tribe-events-loop'})
+
+    for event in all_events.find_all('div', attrs={'class': 'type-tribe_events'}):
+        event_url = event.find('a').attrs['href']
+        title = event.find('a').attrs['title']
+        date = event.find('div', attrs={'class': 'calendar-page'})
+        date = date.get_text() if date is not None else ''
+
+        event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+        date_time_loc = event_soup.find('div', attrs={'class': 'tribe-events-content-header group'})
+        date_time_loc = date_time_loc.find('h3') if date_time_loc is not None else ''
+        date_time_loc = date_time_loc.get_text().strip()
+        date = date_time_loc.split('\n')[0]
+        location = date_time_loc.split('\n')[-1]
+        starttime, endtime = find_startend_time(date)
+        description = event_soup.find('div', attrs={'class': 'tribe-events-content-wrapper'})
+        description = description.get_text().strip() if description is not None else ''
+
+        events.append({
+            'date': date.split('|')[0],
+            'url': event_url,
+            'speaker': '',
+            'title': title,
+            'location': location,
+            'starttime': starttime,
+            'endtime': endtime,
+            'description': description.strip(),
+            'owner': 'Wharton Neuroscience Initiative'
+        })
+    return events
+
+
 def drop_duplicate_events(df):
     """
     Function to group dataframe, use all new information from the latest row
@@ -3071,7 +3233,6 @@ def fetch_all_events():
         fetch_events_earth_enviromental_science, fetch_events_art_history, fetch_events_sociology,
         fetch_events_cceb, fetch_events_cis, fetch_events_CURF,
         fetch_events_upibi, fetch_events_ldi, fetch_events_korean_studies,
-        fetch_events_cscc, fetch_events_fels, fetch_events_sciencehistory,
         fetch_events_HIP, fetch_events_italian_studies, fetch_events_CEMB,
         fetch_events_CEAS, fetch_events_CASI, fetch_events_african_studies,
         fetch_events_business_ethics, fetch_events_law, fetch_events_penn_SAS,
@@ -3084,7 +3245,9 @@ def fetch_all_events():
         fetch_events_wharton_marketing, fetch_events_marketing_col, fetch_events_macro_seminar,
         fetch_events_micro_seminar, fetch_events_energy_econ, fetch_events_industrial_org,
         fetch_events_applied_econ_workshop, fetch_events_public_policy,
-        fetch_events_math, fetch_events_nursing, fetch_events_gcb
+        fetch_events_math, fetch_events_nursing, fetch_events_gcb,
+        fetch_events_ppe, fetch_events_perry_world, fetch_events_psychology,
+        fetch_events_neuro_wharton
     ]
     for f in tqdm(fetch_fns):
         try:
