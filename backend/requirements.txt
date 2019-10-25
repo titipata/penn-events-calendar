@@ -11,3 +11,4 @@ spacy
 scikit-learn
 nltk
 unidecode
+ics
