@@ -4,6 +4,7 @@ import json
 import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
+from dateutil import parser
 from scipy.spatial.distance import cosine
 
 from elasticsearch import Elasticsearch
@@ -30,7 +31,7 @@ es = Elasticsearch([
 es_search = Search(using=es)
 
 
-def get_future_event(date, days=0, hours=6):
+def get_future_event(date, days=0, hours=9):
     """
     Function to get future or recent events
 
@@ -41,7 +42,7 @@ def get_future_event(date, days=0, hours=6):
     date: str, date string in '%d-%m-%Y'
     """
     try:
-        if datetime.strptime(date, '%d-%m-%Y') > (datetime.now() - timedelta(days=days, hours=hours)):
+        if datetime.now() - timedelta(days=days, hours=hours) <= parser.parse(date, dayfirst=True):
             return True
         else:
             return False
@@ -108,7 +109,7 @@ def query(search_query: hug.types.text):
 
     # return future events for a given query
     future_events_indices, relevances = [], []
-    for response in filter(lambda r: get_future_event(r['_source']['date_dt']), search_responses):
+    for response in filter(lambda r: get_future_event('{} {}'.format(r['_source']['date_dt'], r['_source']['starttime'])), search_responses):
         future_events_indices.append(response['_id'])
         relevances.append(response['_score'])
     relevances = [int(100 * (r / max(relevances)))
