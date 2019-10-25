@@ -2966,23 +2966,22 @@ def fetch_events_applied_econ_workshop(base_url='https://bepp.wharton.upenn.edu/
     return events
 
 
-def fetch_events_public_policy(base_url='https://publicpolicy.wharton.upenn.edu/calendar/#!view/all'):
-    """
-    Fetch events from Public Policy Initiative (Wharton)
-    """
+def fetch_events_json(base_url, json_url, owner):
     events = []
-    text = """
-    https://publicpolicy.wharton.upenn.edu/live/calendar/view/all?user_tz=IT&syntax=%3Cwidget%20type%3D%22events_calendar%22%3E%3Carg%20id%3D%22thumb_width%22%3E138%3C%2Farg%3E%3Carg%20id%3D%22thumb_height%22%3E138%3C%2Farg%3E%3Carg%20id%3D%22modular%22%3Etrue%3C%2Farg%3E%3C%2Fwidget%3E
-    """.strip()
-    event_json = requests.get(text).json()
-
+    event_json = requests.get(json_url.strip()).json()
     for event in list(event_json['events'].values()):
         event = event[0]
-        start_date = datetime.utcfromtimestamp(event['ts_start'])
-        end_date = datetime.utcfromtimestamp(event['ts_end'])
+        if event.get('ts_start') is not None:
+            start_date = datetime.utcfromtimestamp(event['ts_start'])
+            starttime = start_date.strftime("%I:%M %p")
+        else:
+            starttime = ''
+        if event.get('ts_end') is not None:
+            end_date = datetime.utcfromtimestamp(event['ts_end'])
+            endtime = end_date.strftime("%I:%M %p")
+        else:
+            endtime = ''
         date = start_date.strftime('%d-%m-%Y')
-        starttime = start_date.strftime("%I:%M %p")
-        endtime = end_date.strftime("%I:%M %p")
         title = event.get('title', '')
         description = event.get('summary', '')
         description = BeautifulSoup(description, 'html.parser').get_text(
@@ -2991,17 +2990,52 @@ def fetch_events_public_policy(base_url='https://publicpolicy.wharton.upenn.edu/
         speaker = event.get('custom_professor', '')
         speaker = BeautifulSoup(speaker, 'html.parser').get_text('\n')
         d = start_date.strftime('%Y%m%d')
-        events.append({
-            'date': date,
-            'url': base_url,
-            'speaker': speaker,
-            'title': title,
-            'location': location,
-            'starttime': starttime,
-            'endtime': endtime,
-            'description': description,
-            'owner': 'Public Policy Initiative (Wharton)'
-        })
+        if not any([k in title.lower() for k in ['registration', 'break', 'schedule']]):
+            events.append({
+                'date': date,
+                'url': base_url,
+                'speaker': speaker,
+                'title': title,
+                'location': location,
+                'starttime': starttime,
+                'endtime': endtime,
+                'description': description.strip(),
+                'owner': owner
+            })
+    return events
+
+
+def fetch_events_public_policy(base_url='https://publicpolicy.wharton.upenn.edu/calendar/#!view/all'):
+    """
+    Fetch events from Public Policy Initiative (Wharton)
+    """
+    json_url = """
+    https://publicpolicy.wharton.upenn.edu/live/calendar/view/all?user_tz=IT&syntax=%3Cwidget%20type%3D%22events_calendar%22%3E%3Carg%20id%3D%22thumb_width%22%3E138%3C%2Farg%3E%3Carg%20id%3D%22thumb_height%22%3E138%3C%2Farg%3E%3Carg%20id%3D%22modular%22%3Etrue%3C%2Farg%3E%3C%2Fwidget%3E
+    """.strip()
+    events = fetch_events_json(base_url, json_url, 'Public Policy Initiative (Wharton)')
+    return events
+
+
+def fetch_events_nursing(base_url='https://www.nursing.upenn.edu/calendar/#!view/all'):
+    """
+    Fetch events from Penn Nursing
+    """
+    json_url = """
+    https://www.nursing.upenn.edu/live/calendar/view/all?user_tz=IT&syntax=%3Cwidget%20type%3D%22events_calendar%22%3E%3Carg%20id%3D%22mini_cal_heat_map%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22thumb_width%22%3E200%3C%2Farg%3E%3Carg%20id%3D%22thumb_height%22%3E200%3C%2Farg%3E%3Carg%20id%3D%22modular%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22show_public%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22default_view%22%3Emonth%3C%2Farg%3E%3Carg%20id%3D%22exclude_group%22%3EWeb%20Admin%3C%2Farg%3E%3C%2Fwidget%3E
+    """.strip()
+    events = fetch_events_json(base_url, json_url, 'Nursing')
+    return events
+
+
+def fetch_events_gcb(base_url='https://events.med.upenn.edu/gcb/#!view/all'):
+    """
+    Fetch events from Penn
+    """
+    json_url = """
+    https://events.med.upenn.edu/live/calendar/view/all?user_tz=IT&syntax=%3Cwidget%20type%3D%22events_calendar%22%3E%3Carg%20id%3D%22mini_cal_heat_map%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22thumb_width%22%3E200%3C%2Farg%3E%3Carg%20id%3D%22thumb_height%22%3E200%3C%2Farg%3E%3Carg%20id%3D%22hide_repeats%22%3Efalse%3C%2Farg%3E%3Carg%20id%3D%22show_groups%22%3Efalse%3C%2Farg%3E%3Carg%20id%3D%22show_tags%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22default_view%22%3Eday%3C%2Farg%3E%3Carg%20id%3D%22group%22%3EGenomics%20and%20Computational%20Biology%20Graduate%20Group%20%28GCB%29%3C%2Farg%3E%3Carg%20id%3D%22group%22%3EBiomedical%20Graduate%20Studies%20%28BGS%29%3C%2Farg%3E%3Carg%20id%3D%22tag%22%3EGCB%3C%2Farg%3E%3Carg%20id%3D%22webcal_feed_links%22%3Etrue%3C%2Farg%3E%3C%2Fwidget%3E
+    """.strip()
+    event_json = requests.get(text).json()
+    events = fetch_events_json(base_url, json_url, 'Genomics and Computational Biology Graduate Group (GCB)')
     return events
 
 
@@ -3020,26 +3054,7 @@ def drop_duplicate_events(df):
 def fetch_all_events():
     events = []
     fetch_fns = [
-        fetch_events_cni, fetch_events_english_dept, fetch_events_crim,
-        fetch_events_mec, fetch_events_biology, fetch_events_economics,
-        fetch_events_philosophy, fetch_events_classical_studies, fetch_events_linguistic,
-        fetch_events_earth_enviromental_science, fetch_events_art_history, fetch_events_sociology,
-        fetch_events_cceb, fetch_events_cis, fetch_events_CURF,
-        fetch_events_upibi, fetch_events_ldi, fetch_events_korean_studies,
-        fetch_events_cscc, fetch_events_fels, fetch_events_sciencehistory,
-        fetch_events_HIP, fetch_events_italian_studies, fetch_events_CEMB,
-        fetch_events_CEAS, fetch_events_CASI, fetch_events_african_studies,
-        fetch_events_business_ethics, fetch_events_law, fetch_events_penn_SAS,
-        fetch_events_physics_astronomy, fetch_events_wolf_humanities, fetch_events_music_dept,
-        fetch_events_annenberg, fetch_events_religious_studies, fetch_events_AHEAD,
-        fetch_events_SPP, fetch_events_ortner_center, fetch_events_penn_today,
-        fetch_events_mins, fetch_events_mindcore, fetch_events_seas,
-        fetch_events_vet, fetch_events_gse, fetch_events_grasp,
-        fetch_events_wharton_stats, fetch_events_school_design, fetch_events_penn_museum,
-        fetch_events_wharton_marketing, fetch_events_marketing_col, fetch_events_macro_seminar,
-        fetch_events_micro_seminar, fetch_events_energy_econ, fetch_events_industrial_org,
-        fetch_events_applied_econ_workshop, fetch_events_public_policy,
-        fetch_events_math
+        fetch_events_nursing, fetch_events_gcb
     ]
     for f in tqdm(fetch_fns):
         try:
