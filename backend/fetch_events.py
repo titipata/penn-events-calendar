@@ -536,17 +536,18 @@ def fetch_events_math(base_url='https://www.math.upenn.edu'):
                 description = event_soup.find('div', attrs={'class': 'field-body'})
                 description = description.get_text().strip() if description is not None else ''
 
-            events.append({
-                'title': title,
-                'date': date,
-                'speaker': speaker,
-                'location': location,
-                'description': description,
-                'url': event_url,
-                'owner': 'Department of Mathematics (Math)',
-                'starttime': starttime,
-                'endtime': endtime
-            })
+            if title != 'TBA' or title != 'TBD':
+                events.append({
+                    'title': title,
+                    'date': date,
+                    'speaker': speaker,
+                    'location': location,
+                    'description': description,
+                    'url': event_url,
+                    'owner': 'Department of Mathematics (Math)',
+                    'starttime': starttime,
+                    'endtime': endtime
+                })
     return events
 
 
