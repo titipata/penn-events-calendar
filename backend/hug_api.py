@@ -3,7 +3,7 @@ import hug
 import json
 import numpy as np
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, timedelta
 from scipy.spatial.distance import cosine
 
 from elasticsearch import Elasticsearch
@@ -30,12 +30,18 @@ es = Elasticsearch([
 es_search = Search(using=es)
 
 
-def get_future_event(date):
+def get_future_event(date, days=0, hours=6):
     """
-    Function return True if the event happens after now
+    Function to get future or recent events
+
+    It returns True if the event happens before determined certain days and hours
+
+    Input
+    =====
+    date: str, date string in '%d-%m-%Y'
     """
     try:
-        if datetime.strptime(date, '%d-%m-%Y') > datetime.now():
+        if datetime.strptime(date, '%d-%m-%Y') > (datetime.now() - timedelta(days=days, hours=hours)):
             return True
         else:
             return False
