@@ -35,6 +35,9 @@ const Layout = ({ children }) => (
       <StyledLink to="/recommendations">
         Recommendations
       </StyledLink>
+      <StyledLink to="/how-it-works">
+        Usage
+      </StyledLink>
     </NavBar>
 
     <Container>

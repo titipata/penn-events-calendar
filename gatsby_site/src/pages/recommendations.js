@@ -73,7 +73,7 @@ export default ({ data, location }) => {
       <EventsContainer
         isLoading={isLoading}
         allEvents={recommendedEvents}
-        noEventDefaultText="Add some events to your library to see our recommendations."
+        noEventDefaultText="Add some events to your library to see your recommendations."
       />
     </Layout>
   );
