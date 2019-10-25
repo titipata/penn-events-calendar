@@ -508,49 +508,45 @@ def fetch_events_math(base_url='https://www.math.upenn.edu'):
                    for page in pagination.find_all('li') if page.text.isdigit()])
 
     for page in range(n_pages):
-        all_event_url = 'https://www.math.upenn.edu/events/?page=%s' % str(
-            page)
+        all_event_url = 'https://www.math.upenn.edu/events/?page={}'.format(page)
         all_event_page = requests.get(all_event_url)
         all_event_soup = BeautifulSoup(all_event_page.content, 'html.parser')
+        all_events = all_event_soup.find('div', attrs={'class': 'item-list'})
 
-        event_urls = [urljoin(base_url, header.find('a')['href']) for header in all_event_soup.find_all('h3')
-                      if 'events' in header.find('a')['href']]
+        for event in all_events.find_all('li'):
+            title_ = event.find('h3')
+            title = title_.text.strip() if title_ is not None else ''
+            date = event.find('p', attrs={'class': 'dateline'})
+            starttime, endtime = find_startend_time(date.get_text())
+            date = date.text.strip() if date is not None else ''
+            location = event.find_all('div')[-1].get_text()
 
-        for event_url in event_urls:
-            event_page = requests.get(event_url)
-            event_soup = BeautifulSoup(event_page.content, 'html.parser')
-            try:
-                event_detail_soup = event_soup.find(
-                    'div', attrs={'class': "pull-right span9"})
-                title = event_detail_soup.find(
-                    'h3', attrs={'class': 'field-og-group-ref'}).find('a').text
-                date = event_detail_soup.find(
-                    'p', attrs={'class': 'field-date'}).text.strip()
-                speaker = event_detail_soup.find(
-                    'h4', attrs={'class': 'field-speaker-name'}).text.strip()
-                speaker_affil = event_detail_soup.find(
-                    'p', attrs={'class': 'field-speaker-affiliation'}).text.strip()
-                location = event_detail_soup.find(
-                    'div', attrs={'class': 'fieldset-wrapper'}).text.strip()
-                description_soup = event_detail_soup.find(
-                    'div', attrs={'class': 'field-body'})
-                if description_soup is not None:
-                    description = description_soup.text.strip()
-                else:
-                    description = ''
-                events.append({
-                    'title': title,
-                    'date': date,
-                    'speaker': speaker + ', ' + speaker_affil,
-                    'location': location,
-                    'description': description,
-                    'url': event_url,
-                    'owner': 'Department of Mathematics (Math)',
-                    'starttime': date,
-                    'endtime': ''
-                })
-            except:
-                pass
+            if title_.find('a')['href'] is not None:
+                event_url = urljoin(base_url, title_.find('a')['href'])
+            else:
+                event_url = base_url
+            if event_url is not base_url:
+                event_page = requests.get(event_url)
+                event_soup = BeautifulSoup(event_page.content, 'html.parser')
+                speaker = event_soup.find('h4', attrs={'class': 'field-speaker-name'})
+                speaker = speaker.text.strip() if speaker is not None else ''
+                affil = event_soup.find('p', attrs={'class': 'field-speaker-affiliation'})
+                affil = affil.text.strip() if affil is not None else ''
+                speaker = '{}, {}'.format(speaker, affil)
+                description = event_soup.find('div', attrs={'class': 'field-body'})
+                description = description.get_text().strip() if description is not None else ''
+
+            events.append({
+                'title': title,
+                'date': date,
+                'speaker': speaker,
+                'location': location,
+                'description': description,
+                'url': event_url,
+                'owner': 'Department of Mathematics (Math)',
+                'starttime': starttime,
+                'endtime': endtime
+            })
     return events
 
 
