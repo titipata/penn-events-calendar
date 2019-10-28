@@ -173,7 +173,7 @@ def parse_pdf_abstract(pdf_url):
         title = pdf_soup.find('title')
         title = title.text if title is not None else ''
         description = pdf_soup.find('abstract')
-        description = description.text.strip() if description is not None else ''
+        description = description.get_text().strip() if description is not None else ''
         if description == '':
             description = pdf_soup.find('div')
             description = description.text.strip() if description is not None else ''
@@ -467,13 +467,7 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
                 pdf_path = event_soup.find(
                     'a', attrs={'class': 'btn btn-lg btn-primary btn-download'})['href']
                 pdf_url = urljoin('https://economics.sas.upenn.edu/', pdf_path)
-                parsed_article = requests.post(
-                    GROBID_PDF_URL, files={'input': requests.get(pdf_url).content}).text
-                pdf_soup = BeautifulSoup(parsed_article, 'lxml')
-                title = pdf_soup.find('title')
-                title = title.text if title is not None else ''
-                description = pdf_soup.find('abstract')
-                description = description.text.strip() if description is not None else ''
+                _, description = parse_pdf_abstract(pdf_url)
                 description = ' '.join(description.split(' ')[0:500])
             except:
                 description = ''
@@ -536,7 +530,7 @@ def fetch_events_math(base_url='https://www.math.upenn.edu'):
                 description = event_soup.find('div', attrs={'class': 'field-body'})
                 description = description.get_text().strip() if description is not None else ''
 
-            if title != 'TBA' or title != 'TBD':
+            if not any([k == title for k in ['TBA', 'TBD']]):
                 events.append({
                     'title': title,
                     'date': date,
@@ -576,7 +570,7 @@ def fetch_events_philosophy(base_url='https://philosophy.sas.upenn.edu'):
             event_time = event_time.text.strip() if event_time is not None else ''
             starttime, endtime = find_startend_time(event_time)
             description = event_soup.find('div', attrs={'class': 'field-body'})
-            description = description.text.strip() if description is not None else ''
+            description = description.get_text().strip() if description is not None else ''
 
             events.append({
                 'title': title,
@@ -620,7 +614,7 @@ def fetch_events_classical_studies(base_url='https://www.classics.upenn.edu'):
             description = event_soup.find('div', attrs={
                                           'class': 'field field-name-body field-type-text-with-summary field-label-hidden'})
             if description is not None:
-                description = description.text
+                description = description.text.strip()
             else:
                 description = ''
             try:
@@ -2962,6 +2956,9 @@ def fetch_events_applied_econ_workshop(base_url='https://bepp.wharton.upenn.edu/
 
 
 def fetch_events_json(base_url, json_url, owner):
+    """
+    Function to get data from JSON url and transform to the same format we use
+    """
     events = []
     event_json = requests.get(json_url.strip()).json()
     for event in list(event_json['events'].values()):
@@ -3032,7 +3029,7 @@ def fetch_events_nursing(base_url='https://www.nursing.upenn.edu/calendar/#!view
 
 def fetch_events_gcb(base_url='https://events.med.upenn.edu/gcb/#!view/all'):
     """
-    Fetch events from Penn
+    Fetch events from Genomics and Computational Biology Graduate Group (GCB)
     """
     json_url = """
     https://events.med.upenn.edu/live/calendar/view/all?user_tz=IT&syntax=%3Cwidget%20type%3D%22events_calendar%22%3E%3Carg%20id%3D%22mini_cal_heat_map%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22thumb_width%22%3E200%3C%2Farg%3E%3Carg%20id%3D%22thumb_height%22%3E200%3C%2Farg%3E%3Carg%20id%3D%22hide_repeats%22%3Efalse%3C%2Farg%3E%3Carg%20id%3D%22show_groups%22%3Efalse%3C%2Farg%3E%3Carg%20id%3D%22show_tags%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22default_view%22%3Eday%3C%2Farg%3E%3Carg%20id%3D%22group%22%3EGenomics%20and%20Computational%20Biology%20Graduate%20Group%20%28GCB%29%3C%2Farg%3E%3Carg%20id%3D%22group%22%3EBiomedical%20Graduate%20Studies%20%28BGS%29%3C%2Farg%3E%3Carg%20id%3D%22tag%22%3EGCB%3C%2Farg%3E%3Carg%20id%3D%22webcal_feed_links%22%3Etrue%3C%2Farg%3E%3C%2Fwidget%3E
