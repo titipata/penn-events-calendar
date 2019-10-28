@@ -4,6 +4,7 @@ import { Link } from 'gatsby';
 import React, { useEffect, useRef, useState } from 'react';
 import styled, { css, keyframes } from 'styled-components';
 import { Key } from '../../utils';
+import { media } from '../../utils/ui';
 
 const Container = styled.form`
   height: 40px;
@@ -13,6 +14,10 @@ const Container = styled.form`
   align-items: center;
   justify-content: flex-end;
   position: relative;
+
+  ${media.medium`
+    width: 80%;
+  `}
 `;
 
 const StyledFa = styled(Fa)`
