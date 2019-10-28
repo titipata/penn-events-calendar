@@ -204,7 +204,6 @@ const SearchButton = () => {
 
   return (
     <Container
-      active={active}
       onSubmit={(e) => {
         e.preventDefault();
         navigate(`/search?search_query=${searchQuery}`);
