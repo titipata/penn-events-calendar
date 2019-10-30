@@ -1,6 +1,6 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
-  faBookmark, faCalendarAlt, faChevronCircleDown,
+  faBookmark, faCalendarAlt, faCalendarPlus, faChevronCircleDown,
   faChevronCircleUp, faClock, faCopy, faExternalLinkAlt,
   faFileAlt, faMapMarkerAlt, faSchool,
   faStar, faUniversity, faUserTie, faSearch,
@@ -11,7 +11,7 @@ import 'rc-pagination/assets/index.css';
 
 function useStaticResources() {
   const [icons, setIcons] = useState([
-    faCalendarAlt, faMapMarkerAlt, faClock, faFileAlt,
+    faCalendarAlt, faCalendarPlus, faMapMarkerAlt, faClock, faFileAlt,
     faExternalLinkAlt, faUserTie, faSchool, faUniversity,
     faBookmark, faChevronCircleDown, faChevronCircleUp,
     faCopy, faStar, faSearch, faArrowUp,
