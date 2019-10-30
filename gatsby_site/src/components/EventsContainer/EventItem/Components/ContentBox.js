@@ -44,6 +44,7 @@ const DetailBox = ({
   url,
   description,
   isDescriptionExpanded,
+  saveToCalendarUrl,
 }) => (
   <DetailWrapper>
     <StyledTitle>
@@ -58,9 +59,15 @@ const DetailBox = ({
           )
           : null
       }
-      <StyledLinkIcon href={url}>
-        <Fa icon={['far', 'calendar-plus']} />
-      </StyledLinkIcon>
+      {
+        saveToCalendarUrl
+          ? (
+            <StyledLinkIcon href={saveToCalendarUrl}>
+              <Fa icon={['far', 'calendar-plus']} />
+            </StyledLinkIcon>
+          )
+          : null
+      }
     </StyledTitle>
     <StyledLocation>
       <StyledMarkerIcon />
@@ -83,6 +90,7 @@ DetailBox.propTypes = {
   url: PropTypes.string,
   description: PropTypes.string,
   isDescriptionExpanded: PropTypes.bool.isRequired,
+  saveToCalendarUrl: PropTypes.string.isRequired,
 };
 
 DetailBox.defaultProps = {
