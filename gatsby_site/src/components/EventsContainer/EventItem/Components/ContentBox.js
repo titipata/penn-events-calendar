@@ -59,7 +59,7 @@ const DetailBox = ({
           : null
       }
       <StyledLinkIcon href={url}>
-        <Fa icon="calendar-plus" />
+        <Fa icon={['far', 'calendar-plus']} />
       </StyledLinkIcon>
     </StyledTitle>
     <StyledLocation>
