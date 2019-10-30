@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { getRandomColorFromText } from '../../../utils';
+import { getRandomColorFromText, Events as evUtil } from '../../../utils';
 import ContentBox from './Components/ContentBox';
 import DescriptionBox from './Components/DescriptionBox';
 import TimeBox from './Components/TimeBox';
@@ -31,6 +31,8 @@ const StyledContentWrapper = styled.div`
 `;
 
 const EventItem = ({ eventData }) => {
+  const saveToCalendarUrl = evUtil.getUrlToAddEventToCalendar(eventData);
+
   // define local hook
   const [
     descriptionVisible,
@@ -77,6 +79,7 @@ const EventItem = ({ eventData }) => {
           url={url}
           description={description}
           isDescriptionExpanded={descriptionVisible}
+          saveToCalendarUrl={saveToCalendarUrl}
         />
       </StyledContentWrapper>
       {

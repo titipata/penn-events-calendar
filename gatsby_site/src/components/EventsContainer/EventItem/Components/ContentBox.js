@@ -44,6 +44,7 @@ const DetailBox = ({
   url,
   description,
   isDescriptionExpanded,
+  saveToCalendarUrl,
 }) => (
   <DetailWrapper>
     <StyledTitle>
@@ -54,6 +55,15 @@ const DetailBox = ({
           ? (
             <StyledLinkIcon href={url}>
               <Fa icon="external-link-alt" />
+            </StyledLinkIcon>
+          )
+          : null
+      }
+      {
+        saveToCalendarUrl
+          ? (
+            <StyledLinkIcon href={saveToCalendarUrl}>
+              <Fa icon={['far', 'calendar-plus']} />
             </StyledLinkIcon>
           )
           : null
@@ -80,6 +90,7 @@ DetailBox.propTypes = {
   url: PropTypes.string,
   description: PropTypes.string,
   isDescriptionExpanded: PropTypes.bool.isRequired,
+  saveToCalendarUrl: PropTypes.string.isRequired,
 };
 
 DetailBox.defaultProps = {

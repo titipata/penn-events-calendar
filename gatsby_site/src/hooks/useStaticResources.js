@@ -6,6 +6,7 @@ import {
   faStar, faUniversity, faUserTie, faSearch,
   faArrowUp,
 } from '@fortawesome/free-solid-svg-icons';
+import { faCalendarPlus } from '@fortawesome/free-regular-svg-icons';
 import { useState, useEffect } from 'react';
 import 'rc-pagination/assets/index.css';
 
@@ -14,7 +15,7 @@ function useStaticResources() {
     faCalendarAlt, faMapMarkerAlt, faClock, faFileAlt,
     faExternalLinkAlt, faUserTie, faSchool, faUniversity,
     faBookmark, faChevronCircleDown, faChevronCircleUp,
-    faCopy, faStar, faSearch, faArrowUp,
+    faCopy, faStar, faSearch, faArrowUp, faCalendarPlus,
   ]);
 
   useEffect(() => {
