@@ -160,13 +160,14 @@ class Events {
   }
 
   static getUrlToAddEventToCalendar(eventObj) {
+    // todo: revise & refactor this function
     // console.log('evobj', eventObj);
     if (!eventObj) return null;
 
-    const isoFormat = 'YYYYMMDDTHHmmssZ';
+    const isoFormat = 'YYYYMMDDTHHmmss[Z]';
     const dateOnlyFormat = 'YYYYMMDD';
 
-    const formatDateTime = dt => dt.format(isoFormat).replace('+00:00', 'Z');
+    const formatDateTime = dt => dt.utc().format(isoFormat);
 
     let formattedStartTime = '';
     let formattedEndTime = '';
@@ -186,20 +187,20 @@ class Events {
 
     // assume all day
     if (!startTime || startTime.toLowerCase().includes('all day')) {
-      const parsed = moment.utc(`${date}`, 'DD-MM-YYYY');
+      const parsed = moment(`${date}`, 'DD-MM-YYYY');
       formattedStartTime = parsed.format(dateOnlyFormat);
       formattedEndTime = parsed.add(1, 'd').format(dateOnlyFormat);
     }
     // assume 1 hr event
-    if (!endTime) {
-      const parsed = moment.utc(`${date} ${startTime}`, 'DD-MM-YYYY hh:mma');
+    if (startTime && !endTime) {
+      const parsed = moment(`${date} ${startTime}`, 'DD-MM-YYYY hh:mma');
       formattedStartTime = formatDateTime(parsed);
       formattedEndTime = formatDateTime(parsed.add(1, 'h'));
     }
     // complete data
     if (startTime && endTime) {
-      const parsedStart = moment.utc(`${date} ${startTime}`, 'DD-MM-YYYY hh:mma');
-      const parsedEnd = moment.utc(`${date} ${endTime}`, 'DD-MM-YYYY hh:mma');
+      const parsedStart = moment(`${date} ${startTime}`, 'DD-MM-YYYY hh:mma');
+      const parsedEnd = moment(`${date} ${endTime}`, 'DD-MM-YYYY hh:mma');
       formattedStartTime = formatDateTime(parsedStart);
       formattedEndTime = formatDateTime(parsedEnd);
     }
