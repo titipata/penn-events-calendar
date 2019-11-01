@@ -611,10 +611,11 @@ def fetch_events_classical_studies(base_url='https://www.classics.upenn.edu'):
             description = event_soup.find('div', attrs={
                                           'class': 'field-type-text-with-summary'})
             description = description.get_text().strip() if description is not None else ''
-            starttime = event_soup.find('span', attrs={'class': 'date-display-start'})
-            endtime = event_soup.find('span', attrs={'class': 'date-display-end'})
-            if starttime is not None and endtime is not None:
-                starttime, endtime = starttime.text.strip(), endtime.text.strip()
+            start_time = event_soup.find('span', attrs={'class': 'date-display-start'})
+            end_time = event_soup.find('span', attrs={'class': 'date-display-end'})
+
+            if start_time is not None and end_time is not None:
+                starttime, endtime = start_time.text.strip(), end_time.text.strip()
                 starttime = starttime.split(' - ')[-1]
                 endtime = endtime.split(' - ')[-1]
 
