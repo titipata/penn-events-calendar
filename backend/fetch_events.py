@@ -594,35 +594,29 @@ def fetch_events_classical_studies(base_url='https://www.classics.upenn.edu'):
     page_soup = BeautifulSoup(html_page.content, 'html.parser')
     events_list = page_soup.find('div', attrs={'class': 'item-list'})
 
-    for event_url in events_list.find_all('a'):
-        event_url = urljoin(base_url, event_url['href'])
+    for event in events_list.find_all('li'):
+        title = event.find('h3')
+        event_url = title.find('a')['href']
+        event_url = urljoin(base_url, event_url)
+        title = title.text.strip() if title is not None else ''
+        date = event.find('span', attrs={'class': 'date-display-single'})
+        date = date.get_text() if date is not None else ''
+        starttime, endtime = find_startend_time(date)
+        location = event.find('span', attrs={'class': 'event-location'})
+        location = location.text.strip() if location is not None else ''
+
         event_page = requests.get(event_url)
         event_soup = BeautifulSoup(event_page.content, 'html.parser')
         if event_soup is not None:
-            title = event_soup.find('h1', attrs={'class': 'page-header'})
-            title = title.text if title is not None else ''
-            date = event_soup.find(
-                'span', attrs={'class': 'date-display-single'})
-            date = date.text if date is not None else ''
-            if event_soup.find('p', attrs={'class': 'MsoNormal'}) is not None:
-                location = event_soup.find(
-                    'p', attrs={'class': 'MsoNormal'}).text
-            elif event_soup.find('p').text is not None:
-                location = event_soup.find('p').text
-            else:
-                location = ''
             description = event_soup.find('div', attrs={
-                                          'class': 'field field-name-body field-type-text-with-summary field-label-hidden'})
-            if description is not None:
-                description = description.text.strip()
-            else:
-                description = ''
-            try:
-                event_time = event_soup.find(
-                    'span', attrs={'class': 'date-display-single'}).text.strip()
-                starttime, endtime = find_startend_time(event_time)
-            except:
-                starttime, endtime = '', ''
+                                          'class': 'field-type-text-with-summary'})
+            description = description.get_text().strip() if description is not None else ''
+            starttime = event_soup.find('span', attrs={'class': 'date-display-start'})
+            endtime = event_soup.find('span', attrs={'class': 'date-display-end'})
+            if starttime is not None and endtime is not None:
+                starttime, endtime = starttime.text.strip(), endtime.text.strip()
+                starttime = starttime.split(' - ')[-1]
+                endtime = endtime.split(' - ')[-1]
 
             events.append({
                 'title': title,
