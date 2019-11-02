@@ -177,7 +177,7 @@ def parse_pdf_abstract(pdf_url):
         if description == '':
             description = pdf_soup.find('div')
             description = description.text.strip() if description is not None else ''
-        description = ' '.join(description.split(' ')[0:500])
+        description = ' '.join(description.replace('ABSTRACT', '').split(' ')[0:500])
     except:
         title, description = '', ''
     return title, description
