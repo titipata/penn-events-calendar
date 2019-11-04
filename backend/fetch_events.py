@@ -2965,7 +2965,7 @@ def fetch_events_applied_econ_workshop(base_url='https://bepp.wharton.upenn.edu/
     return events
 
 
-def fetch_events_json(base_url, json_url, owner):
+def fetch_json_events(base_url, json_url, owner):
     """
     Function to get data from JSON url and transform to the same format we use
     """
@@ -2991,7 +2991,7 @@ def fetch_events_json(base_url, json_url, owner):
         location = event.get('location', '')
         speaker = event.get('custom_professor', '')
         speaker = BeautifulSoup(speaker, 'html.parser').get_text('\n')
-        d = start_date.strftime('%Y%m%d')
+
         if not any([k in title.lower() for k in ['registration', 'break', 'schedule', ' tbd']]):
             events.append({
                 'date': date,
@@ -3014,7 +3014,7 @@ def fetch_events_public_policy(base_url='https://publicpolicy.wharton.upenn.edu/
     json_url = """
     https://publicpolicy.wharton.upenn.edu/live/calendar/view/all?user_tz=IT&syntax=%3Cwidget%20type%3D%22events_calendar%22%3E%3Carg%20id%3D%22thumb_width%22%3E138%3C%2Farg%3E%3Carg%20id%3D%22thumb_height%22%3E138%3C%2Farg%3E%3Carg%20id%3D%22modular%22%3Etrue%3C%2Farg%3E%3C%2Fwidget%3E
     """.strip()
-    events = fetch_events_json(
+    events = fetch_json_events(
         base_url,
         json_url,
         'Public Policy Initiative (Wharton)'
@@ -3029,7 +3029,7 @@ def fetch_events_nursing(base_url='https://www.nursing.upenn.edu/calendar/#!view
     json_url = """
     https://www.nursing.upenn.edu/live/calendar/view/all?user_tz=IT&syntax=%3Cwidget%20type%3D%22events_calendar%22%3E%3Carg%20id%3D%22mini_cal_heat_map%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22thumb_width%22%3E200%3C%2Farg%3E%3Carg%20id%3D%22thumb_height%22%3E200%3C%2Farg%3E%3Carg%20id%3D%22modular%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22show_public%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22default_view%22%3Emonth%3C%2Farg%3E%3Carg%20id%3D%22exclude_group%22%3EWeb%20Admin%3C%2Farg%3E%3C%2Fwidget%3E
     """.strip()
-    events = fetch_events_json(
+    events = fetch_json_events(
         base_url,
         json_url,
         'Nursing'
@@ -3044,7 +3044,7 @@ def fetch_events_gcb(base_url='https://events.med.upenn.edu/gcb/#!view/all'):
     json_url = """
     https://events.med.upenn.edu/live/calendar/view/all?user_tz=IT&syntax=%3Cwidget%20type%3D%22events_calendar%22%3E%3Carg%20id%3D%22mini_cal_heat_map%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22thumb_width%22%3E200%3C%2Farg%3E%3Carg%20id%3D%22thumb_height%22%3E200%3C%2Farg%3E%3Carg%20id%3D%22hide_repeats%22%3Efalse%3C%2Farg%3E%3Carg%20id%3D%22show_groups%22%3Efalse%3C%2Farg%3E%3Carg%20id%3D%22show_tags%22%3Etrue%3C%2Farg%3E%3Carg%20id%3D%22default_view%22%3Eday%3C%2Farg%3E%3Carg%20id%3D%22group%22%3EGenomics%20and%20Computational%20Biology%20Graduate%20Group%20%28GCB%29%3C%2Farg%3E%3Carg%20id%3D%22group%22%3EBiomedical%20Graduate%20Studies%20%28BGS%29%3C%2Farg%3E%3Carg%20id%3D%22tag%22%3EGCB%3C%2Farg%3E%3Carg%20id%3D%22webcal_feed_links%22%3Etrue%3C%2Farg%3E%3C%2Fwidget%3E
     """.strip()
-    events = fetch_events_json(
+    events = fetch_json_events(
         base_url,
         json_url,
         'Genomics and Computational Biology Graduate Group (GCB)'
@@ -3129,7 +3129,7 @@ def fetch_events_perry_world(base_url='https://global.upenn.edu/perryworldhouse/
                 'div', attrs={'class': 'events-details-page__top__content__location'})
             location = location.text.strip() if location is not None else ''
         else:
-            description, location = '', '', ''
+            description, location = '', ''
 
         events.append({
             'date': date,
