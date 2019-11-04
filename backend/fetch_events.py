@@ -442,6 +442,11 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
 
         for event in page_events:
             event_url = urljoin(base_url, event.find('a')['href'])
+            speaker = event.find('h3', attrs={'class': 'event-speaker'})
+            speaker = speaker.get_text().strip() if speaker is not None else ''
+            affiliation = event.find('h5')
+            affiliation = affiliation.get_text().strip() if affiliation is not None else ''
+            speaker = '{}, {}'.format(speaker, affiliation)
             try:
                 start_time, end_time = event.find_all('time')
                 start_time = start_time.text.strip() if start_time is not None else ''
@@ -455,10 +460,6 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
             event_soup = BeautifulSoup(event_page.content, 'html.parser')
             title = event_soup.find('h1', attrs={'class': 'page-header'})
             title = title.text.strip() if title is not None else ''
-            speaker = event_soup.find(
-                'div', attrs={'class': 'col-sm-4 bs-region bs-region--right'})
-            speaker = speaker.text.replace(
-                'Download Paper', '').strip() if speaker is not None else ''
 
             try:
                 pdf_path = event_soup.find(
@@ -3181,7 +3182,7 @@ def fetch_events_psychology(base_url='https://psychology.sas.upenn.edu/calendar'
             'url': event_url,
             'speaker': '',
             'title': title,
-            'location': '',
+            'location': location,
             'starttime': starttime,
             'endtime': endtime,
             'description': description.strip(),
