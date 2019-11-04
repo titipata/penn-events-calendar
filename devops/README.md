@@ -17,7 +17,7 @@ sudo apt-get install nginx
 
 ```sh
 # copy conf file
-sudo cp /devops/penn-calendar.nginx.conf /etc/nginx/conf.d/
+sudo cp devops/penn-calendar.nginx.conf /etc/nginx/conf.d/
 
 # restart the service
 sudo service nginx restart
