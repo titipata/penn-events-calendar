@@ -24,7 +24,7 @@ module.exports = {
     {
       resolve: 'gatsby-source-filesystem',
       options: {
-        path: `${__dirname}/../backend/data`,
+        path: `${__dirname}/../backend/data/events.json`,
       },
     },
     'gatsby-transformer-json',
