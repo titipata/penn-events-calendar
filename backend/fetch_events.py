@@ -3174,6 +3174,7 @@ def fetch_events_psychology(base_url='https://psychology.sas.upenn.edu/calendar'
             location = event_soup.find_all(
                 'div', attrs={'class': 'field-item even'})
             location = location[1] if len(location) >= 2 else ''
+            location = location.text.strip() if location is not None else ''
         else:
             description, location = '', ''
 
@@ -3215,7 +3216,7 @@ def fetch_events_neuro_wharton(base_url='https://neuro.wharton.upenn.edu/events/
             'h3') if date_time_loc is not None else ''
         date_time_loc = date_time_loc.get_text().strip()
         date = date_time_loc.split('\n')[0]
-        location = date_time_loc.split('\n')[-1]
+        location = date_time_loc.split('\n')[-1].strip()
         starttime, endtime = find_startend_time(date)
         description = event_soup.find(
             'div', attrs={'class': 'tribe-events-content-wrapper'})
@@ -3235,6 +3236,53 @@ def fetch_events_neuro_wharton(base_url='https://neuro.wharton.upenn.edu/events/
     return events
 
 
+def fetch_events_pspdg(base_url='https://pennsciencepolicy.squarespace.com'):
+    """
+    Fetch events from Penn Science Policy & Diplomacy Group (PSPDG)
+    """
+    events = []
+    html_page = requests.get(urljoin(base_url, '/events'))
+    page_soup = BeautifulSoup(html_page.content, 'html.parser')
+    all_events = page_soup.find_all('article', attrs={'class': 'eventlist-event'})
+
+    for event in all_events:
+        title = event.find('h1', attrs={'class': 'eventlist-title'})
+        if title is not None:
+            event_url = title.find('a')['href'] if title.find(
+                'a') is not None else ''
+            event_url = urljoin(base_url, event_url)
+            title = title.text.strip() if title is not None else ''
+
+        date = event.find('time', attrs={'class': 'event-date'})
+        date = date.text.strip() if date is not None else ''
+
+        time = event.find('span', attrs={'class': 'event-time-12hr'})
+        startend_time = time.text.strip() if time is not None else ''
+        if startend_time is not '':
+            starttime, endtime = find_startend_time(startend_time)
+        else:
+            starttime, endtime = '', ''
+
+        location = event.find('li', attrs={'class': 'eventlist-meta-address'})
+        location = location.text.replace('(map)', '').strip() if location is not None else ''
+
+        description = event.find('div', attrs={'class': 'sqs-block-content'})
+        description = description.text.strip() if description is not None else ''
+
+        events.append({
+            'date': date,
+            'url': event_url,
+            'speaker': '',
+            'title': title,
+            'location': location,
+            'starttime': starttime,
+            'endtime': endtime,
+            'description': description,
+            'owner': 'Penn Science Policy & Diplomacy Group (PSPDG)'
+        })
+    return events
+
+
 def drop_duplicate_events(df):
     """
     Function to group dataframe, use all new information from the latest row
@@ -3250,27 +3298,8 @@ def drop_duplicate_events(df):
 def fetch_all_events():
     events = []
     fetch_fns = [
-        fetch_events_cni, fetch_events_english_dept, fetch_events_crim,
-        fetch_events_mec, fetch_events_biology, fetch_events_economics,
-        fetch_events_philosophy, fetch_events_classical_studies, fetch_events_linguistic,
-        fetch_events_earth_enviromental_science, fetch_events_art_history, fetch_events_sociology,
-        fetch_events_cceb, fetch_events_cis, fetch_events_CURF,
-        fetch_events_upibi, fetch_events_ldi, fetch_events_korean_studies,
-        fetch_events_HIP, fetch_events_italian_studies, fetch_events_CEMB,
-        fetch_events_CEAS, fetch_events_CASI, fetch_events_african_studies,
-        fetch_events_business_ethics, fetch_events_law, fetch_events_penn_SAS,
-        fetch_events_physics_astronomy, fetch_events_wolf_humanities, fetch_events_music_dept,
-        fetch_events_annenberg, fetch_events_religious_studies, fetch_events_AHEAD,
-        fetch_events_SPP, fetch_events_ortner_center, fetch_events_penn_today,
-        fetch_events_mins, fetch_events_mindcore, fetch_events_seas,
-        fetch_events_vet, fetch_events_gse, fetch_events_grasp,
-        fetch_events_wharton_stats, fetch_events_school_design, fetch_events_penn_museum,
-        fetch_events_wharton_marketing, fetch_events_marketing_col, fetch_events_macro_seminar,
-        fetch_events_micro_seminar, fetch_events_energy_econ, fetch_events_industrial_org,
-        fetch_events_applied_econ_workshop, fetch_events_public_policy,
-        fetch_events_math, fetch_events_nursing, fetch_events_gcb,
         fetch_events_ppe, fetch_events_perry_world, fetch_events_psychology,
-        fetch_events_neuro_wharton
+        fetch_events_neuro_wharton, fetch_events_pspdg
     ]
     for f in tqdm(fetch_fns):
         try:
@@ -3289,14 +3318,6 @@ def fetch_all_events():
     # save data to json if not data in ``data`` folder
     group_columns = ['owner', 'title', 'date_dt', 'starttime']
     if not os.path.exists(PATH_DATA):
-        # save record metadata
-        fetch_record = {}
-        fetch_record['name'] = "Penn Events"
-        fetch_record['refresh_count'] = 1
-        fetch_record['fetch_date'] = datetime.now().strftime('%d-%m-%Y')
-        fetch_record['modified_date'] = ''
-        json.dump(fetch_record, open(PATH_FETCH_DATA, 'w'), indent=2)
-
         # save events
         events_df = events_df.drop_duplicates(
             subset=group_columns, keep='first')
@@ -3306,12 +3327,6 @@ def fetch_all_events():
 
     # if data already exist, append new fetched data to an existing data
     else:
-        # save record metadata
-        fetch_record = json.load(open(PATH_FETCH_DATA, 'r'))
-        fetch_record['refresh_count'] = fetch_record['refresh_count'] + 1
-        fetch_record['modified_date'] = datetime.now().strftime('%d-%m-%Y')
-        json.dump(fetch_record, open(PATH_FETCH_DATA, 'w'), indent=2)
-
         # save events
         events_json = json.loads(open(PATH_DATA, 'r').read())
         events_former_df = pd.DataFrame(events_json)
