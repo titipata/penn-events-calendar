@@ -107,7 +107,7 @@ settings = {
 
 def index_events_elasticsearch():
     print('Indexing events to ElasticSearch...')
-    events = json.loads(open(path_data, 'r').read())['data']
+    events = json.loads(open(path_data, 'r').read())
     events_df = pd.DataFrame(events).fillna('')
     events_feature = json.loads(open(path_vector, 'r').read())
     events_feature_df = pd.DataFrame(events_feature).fillna('')
