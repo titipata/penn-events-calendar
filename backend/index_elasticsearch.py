@@ -32,7 +32,8 @@ def generate_event(events):
              'speaker', 'title', 'description',
              'url', 'speaker')
         }
-        event_add['suggest'] = event['suggest_candidates'] if isinstance(event['suggest_candidates'], list) else []
+        event_add['suggest'] = event['suggest_candidates'] if isinstance(
+            event['suggest_candidates'], list) else []
         yield {
             "_index": "penn-events",
             "_type": "event",
@@ -107,7 +108,7 @@ settings = {
 
 def index_events_elasticsearch():
     print('Indexing events to ElasticSearch...')
-    events = json.loads(open(path_data, 'r').read())['data']
+    events = json.loads(open(path_data, 'r').read())
     events_df = pd.DataFrame(events).fillna('')
     events_feature = json.loads(open(path_vector, 'r').read())
     events_feature_df = pd.DataFrame(events_feature).fillna('')

@@ -15,10 +15,14 @@ api = hug.API(__name__)
 api.http.base_url = '/api'
 api.http.add_middleware(hug.middleware.CORSMiddleware(api))
 
-path_data, path_vector = os.path.join(
-    'data', 'events.json'), os.path.join('data', 'events_vector.json')
+path_data = os.path.join('data', 'events.json')
+path_vector = os.path.join('data', 'events_vector.json')
 event_vectors = json.load(open(path_vector, 'r'))
-events = json.load(open(path_data, 'r'))['data']
+events = json.load(open(path_data, 'r'))
+events_map = {
+    e['event_index']: e
+    for e in events
+}
 event_vectors_map = {
     e['event_index']: e['event_vector']
     for e in event_vectors
@@ -48,6 +52,24 @@ def get_future_event(date, days=0, hours=9):
             return False
     except:
         return False
+
+
+@hug.post("/getevents")
+def getevents(body):
+    """
+    Return full dataset for the given list of event indices
+    Body is sent as JSON from the frontend with data as a value of a key 'payload':
+
+    {
+        "payload": data
+    }
+
+    """
+    event_indices = body['payload']
+    events_body = []
+    for event_idx in event_indices:
+        events_body.append(events_map[event_idx])
+    return events_body
 
 
 @hug.post("/recommendations")
@@ -80,11 +102,17 @@ def recommendations(body):
     relevances = np.array([cosine(pref_vector, np.array(
         event_vectors_map[idx])) for idx in future_event_indices]).ravel()
     rank_indices = np.argsort(relevances)
-    relevances = np.clip(np.sort(relevances)[::-1] * 100, 0, 100).astype(int)
-    indices_recommendation = [future_event_indices[i] for i in rank_indices]
-    recommendations = [{'event_index': idx, 'relevance': rel}
-                       for idx, rel in zip(indices_recommendation, relevances)]
-    return recommendations[0:20]
+    relevances = np.clip(np.sort(relevances)[
+                         ::-1] * 100, 0, 100).astype(int)[0:25]
+    indices_recommendation = [future_event_indices[i]
+                              for i in rank_indices][0:25]
+
+    recommendations = []
+    for idx, rel in zip(indices_recommendation, relevances):
+        recommendation = events_map[idx]
+        recommendation['relevance'] = rel
+        recommendations.append(recommendation)
+    return recommendations
 
 
 @hug.get("/query", examples="search_query=CNI")
@@ -108,16 +136,21 @@ def query(search_query: hug.types.text):
     search_responses = search_responses.to_dict()['hits']['hits']
 
     # return future events for a given query
-    future_events_indices, relevances = [], []
+    future_events, relevances = [], []
     for response in filter(lambda r: get_future_event('{} {}'.format(r['_source']['date_dt'], r['_source']['starttime'])), search_responses):
-        future_events_indices.append(response['_id'])
+        event = response['_source']
+        event['event_index'] = int(response['_id'])
+        if 'suggest' in event:
+            del event['suggest']
+        future_events.append(event)
         relevances.append(response['_score'])
     relevances = [int(100 * (r / max(relevances)))
                   for r in relevances]  # normalize by the maximum relevance
-    search_relevances = [{'event_index': int(i), 'relevance': r}
-                         for i, r in zip(future_events_indices, relevances)]
-
-    return search_relevances
+    query_events = []
+    for event, rel in zip(future_events, relevances):
+        event['relevance'] = rel
+        query_events.append(event)
+    return query_events
 
 
 @hug.get("/suggestion", examples="text=department")
