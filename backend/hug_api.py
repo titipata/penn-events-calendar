@@ -102,8 +102,10 @@ def recommendations(body):
     relevances = np.array([cosine(pref_vector, np.array(
         event_vectors_map[idx])) for idx in future_event_indices]).ravel()
     rank_indices = np.argsort(relevances)
-    relevances = np.clip(np.sort(relevances)[::-1] * 100, 0, 100).astype(int)[0:25]
-    indices_recommendation = [future_event_indices[i] for i in rank_indices][0:25]
+    relevances = np.clip(np.sort(relevances)[
+                         ::-1] * 100, 0, 100).astype(int)[0:25]
+    indices_recommendation = [future_event_indices[i]
+                              for i in rank_indices][0:25]
 
     recommendations = []
     for idx, rel in zip(indices_recommendation, relevances):

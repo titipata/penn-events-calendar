@@ -32,7 +32,8 @@ def generate_event(events):
              'speaker', 'title', 'description',
              'url', 'speaker')
         }
-        event_add['suggest'] = event['suggest_candidates'] if isinstance(event['suggest_candidates'], list) else []
+        event_add['suggest'] = event['suggest_candidates'] if isinstance(
+            event['suggest_candidates'], list) else []
         yield {
             "_index": "penn-events",
             "_type": "event",
