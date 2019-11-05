@@ -5,19 +5,22 @@ import { Events as evUtil } from '../utils';
 function useFetchEvents(endpoint, payload) {
   const [fetchedEvents, setFetchedEvents] = useState([]);
   const isLoading = useLoadingEvents(fetchedEvents);
+  const [fetchOption, setFetchOption] = useState(null);
 
-  const fetchOption = payload
-    ? {
-      method: 'POST',
-      mode: 'cors',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        payload,
-      }),
-    }
-    : null;
+  useEffect(() => {
+    setFetchOption(payload
+      ? {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          payload,
+        }),
+      }
+      : null);
+  }, [payload]);
 
   useEffect(() => {
     fetch(endpoint, fetchOption)
@@ -38,7 +41,7 @@ function useFetchEvents(endpoint, payload) {
       })
       // eslint-disable-next-line
       .catch(err => console.log(err));
-  }, [endpoint, fetchOption, payload]);
+  }, [endpoint, fetchOption]);
 
   return [fetchedEvents, isLoading];
 }
