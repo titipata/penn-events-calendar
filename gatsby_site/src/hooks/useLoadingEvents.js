@@ -7,7 +7,7 @@ function useLoadingAllEvents(allEvents) {
     if (allEvents.length > 0) {
       const timeoutRef = setTimeout(() => {
         setIsLoading(false);
-      }, 750);
+      }, 1);
 
       return () => clearTimeout(timeoutRef);
     }
