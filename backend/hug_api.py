@@ -15,10 +15,10 @@ api = hug.API(__name__)
 api.http.base_url = '/api'
 api.http.add_middleware(hug.middleware.CORSMiddleware(api))
 
-path_data, path_vector = os.path.join(
-    'data', 'events.json'), os.path.join('data', 'events_vector.json')
+path_data = os.path.join('data', 'events.json')
+path_vector = os.path.join('data', 'events_vector.json')
 event_vectors = json.load(open(path_vector, 'r'))
-events = json.load(open(path_data, 'r'))['data']
+events = json.load(open(path_data, 'r'))
 event_vectors_map = {
     e['event_index']: e['event_vector']
     for e in event_vectors
