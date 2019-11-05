@@ -6,8 +6,8 @@ function useFetchEvents(endpoint, payload) {
   const [fetchedEvents, setFetchedEvents] = useState([]);
   const isLoading = useLoadingEvents(fetchedEvents);
 
-  useEffect(() => {
-    fetch(endpoint, {
+  const fetchOption = payload
+    ? {
       method: 'POST',
       mode: 'cors',
       headers: {
@@ -16,7 +16,11 @@ function useFetchEvents(endpoint, payload) {
       body: JSON.stringify({
         payload,
       }),
-    })
+    }
+    : null;
+
+  useEffect(() => {
+    fetch(endpoint, fetchOption)
       .then(res => res.json())
       .then((resJson) => {
         // stop here if there is no data
@@ -34,7 +38,7 @@ function useFetchEvents(endpoint, payload) {
       })
       // eslint-disable-next-line
       .catch(err => console.log(err));
-  }, [endpoint, payload]);
+  }, [endpoint, fetchOption, payload]);
 
   return [fetchedEvents, isLoading];
 }
