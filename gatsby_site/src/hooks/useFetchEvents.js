@@ -32,6 +32,7 @@ function useFetchEvents(endpoint, payload) {
       .then((resJson) => {
         // stop here if there is no data
         if (!resJson || resJson.length === 0) {
+          setFetchedEvents(resJson);
           // set loading is done
           setIsLoading(false);
           return;
