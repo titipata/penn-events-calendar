@@ -2549,51 +2549,60 @@ def fetch_events_school_design(base_url='https://www.design.upenn.edu'):
     return events
 
 
-def fetch_events_penn_museum(base_url='https://www.penn.museum/calendar'):
+def fetch_events_penn_museum(base_url='https://www.penn.museum/'):
     """
-    Fetch events from Penn Museum, we select only lecture
+    Fetch events from Penn Museum, we select only lecture from https://www.penn.museum/calendar
     """
-    event_page = requests.get(base_url)
-    all_event_soup = BeautifulSoup(event_page.content, 'html.parser')
-    event_table = all_event_soup.find('table', attrs={'class': 'table'})
-
     events = []
-    for event in event_table.find('tbody').find_all('tr'):
-        try:
-            date, title, event_type = event.find_all('td')
-            if title is not None:
-                event_url = urljoin(base_url, title.find('a').attrs['href'])
-                title = title.text.strip() if title is not None else ''
-                if 'lecture' in event_type.text.lower().strip():
-                    event_soup = BeautifulSoup(requests.get(
-                        event_url).content, 'html.parser')
+    for start_range in range(0, 160, 20):
+        all_event_url = urljoin(base_url, 'calendar/list.events/-?start={}'.format(start_range))
+        event_page = requests.get(all_event_url)
+        all_event_soup = BeautifulSoup(event_page.content, 'html.parser')
+        event_table = all_event_soup.find('div', attrs={'id': 'eventlist'})
+        if event_table is not None:
+            for event in event_table.find_all('div', attrs={'class': 'row'}):
+                event_type = event.find('span', attrs={'class': 'badge dark-gray-bg'})
+                event_type = event_type.text.strip() if event_type is not None else ''
+                if 'lecture' in event_type.lower():
+                    event_url = urljoin(base_url, event.find('a')['href'])
+                    if event_url != '':
+                        event_soup = BeautifulSoup(requests.get(
+                            event_url).content, 'html.parser')
+                        title = event_soup.find('h1')
+                        subtitle = event_soup.find('h3')
+                        title = title.get_text().strip() if title is not None else ''
+                        subtitle = subtitle.get_text().strip() if subtitle is not None else ''
+                        title = '{} {}'.format(title, subtitle)
 
-                    event_details = event_soup.find(
-                        'div', attrs={'itemscope': 'itemscope'})
-                    title = event_details.find('h2')
-                    title = title.text.strip() if title is not None else ''
-                    date, time, location, category = event_details.find(
-                        'dl', attrs={'class': 'dl-horizontal'}).find_all('dd')
-                    date = date.text.strip() if date is not None else ''
-                    starttime, endtime = find_startend_time(time.text)
-                    location = location.text.strip() if location is not None else ''
-                    description = event_soup.find(
-                        'div', attrs={'itemprop': 'description'})
-                    description = '\n'.join(
-                        [p.text.strip() for p in description.find_all('p') if p is not None]).strip()
+                        date_time = event_soup.find('h2', attrs={'class': 'dark-gray'})
+                        date = date_time.text.split('|')[0].strip() if date_time is not None else ''
+                        time = date_time.text.split('|')[-1]
+                        starttime, endtime = find_startend_time(time)
+                        location = event_soup.find('div', attrs={'class': 'row mb-5'})
+                        if location is not None:
+                            location = location.find('div', attrs={'class': 'col-lg-3'})
+                            location = location.text.replace('Location', '') if location is not None else ''
+                        description = event_soup.find(
+                            'div', attrs={'class': 'jev_evdt_desc'})
+                        if description is not None:
+                            r = description.find('script')
+                            r = r.get_text() if r is not None else ''
+                            description = '\n'.join(
+                                [p.text.strip() for p in description.find_all('p') if p is not None]).strip()
+                            description = description.replace(r, '')
+                        else:
+                            description = ''
 
-                    events.append({
-                        'title': title,
-                        'date': date,
-                        'starttime': starttime,
-                        'endtime': endtime,
-                        'location': location,
-                        'description': description,
-                        'url': event_url,
-                        'owner': 'Penn Museum (lecture)'
-                    })
-        except:
-            pass
+                        events.append({
+                            'title': title,
+                            'date': date,
+                            'starttime': starttime,
+                            'endtime': endtime,
+                            'location': location,
+                            'description': description,
+                            'url': event_url,
+                            'owner': 'Penn Museum (lecture)'
+                        })
     return events
 
 
