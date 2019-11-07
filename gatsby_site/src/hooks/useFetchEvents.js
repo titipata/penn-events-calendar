@@ -4,7 +4,7 @@ import { Events as evUtil } from '../utils';
 
 function useFetchEvents(endpoint, payload) {
   const [fetchedEvents, setFetchedEvents] = useState([]);
-  const isLoading = useLoadingEvents(fetchedEvents);
+  const [isLoading, setIsLoading] = useLoadingEvents(fetchedEvents);
   const [fetchOption, setFetchOption] = useState(null);
 
   useEffect(() => {
@@ -19,15 +19,21 @@ function useFetchEvents(endpoint, payload) {
           payload,
         }),
       }
-      : null);
+      : {
+        method: 'GET',
+      });
   }, [payload]);
 
   useEffect(() => {
+    if (!fetchOption) return;
+
     fetch(endpoint, fetchOption)
       .then(res => res.json())
       .then((resJson) => {
         // stop here if there is no data
         if (!resJson || resJson.length === 0) {
+          // set loading is done
+          setIsLoading(false);
           return;
         }
 
@@ -41,7 +47,7 @@ function useFetchEvents(endpoint, payload) {
       })
       // eslint-disable-next-line
       .catch(err => console.log(err));
-  }, [endpoint, fetchOption]);
+  }, [endpoint, fetchOption, setIsLoading]);
 
   return [fetchedEvents, isLoading];
 }

@@ -15,7 +15,7 @@ function useLoadingAllEvents(allEvents) {
     return undefined;
   }, [allEvents]);
 
-  return isLoading;
+  return [isLoading, setIsLoading];
 }
 
 export default useLoadingAllEvents;

@@ -21,7 +21,7 @@ export default ({ data, location }) => {
   useStaticResources();
 
   // use custom hook to check if it is loading
-  const isLoading = useLoadingAllEvents(data.allEventsJson.edges);
+  const [isLoading] = useLoadingAllEvents(data.allEventsJson.edges);
 
   // preprocess events before sending to events list
   const preprocessedEvents = evUtil.getPreprocessedEvents(
