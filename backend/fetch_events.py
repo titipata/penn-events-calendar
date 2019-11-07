@@ -2360,7 +2360,7 @@ def fetch_events_gse(base_url='https://www.gse.upenn.edu/event'):
                     starttime = event_soup.find('span', attrs={'class': 'date-display-single'})
                     starttime = starttime.text.split('-')[-1].strip() if starttime is not None else ''
             except:
-                description = ''
+                starttime, endtime, description = '', '', ''
 
             events.append({
                 'title': title,
