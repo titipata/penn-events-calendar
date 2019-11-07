@@ -28,21 +28,19 @@ export default () => (
       built-in search and recommendation engine. Here is an instruction on how to use the web
       application:
     </p>
-    <p>
-      <ul>
-        <li>
-          See upcoming events on the main page, search for anything you are interested:
-          <StyledImg src={img1} alt="upcoming events" />
-        </li>
-        <li>
-          Select events by clicking the star icon:
-          <StyledImg src={img2} alt="select events" />
-        </li>
-        <li>
-          See recommendation based on your selected events:
-          <StyledImg src={img3} alt="recommendations" />
-        </li>
-      </ul>
-    </p>
+    <ul>
+      <li>
+        See upcoming events on the main page, search for anything you are interested:
+        <StyledImg src={img1} alt="upcoming events" />
+      </li>
+      <li>
+        Select events by clicking the star icon:
+        <StyledImg src={img2} alt="select events" />
+      </li>
+      <li>
+        See recommendation based on your selected events:
+        <StyledImg src={img3} alt="recommendations" />
+      </li>
+    </ul>
   </Layout>
 );

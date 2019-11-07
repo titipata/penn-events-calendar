@@ -21,11 +21,11 @@ export default ({ data, location }) => {
   useStaticResources();
 
   // use custom hook to check if it is loading
-  const isLoading = useLoadingAllEvents(data.dataJson.data);
+  const [isLoading] = useLoadingAllEvents(data.allEventsJson.edges);
 
   // preprocess events before sending to events list
   const preprocessedEvents = evUtil.getPreprocessedEvents(
-    data.dataJson.data,
+    data.allEventsJson.edges,
     true,
   );
 
@@ -43,21 +43,22 @@ export default ({ data, location }) => {
   );
 };
 
-export const query = graphql`
+export const pageQuery = graphql`
   query {
-    dataJson {
-      modified_date
-      data {
-        date_dt
-        description
-        endtime
-        event_index
-        location
-        owner
-        speaker
-        starttime
-        title
-        url
+    allEventsJson {
+      edges {
+        node {
+          date_dt
+          description
+          endtime
+          event_index
+          location
+          owner
+          speaker
+          starttime
+          title
+          url
+        }
       }
     }
   }

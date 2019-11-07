@@ -77,25 +77,25 @@ class Events {
   // ---- preprocessing
   static filterEvents(eventArr) {
     return eventArr
-      .filter(ev => ev.title) // filter events with no title out
-      .filter(ev => ev.date_dt); // filter events with no date_dt out
+      .filter(ev => ev.node.title) // filter events with no title out
+      .filter(ev => ev.node.date_dt); // filter events with no date_dt out
   }
 
   static sortEvents(eventArr) {
     return Events.filterEvents(eventArr)
       .sort((ev1, ev2) => Sort.sortDate(
-        ev1.date_dt,
-        ev2.date_dt,
+        ev1.node.date_dt,
+        ev2.node.date_dt,
       ) // sort dates ascendingly
-        || Sort.sortStarttime(ev1, ev2) // sort starttime ascendingly
-        || Sort.sortOwner(ev1, ev2)); // sort owner ascendingly
+        || Sort.sortStarttime(ev1.node, ev2.node) // sort starttime ascendingly
+        || Sort.sortOwner(ev1.node, ev2.node)); // sort owner ascendingly
   }
 
   static getFutureEvents(eventArr) {
     return Events.sortEvents(eventArr)
       // as the 'today' to compare has time as 00:00, all the actual events of 'today'
       // are filtered out, fix by subtract 'today' to compare out by 1
-      .filter(x => moment(x.date_dt, 'DD-MM-YYYY') >= moment().subtract(1, 'day')); // filter only incoming dates
+      .filter(x => moment(x.node.date_dt, 'DD-MM-YYYY') >= moment().subtract(1, 'day')); // filter only incoming dates
   }
 
   // normally just call this function should be enough
@@ -114,7 +114,7 @@ class Events {
 
     // get all dates from preprocessed event array
     const allDates = preprocessedEventArr
-      .map(ev => ev.date_dt);
+      .map(ev => ev.node.date_dt);
     // get sorted unique dates
     const uniqueDates = Array.from(new Set(allDates)).sort(Sort.sortDate);
 
@@ -125,7 +125,7 @@ class Events {
         {
           dateFormatted: Datetime.getDayMonthDate(cur),
           // group events with the current date and also has title
-          events: preprocessedEventArr.filter(ev => ev.date_dt === cur && ev.title),
+          events: preprocessedEventArr.filter(ev => ev.node.date_dt === cur && ev.node.title),
         },
       ]
     ), []);
@@ -179,7 +179,7 @@ class Events {
       title,
       location,
       description,
-    } = eventObj;
+    } = eventObj.node;
 
     // if allday or have no starttime - starttime/endtime should not contain
     // T...Z part and the end date should + 1 day

@@ -50,7 +50,8 @@ const EventItem = ({ eventData }) => {
     owner,
     location,
     url,
-  } = eventData;
+    relevance,
+  } = eventData.node;
 
   // handle functions
   const _handleCardClick = () => {
@@ -69,7 +70,7 @@ const EventItem = ({ eventData }) => {
           eventIndex={eventIndex}
           starttime={starttime}
           endtime={endtime}
-          relevance={eventData.relevance}
+          relevance={relevance}
         />
         <ContentBox
           // show by default
@@ -99,23 +100,25 @@ const EventItem = ({ eventData }) => {
 
 EventItem.propTypes = {
   eventData: PropTypes.shape({
-    relevance: PropTypes.oneOfType([
-      PropTypes.number,
-      PropTypes.string,
-    ]),
-    event_index: PropTypes.oneOfType([
-      PropTypes.number,
-      PropTypes.string,
-    ]),
-    date_dt: PropTypes.string,
-    title: PropTypes.string,
-    description: PropTypes.string,
-    starttime: PropTypes.string,
-    endtime: PropTypes.string,
-    speaker: PropTypes.string,
-    owner: PropTypes.string,
-    location: PropTypes.string,
-    url: PropTypes.string,
+    node: PropTypes.shape({
+      relevance: PropTypes.oneOfType([
+        PropTypes.number,
+        PropTypes.string,
+      ]),
+      event_index: PropTypes.oneOfType([
+        PropTypes.number,
+        PropTypes.string,
+      ]),
+      date_dt: PropTypes.string,
+      title: PropTypes.string,
+      description: PropTypes.string,
+      starttime: PropTypes.string,
+      endtime: PropTypes.string,
+      speaker: PropTypes.string,
+      owner: PropTypes.string,
+      location: PropTypes.string,
+      url: PropTypes.string,
+    }),
   }).isRequired,
 };
 
