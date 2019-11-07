@@ -2333,12 +2333,6 @@ def fetch_events_gse(base_url='https://www.gse.upenn.edu/event'):
             description = description.text.strip() if description is not None else ''
             date = event_post.find('span', attrs={'class': '_start'})
             date = date.text.split(' ')[0] if date is not None else ''
-            starttime = event_post.find(
-                'span', attrs={'class': 'date-display-start'})
-            starttime = starttime.text.strip() if starttime is not None else ''
-            endtime = event_post.find(
-                'span', attrs={'class': 'date-display-end'})
-            endtime = endtime.text.strip() if endtime is not None else ''
             speaker = event_post.find('span', attrs={'class': '_organizer'})
             speaker = speaker.text.strip() if speaker is not None else ''
             location = event_post.find(
@@ -2349,6 +2343,12 @@ def fetch_events_gse(base_url='https://www.gse.upenn.edu/event'):
             try:
                 event_soup = BeautifulSoup(requests.get(
                     event_url).content, 'html.parser')
+                starttime = event_soup.find(
+                    'span', attrs={'class': 'date-display-start'})
+                starttime = starttime.text.strip() if starttime is not None else ''
+                endtime = event_soup.find(
+                    'span', attrs={'class': 'date-display-end'})
+                endtime = endtime.text.strip() if endtime is not None else ''
                 description = event_soup.find(
                     'div', attrs={'class': 'node-event'})
                 description = description.find(
@@ -2356,6 +2356,9 @@ def fetch_events_gse(base_url='https://www.gse.upenn.edu/event'):
                 description = description.find(
                     'div', attrs={'class': 'field-items'})
                 description = description.text.strip() if description is not None else ''
+                if starttime == '':
+                    starttime = event_soup.find('span', attrs={'class': 'date-display-single'})
+                    starttime = starttime.text.split('-')[-1].strip() if starttime is not None else ''
             except:
                 description = ''
 
