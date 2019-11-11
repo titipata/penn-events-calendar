@@ -1,3 +1,4 @@
+requests
 hug
 beautifulsoup4
 numpy
@@ -12,3 +13,4 @@ scikit-learn
 nltk
 unidecode
 ics
+lxml

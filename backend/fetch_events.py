@@ -2298,7 +2298,6 @@ def fetch_events_vet(base_url='https://www.vet.upenn.edu/veterinary-hospitals/NB
                     'endtime': endtime,
                     'url': event_url,
                     'speaker': speaker,
-                    'url': event_url,
                     'owner': 'New Bolton Center Hospital (Veterinary Hospitals)'
                 })
     return events
@@ -3295,6 +3294,58 @@ def fetch_events_pspdg(base_url='https://pennsciencepolicy.squarespace.com'):
     return events
 
 
+def fetch_events_wolf_humanities(base_url='https://wolfhumanities.upenn.edu'):
+    """
+    Fetch events from Wolf Humanities Center
+    ref: https://wolfhumanities.upenn.edu/events/current
+    """
+    events = []
+    page_soup = BeautifulSoup(requests.get(urljoin(base_url, '/events/current')).content, 'html.parser')
+    event_content = page_soup.find('ul', attrs={'class': 'media-list'})
+    all_events = event_content.find_all('li', attrs={'class': 'clearfix'}) if event_content is not None else []
+
+    if len(all_events) > 0:
+        for event in all_events:
+            if event.find('a') is not None:
+                event_url = urljoin(base_url, event.find('a')['href'])
+                event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+                title = event_soup.find('h1')
+                title = title.text.strip() if title is not None else ''
+                subtitle = event_soup.find('h2')
+                subtitle = subtitle.text.strip() if subtitle is not None else ''
+                if subtitle is not '':
+                    title = '{}, {}'.format(title, subtitle)
+
+                location = event_soup.find('div', attrs={'class': 'field-location'})
+                location = location.text.strip() if location is not None else ''
+
+                date_time = event_soup.find('span', attrs={'class': 'date-display-single'})
+                if date_time is not None:
+                    date_time = date_time.text.strip()
+                    date = date_time.split('-')[0]
+                    starttime, endtime = find_startend_time(date_time)
+                else:
+                    date_time = event_soup.find('span', attrs={'class': 'date-display-start'})
+                    date = date_time.text.strip()
+                    starttime, endtime = find_startend_time(date)
+
+                description = event_soup.find('div', attrs={'class': 'field-body'})
+                description = description.get_text().strip() if description is not None else ''
+
+                events.append({
+                    'title': title,
+                    'date': date,
+                    'location': location,
+                    'description': description,
+                    'starttime': starttime,
+                    'endtime': endtime,
+                    'url': event_url,
+                    'speaker': '',
+                    'owner': 'Wolf Humanities Center'
+                })
+    return events
+
+
 def drop_duplicate_events(df):
     """
     Function to group dataframe, use all new information from the latest row
@@ -3330,7 +3381,7 @@ def fetch_all_events():
         fetch_events_applied_econ_workshop, fetch_events_public_policy,
         fetch_events_math, fetch_events_nursing, fetch_events_gcb,
         fetch_events_ppe, fetch_events_perry_world, fetch_events_psychology,
-        fetch_events_neuro_wharton, fetch_events_pspdg
+        fetch_events_neuro_wharton, fetch_events_pspdg, fetch_events_wolf_humanities
     ]
     for f in tqdm(fetch_fns):
         try:
