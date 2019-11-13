@@ -5,7 +5,11 @@ module.exports = {
   },
   pathPrefix: '/penn-events',
   siteMetadata: {
-    title: 'Penn Event Calendar',
+    title: 'Events at Penn',
+    description: 'A web application that collects all events happening at the University of Pennsylvania with built-in search and recommendation engine.',
+    siteUrl: 'http://35.160.123.103',
+    image: 'http://35.160.123.103/og-image-penn.png',
+    logo: 'http://35.160.123.103/favicon.ico',
   },
   plugins: [
     {
