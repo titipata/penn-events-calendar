@@ -10,6 +10,7 @@ module.exports = {
     siteUrl: 'http://35.160.123.103',
     image: 'http://35.160.123.103/og-image-penn.png',
     logo: 'http://35.160.123.103/favicon.ico',
+    type: 'website'
   },
   plugins: [
     {

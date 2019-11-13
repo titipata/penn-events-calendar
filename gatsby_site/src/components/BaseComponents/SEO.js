@@ -12,6 +12,7 @@ const SEO = () => (
             description
             siteUrl
             image
+            type
           }
         }
       }
@@ -35,6 +36,7 @@ const SEO = () => (
             <meta property="og:title" content={title} />
             <meta property="og:description" content={description} />
             <meta property="og:image" content={image} />
+            <meta property="og:type" content={type} />
 
             {/* Twitter Card tags */}
             <meta name="twitter:card" content="summary_large_image" />
