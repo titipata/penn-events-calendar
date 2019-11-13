@@ -6,6 +6,7 @@ import styled from 'styled-components';
 import { Container } from './BaseComponents/container';
 import NavBar from './Navbar';
 import Footer from './Footer';
+import SEO from './BaseComponents/SEO';
 
 const StickyFooterWrapper = styled.div`
   /* sticky footer */
@@ -24,28 +25,31 @@ const StyledLink = styled(Link)`
 `;
 
 const Layout = ({ children }) => (
-  <StickyFooterWrapper>
-    <NavBar>
-      <StyledLink to="/">
-        Home
-      </StyledLink>
-      <StyledLink to="/selected-events">
-        Selected Events
-      </StyledLink>
-      <StyledLink to="/recommendations">
-        Recommendations
-      </StyledLink>
-      <StyledLink to="/how-it-works">
-        Usage
-      </StyledLink>
-    </NavBar>
+  <>
+    <SEO />
+    <StickyFooterWrapper>
+      <NavBar>
+        <StyledLink to="/">
+          Home
+        </StyledLink>
+        <StyledLink to="/selected-events">
+          Selected Events
+        </StyledLink>
+        <StyledLink to="/recommendations">
+          Recommendations
+        </StyledLink>
+        <StyledLink to="/how-it-works">
+          Usage
+        </StyledLink>
+      </NavBar>
 
-    <Container>
-      {children}
-    </Container>
+      <Container>
+        {children}
+      </Container>
 
-    <Footer />
-  </StickyFooterWrapper>
+      <Footer />
+    </StickyFooterWrapper>
+  </>
 );
 
 Layout.propTypes = {
