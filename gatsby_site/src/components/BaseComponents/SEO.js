@@ -19,7 +19,7 @@ const SEO = () => (
     `}
     render={({ site: { siteMetadata: seo } }) => {
       const {
-        title, description, siteUrl, image,
+        title, description, siteUrl, image, type
       } = seo;
 
       return (

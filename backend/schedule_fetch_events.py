@@ -30,6 +30,7 @@ def job():
 
     # restart supervisor-hug after fetching
     subprocess.run(['supervisorctl', 'restart', 'supervisor-hug'])
+    subprocess.run(['supervisorctl', 'restart', 'supervisor-gatsby'])
 
 
 schedule.every().sunday.at("23:59").do(job)
