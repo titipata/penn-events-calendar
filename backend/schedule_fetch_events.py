@@ -18,11 +18,19 @@ subprocess.run(['python', '-m', 'spacy', 'download', 'en_core_web_sm'])
 
 
 def job():
+    # start GROBID
+    subprocess.run(['supervisorctl', 'start', 'supervisor-grobid'])
+    time.sleep(30)
+
     print("Start fetching events...")
     fetch_all_events() # fetch all events
     create_events_features() # create events features: event topics, search keywords
     index_events_elasticsearch() # index events and keywords to elasticsearch
     print("Done fetching events at {}...".format(str(datetime.now())))
+
+    # restart supervisor-hug after fetching
+    subprocess.run(['supervisorctl', 'restart', 'supervisor-hug'])
+    subprocess.run(['supervisorctl', 'stop', 'supervisor-grobid'])
 
 
 schedule.every().sunday.at("23:59").do(job)
