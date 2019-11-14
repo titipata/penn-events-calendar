@@ -1501,20 +1501,33 @@ def fetch_events_CASI(base_url='https://casi.ssc.upenn.edu'):
 
     events = []
     event_table = page_soup.find(
-        'div', attrs={'class': 'main-container container'})
+        'div', attrs={'class': 'view-events'})
     all_events = event_table.find_all('div', attrs={'class': 'views-row'})
     for event in all_events:
+        title = event.find('span', attrs={'class': 'field-content'})
+        title = title.text.strip() if title is not None else ''
+        speaker = event.find('div', attrs={
+                                  'class': 'views-field-field-speaker-full-name'})
+        speaker = speaker.text.strip() if speaker is not None else ''
+        date_time = event.find('span', attrs={'class': 'date-display-single'})
+        date = date_time.text.strip() if date_time is not None else ''
+        starttime = date.split('-')[-1].strip()
+        try:
+            s = int(starttime.split(':')[0])
+            if s <= 6 or s >= 12:
+                starttime = starttime + ' PM'
+            else:
+                starttime = starttime + ' AM'
+        except:
+            pass
+
+        endtime = ''
         event_url = urljoin(base_url, event.find('a')['href'])
         event_soup = BeautifulSoup(requests.get(
             event_url).content, 'html.parser')
-        title = event_soup.find('h1', attrs={'class': 'page-header'})
-        title = title.text.strip() if title is not None else ''
-        date = event_soup.find('span', attrs={'class': 'date-display-single'})
-        date = date.text.strip() if date is not None else ''
-        starttime, endtime = find_startend_time(date)
         details = event_soup.find('div', attrs={
                                   'class': 'field field-name-body field-type-text-with-summary field-label-hidden'})
-        details = details.text.strip() if details is not None else ''
+        details = details.get_text().strip() if details is not None else ''
         events.append({
             'title': title,
             'date': date,
@@ -1522,6 +1535,7 @@ def fetch_events_CASI(base_url='https://casi.ssc.upenn.edu'):
             'endtime': endtime,
             'description': details,
             'url': event_url,
+            'speaker': speaker,
             'owner': 'Center for the Advanced Study of India'
         })
     return events
