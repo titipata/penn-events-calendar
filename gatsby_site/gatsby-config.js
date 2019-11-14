@@ -10,7 +10,7 @@ module.exports = {
     siteUrl: 'http://35.160.123.103',
     image: 'http://35.160.123.103/og-image-penn.png',
     logo: 'http://35.160.123.103/favicon.ico',
-    type: 'website'
+    type: 'website',
   },
   plugins: [
     {
@@ -34,5 +34,12 @@ module.exports = {
     },
     'gatsby-transformer-json',
     'gatsby-plugin-react-helmet',
+    {
+      resolve: 'gatsby-plugin-google-analytics',
+      options: {
+        trackingId: 'UA-152564648-1',
+        exclude: ['/*.png', '/*.ico', '/static/**'],
+      },
+    },
   ],
 };
