@@ -34,5 +34,12 @@ module.exports = {
     },
     'gatsby-transformer-json',
     'gatsby-plugin-react-helmet',
+    {
+      resolve: `gatsby-plugin-google-analytics`,
+      options: {
+        trackingId: "UA-152564648-1",
+        exclude: ["/*.png", "/*.ico", "/static/**"],
+      },
+    },
   ],
 };
