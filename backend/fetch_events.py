@@ -232,13 +232,13 @@ def fetch_events_cni(base_url='https://cni.upenn.edu/events'):
 
         events.append({
             'title': title,
+            'speaker': speaker,
             'date': date,
             'location': location,
             'description': description,
             'starttime': starttime,
             'endtime': endtime,
             'url': event_url,
-            'speaker': speaker,
             'owner': 'Computational Neuroscience Initiative (CNI)'
         })
     return events
@@ -285,11 +285,12 @@ def fetch_events_english_dept(base_url='https://www.english.upenn.edu/events/cal
 
                 events.append({
                     'title': title,
+                    'speaker': '',
                     'date': date,
-                    'starttime': starttime,
-                    'endtime': endtime,
                     'location': location,
                     'description': description,
+                    'starttime': starttime,
+                    'endtime': endtime,
                     'url': event_url,
                     'owner': "English Department",
                 })
@@ -331,13 +332,14 @@ def fetch_events_crim(base_url='https://crim.sas.upenn.edu'):
                 endtime = ''
             events.append({
                 'title': title,
+                'speaker': '',
                 'date': date,
-                'starttime': starttime,
                 'location': location,
                 'description': description,
+                'starttime': starttime,
+                'endtime': endtime,
                 'url': event_url,
                 'owner': 'Dapartment of Criminology',
-                'endtime': endtime
             })
     return events
 
@@ -372,14 +374,15 @@ def fetch_events_mec(base_url='https://www.sas.upenn.edu'):
             endtime = ''
         events.append({
             'title': title,
-            'date': date,
-            'description': description,
-            'owner': 'Middle East Center',
-            'url': event_url,
-            'location': '',
             'speaker': '',
+            'date': date,
+            'location': '',
+            'description': description,
             'starttime': starttime,
-            'endtime': endtime
+            'endtime': endtime,
+            'url': event_url,
+            'owner': 'Middle East Center',
+
         })
     return events
 
@@ -410,9 +413,12 @@ def fetch_events_biology(base_url='http://www.bio.upenn.edu'):
             'p').text if description is not None else ''
         events.append({
             'title': title,
+            'speaker': '',
             'date': date,
             'location': location,
             'description': description,
+            'starttime': '',
+            'endtime': '',
             'owner': 'Department of Biology',
             'url': event_url
         })
@@ -474,12 +480,12 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
                 'p', attrs={'class': 'address'}).text.strip()
             events.append({
                 'title': title,
-                'description': description,
                 'speaker': speaker,
                 'date': date,
+                'location': location,
+                'description': description,
                 'starttime': starttime,
                 'endtime': endtime,
-                'location': location,
                 'url': event_url,
                 'owner': 'Department of Economics'
             })
@@ -535,14 +541,15 @@ def fetch_events_math(base_url='https://www.math.upenn.edu'):
             if not any([k == title for k in ['TBA', 'TBD']]):
                 events.append({
                     'title': title,
-                    'date': date,
                     'speaker': speaker,
+                    'date': date,
                     'location': location,
                     'description': description,
+                    'starttime': starttime,
+                    'endtime': endtime,
                     'url': event_url,
                     'owner': 'Department of Mathematics (Math)',
-                    'starttime': starttime,
-                    'endtime': endtime
+
                 })
     return events
 
@@ -576,12 +583,13 @@ def fetch_events_philosophy(base_url='https://philosophy.sas.upenn.edu'):
 
             events.append({
                 'title': title,
+                'speaker': '',
                 'date': date,
                 'location': location,
                 'description': description,
-                'url': event_url,
                 'starttime': starttime,
                 'endtime': endtime,
+                'url': event_url,
                 'owner': 'Department of Philosophy'
             })
     return events
@@ -625,12 +633,13 @@ def fetch_events_classical_studies(base_url='https://www.classics.upenn.edu'):
 
             events.append({
                 'title': title,
+                'speaker': '',
                 'date': date,
                 'location': location,
                 'description': description,
-                'url': event_url,
                 'starttime': starttime,
                 'endtime': endtime,
+                'url': event_url,
                 'owner': 'Department of Classical Studies'
             })
     return events
@@ -669,14 +678,14 @@ def fetch_events_linguistic(base_url='https://www.ling.upenn.edu'):
         description = description.get_text() if description is not None else ''
 
         events.append({
-            'title': title,
+            'title': ''.join(title.split(': ')[:-1]) if ': ' in title else title,
+            'speaker': title.split(': ')[-1] if ': ' in title else '',
             'date': date,
             'location': location,
             'description': description,
-            'url': event_url,
             'starttime': starttime,
             'endtime': endtime,
-            'speaker': title.split(': ')[-1] if ': ' in title else '',
+            'url': event_url,
             'owner': 'Department of Linguistics'
         })
     return events
@@ -710,10 +719,10 @@ def fetch_events_earth_enviromental_science(base_url='https://www.sas.upenn.edu'
         starttime, endtime = find_startend_time(date)
         events.append({
             'title': title,
+            'speaker': presenter,
             'date': date,
             'location': location,
             'description': description,
-            'speaker': presenter,
             'starttime': starttime,
             'endtime': endtime,
             'url': event_url,
@@ -764,6 +773,7 @@ def fetch_events_art_history(base_url='https://www.sas.upenn.edu'):
             description = description.text.strip() if description is not None else ''
             events.append({
                 'title': title,
+                'speaker': '',
                 'date': date,
                 'location': location,
                 'description': description,
@@ -830,11 +840,12 @@ def fetch_events_sociology(base_url='https://sociology.sas.upenn.edu'):
                     description = ''
             events.append({
                 'title': title,
+                'speaker': '',
                 'date': date,
-                'starttime': starttime,
-                'endtime': endtime,
                 'location': location,
                 'description': description,
+                'starttime': starttime,
+                'endtime': endtime,
                 'url': event_url,
                 'owner': 'Department of Sociology (Sociology)'
             })
@@ -889,11 +900,12 @@ def fetch_events_cceb(base_url='https://www.cceb.med.upenn.edu/events'):
                 event_json['event']['description'] or '', 'html.parser').text.strip()
             events.append({
                 'title': title,
+                'speaker': '',
                 'date': date,
-                'starttime': starttime,
-                'endtime': endtime,
                 'location': location,
                 'description': description,
+                'starttime': starttime,
+                'endtime': endtime,
                 'url': event_url,
                 'owner': 'Clinical Epidemiology and Biostatistics (CCEB)'
             })
@@ -910,10 +922,11 @@ def fetch_events_cis(base_url="http://www.cis.upenn.edu/about-cis/events/index.p
     for tr in page_soup.find_all('tr'):
         if tr.find('img') is not None:
             events.append({
-                'date': date,
                 'title': title,
-                'description': description,
                 'speaker': speaker,
+                'date': date,
+                'location': location,
+                'description': description,
                 'url': base_url,
                 'owner': 'CIS',
                 'starttime': '3:00 PM',
@@ -951,14 +964,14 @@ def fetch_events_dsl(base_url='http://dsl.cis.upenn.edu/seminar/'):
         if date != '' and speaker != '' and title != '':
             events.append({
                 'title': title,
-                'description': description,
-                'date': date,
-                'url': base_url,
                 'speaker': speaker,
-                'owner': 'Distributed Systems Laboratory (DSL)',
+                'date': date,
                 'location': 'DSL Conference Room',
+                'description': description,
                 'starttime': '12:00 PM',
-                'endtime': '1:00 PM'
+                'endtime': '1:00 PM',
+                'url': base_url,
+                'owner': 'Distributed Systems Laboratory (DSL)'
             })
     return events
 
@@ -1001,12 +1014,13 @@ def fetch_events_CURF(base_url='https://www.curf.upenn.edu'):
 
         events.append({
             'title': title,
-            'description': description,
-            'url': event_url,
+            'speaker': '',
             'date': date,
             'location': location,
+            'description': description,
             'starttime': starttime,
             'endtime': endtime,
+            'url': event_url,
             'owner': 'Center for Undergrad Research and Fellowship (CURF)',
         })
     return events
@@ -1036,12 +1050,13 @@ def fetch_events_upibi(base_url='http://upibi.org/events/list/?tribe_paged=1&tri
             event_url = event.find('a')['href']
             events.append({
                 'title': title,
-                'description': description,
-                'url': event_url,
+                'speaker': '',
                 'date': date,
                 'location': location,
+                'description': description,
                 'starttime': starttime,
                 'endtime': endtime,
+                'url': event_url,
                 'owner': 'Institute for Biomedical Informatics (UPIBI)'
             })
         except:
@@ -1110,14 +1125,14 @@ def fetch_events_ldi(base_url='https://ldi.upenn.edu'):
             if title != '' and description != '':
                 events.append({
                     'title': title,
-                    'description': description,
+                    'speaker': speaker,
                     'date': date,
                     'location': location,
-                    'speaker': speaker,
+                    'description': description,
+                    'starttime': starttime,
+                    'endtime': endtime,
                     'url': event_url,
                     'owner': 'Leonard & Davis Institute (LDI)',
-                    'starttime': starttime,
-                    'endtime': endtime
                 })
     return events
 
@@ -1149,12 +1164,13 @@ def fetch_events_korean_studies(base_url='https://www.sas.upenn.edu'):
         event_speaker = event_speaker.text.strip() if event_speaker is not None else ''
         events.append({
             'title': title,
-            'description': description,
-            'url': event_url,
+            'speaker': event_speaker,
             'date': date,
+            'location': '',
+            'description': description,
             'starttime': starttime,
             'endtime': endtime,
-            'speaker': event_speaker,
+            'url': event_url,
             'owner': 'Korean Studies'
         })
     return events
@@ -1194,13 +1210,13 @@ def fetch_events_cscc(base_url='https://cscc.sas.upenn.edu/'):
             description = description.text.strip() if description is not None else ''
             events.append({
                 'title': title,
-                'location': location,
+                'speaker': speaker,
                 'date': event_date,
+                'location': location,
+                'description': description,
                 'starttime': starttime,
                 'endtime': endtime,
-                'speaker': speaker,
                 'url': event_url,
-                'description': description,
                 'owner': 'Center for the Study of Contemporary China'
             })
         except:
@@ -1244,12 +1260,12 @@ def fetch_events_fels(base_url='https://www.fels.upenn.edu'):
             'Home\xa0 // \xa0', '').strip() if speaker is not None else ''
         events.append({
             'title': title,
-            'location': (location + ' ' + room).strip(),
+            'speaker': speaker,
             'date': date,
+            'location': (location + ' ' + room).strip(),
+            'description': description,
             'starttime': starttime,
             'endtime': endtime,
-            'description': description,
-            'speaker': speaker,
             'url': event_url,
             'owner': 'Fels institute'
         })
@@ -1293,11 +1309,12 @@ def fetch_events_sciencehistory(base_url='https://www.sciencehistory.org'):
 
         events.append({
             'title': title,
-            'description': descriptions,
+            'speaker': '',
             'date': date,
+            'location': location,
+            'description': descriptions,
             'starttime': starttime,
             'endtime': endtime,
-            'location': location,
             'url': event_url,
             'owner': 'Science History Institute'
         })
@@ -1338,10 +1355,13 @@ def fetch_events_HIP(base_url='https://www.impact.upenn.edu/'):
 
         events.append({
             'title': title,
-            'description': description,
-            'url': event_url,
+            'speaker': '',
             'date': date,
+            'location': '',
+            'description': description,
             'starttime': starttime,
+            'endtime': endtime,
+            'url': event_url,
             'owner': "Center for High Impact Philanthropy"
         })
     return events
@@ -1394,13 +1414,13 @@ def fetch_events_italian_studies(base_url='https://www.sas.upenn.edu'):
             'p')]) if description is not None else ''
         events.append({
             'title': title,
-            'url': event_url,
+            'speaker': speaker,
             'date': date,
-            'starttime': starttime,
-            'endtime': endtime,
             'location': location,
             'description': description,
-            'speaker': speaker,
+            'starttime': starttime,
+            'endtime': endtime,
+            'url': event_url,
             'owner': 'Italian Studies'
         })
     return events
@@ -1447,12 +1467,13 @@ def fetch_events_CEMB(base_url='https://cemb.upenn.edu'):
 
         events.append({
             'title': title,
+            'speaker': '',
             'date': date,
+            'location': location,
+            'description': details,
             'starttime': starttime,
             'endtime': endtime,
-            'location': location,
             'url': event_url,
-            'description': details,
             'owner': 'Center for Engineering MechanoBiology'
         })
     return events
@@ -1482,11 +1503,13 @@ def fetch_events_CEAS(base_url='https://ceas.sas.upenn.edu'):
         details = details.text if details is not None else ''
         events.append({
             'title': title,
+            'speaker'
             'date': date,
+            'location': '',
+            'description': details,
             'starttime': starttime,
             'endtime': endtime,
             'url': event_url,
-            'description': details,
             'owner': 'Center for East Asian Studies'
         })
     return events
@@ -1530,12 +1553,13 @@ def fetch_events_CASI(base_url='https://casi.ssc.upenn.edu'):
         details = details.get_text().strip() if details is not None else ''
         events.append({
             'title': title,
+            'speaker': speaker,
             'date': date,
+            'location': '',
+            'description': details,
             'starttime': starttime,
             'endtime': endtime,
-            'description': details,
             'url': event_url,
-            'speaker': speaker,
             'owner': 'Center for the Advanced Study of India'
         })
     return events
@@ -1574,9 +1598,10 @@ def fetch_events_african_studies(base_url='https://africana.sas.upenn.edu'):
             'title': title,
             'speaker': speaker,
             'date': date,
+            'location': '',
+            'description': details,
             'starttime': starttime,
             'endtime': endtime,
-            'description': details,
             'url': event_url,
             'owner': 'African Studies'
         })
@@ -1611,10 +1636,12 @@ def fetch_events_business_ethics(base_url='https://zicklincenter.wharton.upenn.e
         details = details.text.strip() if details is not None else ''
         events.append({
             'title': title,
+            'speaker': '',
             'date': date,
+            'location': '',
+            'description': details,
             'starttime': starttime,
             'endtime': endtime,
-            'description': details,
             'url': event_url,
             'owner': 'Zicklincenter Center for Business Ethics'
         })
@@ -1641,12 +1668,13 @@ def fetch_events_law(base_url='https://www.law.upenn.edu/institutes/legalhistory
             event_detail['event'].get('description', ''), 'html.parser')
         description = description.text.strip() if description is not None else ''
         events.append({
-            'date': event_detail['title'],
             'title': event_detail['event']['title'],
-            'starttime': starttime,
-            'endtime': endtime,
+            'speaker': '',
+            'date': event_detail['title'],
             'location': event_detail['event']['location'],
             'description': description,
+            'starttime': starttime,
+            'endtime': endtime,
             'url': 'https://www.law.upenn.edu/newsevents/calendar.php#event_id/{}/view/event'.format(event_id),
             'owner': 'Law School'
         })
@@ -1685,12 +1713,12 @@ def fetch_events_penn_SAS(base_url='https://www.sas.upenn.edu'):
         details = details.text.strip() if details is not None else ''
         events.append({
             'title': title,
+            'speaker': speaker,
             'date': date,
+            'location': location,
+            'description': details,
             'starttime': starttime,
             'endtime': endtime,
-            'location': location,
-            'speaker': speaker,
-            'description': details,
             'url': event_url,
             'owner': 'School of Arts & Science (SAS)'
         })
@@ -1739,11 +1767,12 @@ def fetch_events_physics_astronomy(base_url='https://www.physics.upenn.edu'):
             description = description.text.strip() if description is not None else ''
             events.append({
                 'title': title,
+                'speaker': speaker,
                 'date': date,
+                'location': '',
+                'description': description,
                 'starttime': starttime,
                 'endtime': endtime,
-                'speaker': speaker,
-                'description': description,
                 'url': event_url,
                 'owner': 'Department of Physics and Astronomy'
             })
@@ -1775,11 +1804,12 @@ def fetch_events_wolf_humanities(base_url='http://wolfhumanities.upenn.edu'):
         details = details.text.strip() if details is not None else ''
         events.append({
             'title': title,
+            'speaker': '',
             'date': date,
-            'starttime': starttime,
-            'endtime': endtime,
             'location': location,
             'description': details,
+            'starttime': starttime,
+            'endtime': endtime,
             'url': event_url,
             'owner': 'Wolf Humanities Center Events'
         })
@@ -1811,10 +1841,12 @@ def fetch_events_music_dept(base_url='https://www.sas.upenn.edu'):
         starttime, endtime = find_startend_time(date)
         events.append({
             'title': title,
+            'speaker': '',
             'date': date,
+            'location': '',
+            'description': details.strip(),
             'starttime': starttime,
             'endtime': endtime,
-            'description': details.strip(),
             'url': event_url,
             'owner': 'Department of Music'
         })
@@ -1858,11 +1890,11 @@ def fetch_events_annenberg(base_url='https://www.asc.upenn.edu'):
                     speaker = title.split(kw)[-1]
             events.append({
                 'title': title,
+                'speaker': speaker,
                 'date': date,
                 'location': location,
                 'description': details,
                 'url': event_url,
-                'speaker': speaker,
                 'starttime': starttime,
                 'endtime': endtime,
                 'owner': 'Annenberg School of Communication'
@@ -1899,12 +1931,13 @@ def fetch_events_religious_studies(base_url='https://www.sas.upenn.edu'):
             'p')]) if details is not None else ''
         events.append({
             'title': title,
+            'speaker': '',
             'date': date,
             'location': location,
             'description': details,
-            'url': event_url,
             'starttime': starttime,
             'endtime': endtime,
+            'url': event_url,
             'owner': 'Department of Religious Studies'
         })
     return events
@@ -1937,12 +1970,13 @@ def fetch_events_AHEAD(base_url='http://www.ahead-penn.org'):
         details = details.text.strip() if details is not None else ''
         events.append({
             'title': title,
+            'speaker': '',
             'date': date,
             'location': location,
             'description': details,
-            'url': event_url,
             'starttime': starttime,
             'endtime': endtime,
+            'url': event_url,
             'owner': 'Penn AHEAD',
         })
     return events
@@ -1976,10 +2010,12 @@ def fetch_events_SPP(base_url='https://www.sp2.upenn.edu'):
         details = details.text.strip() if details is not None else ''
         events.append({
             'title': title,
+            'speaker': '',
             'date': date,
+            'location': '',
+            'description': details,
             'starttime': starttime,
             'endtime': endtime,
-            'description': details,
             'url': event_url,
             'owner': 'Social Policy & Practice'
         })
@@ -2010,10 +2046,12 @@ def fetch_events_ortner_center(base_url='http://ortnercenter.org'):
         details = details.text.strip() if details is not None else ''
         events.append({
             'title': title,
+            'speaker': '',
             'date': date,
+            'location': '',
+            'description': details,
             'starttime': '',
             'endtime': '',
-            'description': details,
             'url': event_url,
             'owner': 'Ortner Center for Violence and Abuse in Relationships'
         })
@@ -2031,11 +2069,12 @@ def fetch_events_penn_today(base_url='https://penntoday.upenn.edu'):
         events_list.append({
             # 'event_id': event['id'],
             'title': event['title'],
-            'description': BeautifulSoup(event['body'], 'html.parser').text.strip(),
+            'speaker': '',
             'date': event['start'],
+            'location': event['location'] if event['location'] is not False else '',
+            'description': BeautifulSoup(event['body'], 'html.parser').text.strip(),
             'starttime': event['starttime'],
             'endtime': event['endtime'],
-            'location': event['location'] if event['location'] is not False else '',
             'url': urljoin(base_url, event['path']),
             'owner': 'Penn Today Events'
         })
@@ -2085,11 +2124,12 @@ def fetch_events_mins(base_url='http://go.activecalendar.com/handlers/query.ashx
     for title, date, url, description, location in zip(titles, dates, urls, events_descriptions, locations):
         events.append({
             'title': title,
-            'description': description,
+            'speaker': '',
             'date': date[0],
+            'location': location,
+            'description': description,
             'starttime': date[1],
             'endtime': date[2],
-            'location': location,
             'url': url,
             'owner': 'Mahoney Institute for Neuroscience (MINS)'
         })
@@ -2127,13 +2167,13 @@ def extract_mindcore_event_detail(event):
 
     return {
         'title': title,
+        'speaker': speaker,
         'date': date,
         'location': location,
         'description': description,
         'starttime': starttime,
         'endtime': endtime,
         'url': event_url,
-        'speaker': speaker,
         'owner': 'MindCORE'
     }
 
@@ -2253,13 +2293,13 @@ def fetch_events_seas(base_url='https://events.seas.upenn.edu/calendar/list/'):
 
                 events.append({
                     'title': title,
+                    'speaker': speaker,
                     'date': date,
                     'location': location,
                     'description': description,
                     'starttime': starttime,
                     'endtime': endtime,
                     'url': event_url,
-                    'speaker': speaker,
                     'owner': owner
                 })
         except:
@@ -2305,13 +2345,13 @@ def fetch_events_vet(base_url='https://www.vet.upenn.edu/veterinary-hospitals/NB
 
                 events.append({
                     'title': title,
+                    'speaker': speaker,
                     'date': date,
                     'location': location,
                     'description': description,
                     'starttime': starttime,
                     'endtime': endtime,
                     'url': event_url,
-                    'speaker': speaker,
                     'owner': 'New Bolton Center Hospital (Veterinary Hospitals)'
                 })
     return events
@@ -2377,12 +2417,12 @@ def fetch_events_gse(base_url='https://www.gse.upenn.edu/event'):
 
             events.append({
                 'title': title,
+                'speaker': speaker,
                 'date': date,
                 'location': location,
                 'description': description,
                 'starttime': starttime,
                 'endtime': endtime,
-                'speaker': speaker,
                 'url': event_url,
                 'owner': 'Graduate School of Education (GSE)'
             })
@@ -2433,12 +2473,12 @@ def fetch_events_grasp(base_url='https://www.grasp.upenn.edu'):
 
         events.append({
             'title': title,
+            'speaker': speaker,
             'date': date,
             'location': location,
             'description': description,
             'starttime': starttime,
             'endtime': endtime,
-            'speaker': speaker,
             'url': event_url,
             'owner': 'General Robotics, Automation, Sensing & Perception laboratory (GRASP)'
         })
@@ -2484,12 +2524,12 @@ def fetch_events_wharton_stats(base_url='https://statistics.wharton.upenn.edu/re
                 location = location.replace('Location: ', '').replace('*', '')
             events.append({
                 'title': title,
+                'speaker': speaker,
                 'date': date,
                 'location': location,
                 'description': description,
                 'starttime': starttime,
                 'endtime': endtime,
-                'speaker': speaker,
                 'url': event_url,
                 'owner': 'Wharton Statistics Seminars'
             })
@@ -2552,10 +2592,11 @@ def fetch_events_school_design(base_url='https://www.design.upenn.edu'):
 
                 events.append({
                     'title': title,
+                    'speaker': '',
                     'date': date,
+                    'location': location,
                     'starttime': starttime,
                     'endtime': endtime,
-                    'location': location,
                     'description': description,
                     'url': event_url,
                     'owner': 'School of Design (Weitzman)'
@@ -2611,11 +2652,12 @@ def fetch_events_penn_museum(base_url='https://www.penn.museum/'):
 
                         events.append({
                             'title': title,
+                            'speaker': '',
                             'date': date,
-                            'starttime': starttime,
-                            'endtime': endtime,
                             'location': location,
                             'description': description,
+                            'starttime': starttime,
+                            'endtime': endtime,
                             'url': event_url,
                             'owner': 'Penn Museum (lecture)'
                         })
@@ -2662,14 +2704,14 @@ def fetch_events_wharton_marketing(base_url='https://marketing.wharton.upenn.edu
             title = title.text.strip() if title is not None else ''
             if date != '' and title != 'TBD':
                 events.append({
-                    'date': date,
-                    'url': base_url,
-                    'speaker': speaker,
                     'title': title,
+                    'speaker': speaker,
+                    'date': date,
                     'location': location,
+                    'description': description,
                     'starttime': starttime,
                     'endtime': endtime,
-                    'description': description,
+                    'url': base_url,
                     'owner': 'Decision Processes Colloquia (Wharton)'
                 })
     return events
@@ -2710,14 +2752,14 @@ def fetch_events_marketing_col(base_url='https://marketing.wharton.upenn.edu/eve
                 description = ''
             if 'Speaker TBA' not in title:
                 events.append({
-                    'date': date,
-                    'url': base_url,
-                    'speaker': speaker,
                     'title': title,
+                    'speaker': speaker,
+                    'date': date,
                     'location': location,
+                    'description': description,
                     'starttime': starttime,
                     'endtime': endtime,
-                    'description': description,
+                    'url': base_url,
                     'owner': 'Marketing Department Colloquia (Wharton)'
                 })
     return events
@@ -2757,14 +2799,14 @@ def fetch_events_macro_seminar(base_url='https://fnce.wharton.upenn.edu/departme
             date = date + ' ' + year
             if title.strip() is not '':
                 events.append({
-                    'date': date,
-                    'url': base_url,
-                    'speaker': speaker,
                     'title': title,
+                    'speaker': speaker,
+                    'date': date,
                     'location': location,
+                    'description': description,
                     'starttime': starttime,
                     'endtime': endtime,
-                    'description': description,
+                    'url': base_url,
                     'owner': 'Finance Department, Macro Seminar (Wharton)'
                 })
     return events
@@ -2854,14 +2896,14 @@ def fetch_events_accounting_wharton(base_url='https://accounting.wharton.upenn.e
             title = title.text.strip() if title is not None else ''
             if title is not '':
                 events.append({
-                    'date': date,
-                    'url': base_url,
-                    'speaker': speaker,
                     'title': title,
+                    'speaker': speaker,
+                    'date': date,
                     'location': location,
+                    'description': description,
                     'starttime': starttime,
                     'endtime': endtime,
-                    'description': description,
+                    'url': base_url,
                     'owner': 'Accounting Department (Wharton)'
                 })
     return events
@@ -2898,14 +2940,14 @@ def fetch_events_lgst_wharton(base_url='https://lgst.wharton.upenn.edu/departmen
             title = title.text.strip() if title is not None else ''
             if title is not '':
                 events.append({
-                    'date': date,
-                    'url': base_url,
-                    'speaker': speaker,
                     'title': title,
+                    'speaker': speaker,
+                    'date': date,
                     'location': location,
+                    'description': description,
                     'starttime': starttime,
                     'endtime': endtime,
-                    'description': description,
+                    'url': base_url,
                     'owner': 'Legal Studies & Business Ethic Department (Wharton)'
                 })
     return events
@@ -2932,10 +2974,13 @@ def read_google_ics(ics_url):
             title = event.name
             events.append({
                 'title': title,
+                #Speaker set later
                 'date': date,
+                #Location set later
+                'description': description
                 'starttime': starttime,
                 'endtime': endtime,
-                'description': description
+                #Owner and URL set later
             })
     return events
 
@@ -2949,10 +2994,13 @@ def fetch_events_energy_econ(base_url='https://bepp.wharton.upenn.edu/research/e
 
     events = []
     for event in events_calendar:
-        event['location'] = 'Kleinman Center classroom—Fisher Fine Arts Room 306'
-        event['owner'] = 'Energy Economics & Finance Seminar'
-        event['url'] = base_url
+        # Title already set by read_google_ics()
         event['speaker'] = event['title']
+        # Date already set
+        event['location'] = 'Kleinman Center classroom—Fisher Fine Arts Room 306'
+        #Description, starttime, and endtime already set
+        event['url'] = base_url
+        event['owner'] = 'Energy Economics & Finance Seminar'
         events.append(event)
     return events
 
@@ -2966,10 +3014,11 @@ def fetch_events_industrial_org(base_url='https://bepp.wharton.upenn.edu/researc
 
     events = []
     for event in events_calendar:
-        event['location'] = 'The Ronald O. Perelman Center for Political Science and Economics (PCPSE); 133 South 36th Street – Room 101'
-        event['owner'] = 'Industrial Organization Seminar (Wharton)'
-        event['url'] = base_url
+        # Remaining fields set by read_google_ics()
         event['speaker'] = event['title']
+        event['location'] = 'The Ronald O. Perelman Center for Political Science and Economics (PCPSE); 133 South 36th Street – Room 101'
+        event['url'] = base_url
+        event['owner'] = 'Industrial Organization Seminar (Wharton)'
         events.append(event)
     return events
 
@@ -2983,10 +3032,11 @@ def fetch_events_applied_econ_workshop(base_url='https://bepp.wharton.upenn.edu/
 
     events = []
     for event in events_calendar:
-        event['location'] = '265 JMHH'
-        event['owner'] = 'Applied Economics Workshop (Wharton)'
-        event['url'] = base_url
+        # Remaining fields set by read_google_ics()
         event['speaker'] = event['title']
+        event['location'] = '265 JMHH'
+        event['url'] = base_url
+        event['owner'] = 'Applied Economics Workshop (Wharton)'
         events.append(event)
     return events
 
@@ -3020,14 +3070,14 @@ def fetch_json_events(base_url, json_url, owner):
 
         if not any([k in title.lower() for k in ['registration', 'break', 'schedule', ' tbd']]):
             events.append({
-                'date': date,
-                'url': base_url,
-                'speaker': speaker,
                 'title': title,
+                'speaker': speaker,
+                'date': date,
                 'location': location,
+                'description': description.strip(),
                 'starttime': starttime,
                 'endtime': endtime,
-                'description': description.strip(),
+                'url': base_url,
                 'owner': owner
             })
     return events
@@ -3043,7 +3093,7 @@ def fetch_events_public_policy(base_url='https://publicpolicy.wharton.upenn.edu/
     events = fetch_json_events(
         base_url,
         json_url,
-        'Public Policy Initiative (Wharton)'
+        owner='Public Policy Initiative (Wharton)'
     )
     return events
 
@@ -3058,7 +3108,7 @@ def fetch_events_nursing(base_url='https://www.nursing.upenn.edu/calendar/#!view
     events = fetch_json_events(
         base_url,
         json_url,
-        'Nursing'
+        owner='Nursing'
     )
     return events
 
@@ -3073,7 +3123,7 @@ def fetch_events_gcb(base_url='https://events.med.upenn.edu/gcb/#!view/all'):
     events = fetch_json_events(
         base_url,
         json_url,
-        'Genomics and Computational Biology Graduate Group (GCB)'
+        owner='Genomics and Computational Biology Graduate Group (GCB)'
     )
     return events
 
@@ -3113,14 +3163,14 @@ def fetch_events_ppe(base_url='https://ppe.sas.upenn.edu/events'):
         else:
             description, starttime, endtime = '', '', ''
         events.append({
-            'date': date,
-            'url': event_url,
-            'speaker': '',
             'title': title,
+            'speaker': '',
+            'date': date,
             'location': location,
+            'description': description.strip(),
             'starttime': starttime,
             'endtime': endtime,
-            'description': description.strip(),
+            'url': event_url,
             'owner': 'Philosophy Politics & Economics (PPE)'
         })
     return events
@@ -3158,14 +3208,14 @@ def fetch_events_perry_world(base_url='https://global.upenn.edu/perryworldhouse/
             description, location = '', ''
 
         events.append({
-            'date': date,
-            'url': event_url,
-            'speaker': '',
             'title': title,
+            'speaker': '',
+            'date': date,
             'location': location,
+            'description': description.strip(),
             'starttime': starttime,
             'endtime': endtime,
-            'description': description.strip(),
+            'url': event_url,
             'owner': 'Perry World House'
         })
     return events
@@ -3204,14 +3254,14 @@ def fetch_events_psychology(base_url='https://psychology.sas.upenn.edu/calendar'
             description, location = '', ''
 
         events.append({
-            'date': date,
-            'url': event_url,
-            'speaker': '',
             'title': title,
+            'speaker': '',
+            'date': date,
             'location': location,
+            'description': description.strip(),
             'starttime': starttime,
             'endtime': endtime,
-            'description': description.strip(),
+            'url': event_url,
             'owner': 'Department of Psychology (Psychology)'
         })
     return events
@@ -3248,14 +3298,14 @@ def fetch_events_neuro_wharton(base_url='https://neuro.wharton.upenn.edu/events/
         description = description.get_text().strip() if description is not None else ''
 
         events.append({
-            'date': date.split('|')[0],
-            'url': event_url,
-            'speaker': '',
             'title': title,
+            'speaker': '',
+            'date': date.split('|')[0],
             'location': location,
+            'description': description.strip(),
             'starttime': starttime,
             'endtime': endtime,
-            'description': description.strip(),
+            'url': event_url,
             'owner': 'Wharton Neuroscience Initiative'
         })
     return events
@@ -3295,14 +3345,14 @@ def fetch_events_pspdg(base_url='https://pennsciencepolicy.squarespace.com'):
         description = description.text.strip() if description is not None else ''
 
         events.append({
-            'date': date,
-            'url': event_url,
-            'speaker': '',
             'title': title,
+            'speaker': '',
+            'date': date,
             'location': location,
+            'description': description,
             'starttime': starttime,
             'endtime': endtime,
-            'description': description,
+            'url': event_url,
             'owner': 'Penn Science Policy & Diplomacy Group (PSPDG)'
         })
     return events
@@ -3348,13 +3398,13 @@ def fetch_events_wolf_humanities(base_url='https://wolfhumanities.upenn.edu'):
 
                 events.append({
                     'title': title,
+                    'speaker': '',
                     'date': date,
                     'location': location,
                     'description': description,
                     'starttime': starttime,
                     'endtime': endtime,
                     'url': event_url,
-                    'speaker': '',
                     'owner': 'Wolf Humanities Center'
                 })
     return events
