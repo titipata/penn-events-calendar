@@ -1779,43 +1779,6 @@ def fetch_events_physics_astronomy(base_url='https://www.physics.upenn.edu'):
     return events
 
 
-def fetch_events_wolf_humanities(base_url='http://wolfhumanities.upenn.edu'):
-    """
-    Wolf Humanities Center Events, http://wolfhumanities.upenn.edu/events/color
-    """
-    page_soup = BeautifulSoup(requests.get(
-        urljoin(base_url, '/events/color')).content, 'html.parser')
-
-    events = []
-    event_table = page_soup.find('div', attrs={'class': 'event-list'})
-    all_events = event_table.find_all('li', attrs={'class': 'clearfix'})
-    for event in all_events:
-        event_url = urljoin(base_url, event.find('a')['href'])
-        event_soup = BeautifulSoup(requests.get(
-            event_url).content, 'html.parser')
-        title = event_soup.find('h1')
-        title = title.text.strip() if title is not None else ''
-        date = event_soup.find('p', attrs={'class': 'field-date'})
-        date = date.text.strip() if date is not None else ''
-        starttime, endtime = find_startend_time(date)
-        location = event_soup.find('div', attrs={'class': 'field-location'})
-        location = location.text.strip() if location is not None else ''
-        details = event_soup.find('div', attrs={'class': 'field-body'})
-        details = details.text.strip() if details is not None else ''
-        events.append({
-            'title': title,
-            'speaker': '',
-            'date': date,
-            'location': location,
-            'description': details,
-            'starttime': starttime,
-            'endtime': endtime,
-            'url': event_url,
-            'owner': 'Wolf Humanities Center Events'
-        })
-    return events
-
-
 def fetch_events_music_dept(base_url='https://www.sas.upenn.edu'):
     """
     Department of Music... details does not output anything
@@ -3434,7 +3397,7 @@ def fetch_all_events():
         fetch_events_HIP, fetch_events_italian_studies, fetch_events_CEMB,
         fetch_events_CEAS, fetch_events_CASI, fetch_events_african_studies,
         fetch_events_business_ethics, fetch_events_law, fetch_events_penn_SAS,
-        fetch_events_physics_astronomy, fetch_events_wolf_humanities, fetch_events_music_dept,
+        fetch_events_physics_astronomy, fetch_events_music_dept,
         fetch_events_annenberg, fetch_events_religious_studies, fetch_events_AHEAD,
         fetch_events_SPP, fetch_events_ortner_center, fetch_events_penn_today,
         fetch_events_mins, fetch_events_mindcore, fetch_events_seas,
