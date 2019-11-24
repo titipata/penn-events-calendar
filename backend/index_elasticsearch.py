@@ -3,14 +3,12 @@ import pandas as pd
 from elasticsearch import Elasticsearch, helpers
 from datetime import datetime
 from dateutil.parser import parse
-from tqdm import tqdm
 
+import backend.config as config
 
 es = Elasticsearch([
-    {'host': 'localhost', 'port': 9200},
+    {'host': config.ELASTIC_HOST, 'port': config.ELASTIC_PORT},
 ])
-INDEX_NAME = 'penn-events'
-path_data, path_vector = 'data/events.json', 'data/events_vector.json'
 
 
 def generate_event(events):
@@ -108,21 +106,21 @@ settings = {
 
 def index_events_elasticsearch():
     print('Indexing events to ElasticSearch...')
-    events = json.loads(open(path_data, 'r').read())
+    events = json.loads(open(config.PATH_DATA, 'r').read())
     events_df = pd.DataFrame(events).fillna('')
-    events_feature = json.loads(open(path_vector, 'r').read())
+    events_feature = json.loads(open(config.PATH_VECTOR, 'r').read())
     events_feature_df = pd.DataFrame(events_feature).fillna('')
 
     events_df = events_df.merge(events_feature_df[['event_index', 'suggest_candidates']],
                                 on='event_index', how='left')
     events = events_df.to_dict(orient='records')
 
-    es.indices.delete(index=INDEX_NAME, ignore=[
+    es.indices.delete(index=config.ELASTIC_INDEX, ignore=[
                       400, 404])  # delete current index
     # add settings to es indices client
     # include_type_name is very important!
     # also dont ignore 400, 404 here to know what the error is
-    es.indices.create(index=INDEX_NAME,
+    es.indices.create(index=config.ELASTIC_INDEX,
                       body=settings,
                       include_type_name=True)
 
