@@ -1,8 +1,6 @@
-import os
 import re
 import json
 from unidecode import unidecode
-import numpy as np
 import pandas as pd
 
 import spacy
@@ -11,52 +9,13 @@ from nltk.stem.porter import PorterStemmer
 from nltk.tokenize import WhitespaceTokenizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import TruncatedSVD
-from sklearn.neighbors import NearestNeighbors
 
-
-PATH_DATA = os.path.join('data', 'events.json')
-PATH_VECTOR = os.path.join('data', 'events_vector.json')
+import backend.config as config
 
 nlp = spacy.load('en_core_web_sm')
 stemmer = PorterStemmer()
 w_tokenizer = WhitespaceTokenizer()
 punct_re = re.compile('[{}]'.format(re.escape(string.punctuation)))
-
-
-PENN_LOCATIONS = [
-    'Wu and Chen Auditorium',
-    'Levine Hall',
-    'Towne',
-    'Goddard Labs',
-    'Fireside Lounge',
-    'Penn Museum',
-    'Annenberg Center',
-    'The Ambler Theater',
-    'Lightbox Film Center',
-    'Kleinman Center',
-    'Perelman Center for Political Science',
-    'Montgomery Theater',
-    'PCPSE',
-    'Fisher-Bennett Hall',
-    'Barchi Library',
-    'John Morgan Building',
-    'Hayden Hall',
-    'Blockley Hall',
-    'Irvine Auditorium',
-    'Blockley Hall',
-    'Fireside Lounge',
-    'BRB Auditorium',
-    'Penn Book Center',
-    'International House',
-    'Slought',
-    'Van Pelt Library',
-    'College Green',
-    'Locust Walk',
-    'National Mechanics',
-    'Kroiz Gallery',
-    'Fisher Fine Arts Library'
-]
-
 
 def save_json(ls, file_path):
     """
@@ -94,7 +53,7 @@ def generate_location_candidate(event):
     location = nlp(event['location'])
     location_candidates = [
         ent.text for ent in location.ents if ent.label_ in ('ORG', 'LOC')]
-    for penn_location in PENN_LOCATIONS:
+    for penn_location in config.locations:
         if penn_location in location.text:
             location_candidates.append(penn_location)
     return location_candidates
@@ -135,7 +94,7 @@ def generate_owner_candidate(event):
 def create_events_features():
     # produce topic vectors using tf-idf and Laten Semantic Analysis (LSA) and search candidate list
     print('Compute LSA vectors...')
-    events_json = json.loads(open(PATH_DATA, 'r').read())
+    events_json = json.loads(open(config.PATH_DATA, 'r').read())
     events_df = pd.DataFrame(events_json)
     events_text = [' '.join([e[1] for e in r.items()])
                    for _, r in events_df[['title', 'description', 'location', 'owner']].iterrows()]
@@ -169,8 +128,8 @@ def create_events_features():
 
     # save to JSON file
     save_json(events_df[['event_index', 'event_vector', 'suggest_candidates']].to_dict(
-        orient='records'), PATH_VECTOR)
-    print('Save feature file in {}!'.format(PATH_VECTOR))
+        orient='records'), config.PATH_VECTOR)
+    print('Save feature file in {}!'.format(config.PATH_VECTOR))
 
 
 if __name__ == '__main__':
