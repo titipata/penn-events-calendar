@@ -1,0 +1,36 @@
+# List of locations *that can be used to make recommendations*
+# (Other locations are valid, but can't be suggested)
+
+locations = [
+    'Wu and Chen Auditorium',
+    'Levine Hall',
+    'Towne',
+    'Goddard Labs',
+    'Fireside Lounge',
+    'Penn Museum',
+    'Annenberg Center',
+    'The Ambler Theater',
+    'Lightbox Film Center',
+    'Kleinman Center',
+    'Perelman Center for Political Science',
+    'Montgomery Theater',
+    'PCPSE',
+    'Fisher-Bennett Hall',
+    'Barchi Library',
+    'John Morgan Building',
+    'Hayden Hall',
+    'Blockley Hall',
+    'Irvine Auditorium',
+    'Blockley Hall',
+    'Fireside Lounge',
+    'BRB Auditorium',
+    'Penn Book Center',
+    'International House',
+    'Slought',
+    'Van Pelt Library',
+    'College Green',
+    'Locust Walk',
+    'National Mechanics',
+    'Kroiz Gallery',
+    'Fisher Fine Arts Library'
+]
