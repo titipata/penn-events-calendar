@@ -22,6 +22,7 @@ def drop_duplicate_events(df):
     r['event_index'] = event_index
     return r
 
+
 def find_scrapers(module) -> List[Callable]:
     """
     Build a list of 'scraper' functions contained in a module.

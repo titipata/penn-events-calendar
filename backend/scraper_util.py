@@ -12,6 +12,7 @@ from bs4 import BeautifulSoup
 from ics import Calendar
 from unidecode import unidecode
 
+
 PATTERNS = [
     r'^[a-zA-Z]+, ([a-zA-Z]+ [0-9]{1,2}, [0-9]{4}).*',
     r'^([a-zA-Z]+ [0-9]{1,2}, [0-9]{4}) .*',
@@ -34,11 +35,13 @@ def clean_date_format(d):
     try:
         return dateutil.parser.parse(d).strftime('%d-%m-%Y')
     except:
-        d = d.replace('Date TBD', '')
-        d = d.replace('EDT', '').replace('Special time:', '')
-        d = d.replace('Wu & Chen Auditorium', '')
+        d = d.replace('*', '')
         d = d.replace('-', '')
         d = d.replace('\n', ' ')
+        d = d.replace('Date TBD', '')
+        d = d.replace('EDT', '')
+        d = d.replace('Special time:', '')
+        d = d.replace('Wu & Chen Auditorium', '')
         d = re.sub(r'(\d+\:\d+\s?(?:AM|PM|am|pm|A.M.|P.M.|a.m.|p.m.))', '', d)
         d = d.replace('-', '').strip()
         if d is not '':

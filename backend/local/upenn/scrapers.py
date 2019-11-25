@@ -1,3 +1,5 @@
+import os
+import sys
 import json
 import re
 from datetime import timedelta, datetime
@@ -7,6 +9,7 @@ import requests
 from bs4 import BeautifulSoup, NavigableString
 from dateutil import relativedelta
 
+sys.path.append(os.path.join('..', '..'))
 from scraper_util import parse_pdf_abstract, find_startend_time, read_google_ics, fetch_json_events
 
 
@@ -148,8 +151,8 @@ def fetch_events_crim(base_url='https://crim.sas.upenn.edu'):
                 find('h1', attrs={'class': 'page-header'}).text
             date = soup.find(
                 'div', attrs={'class': 'field-date'}).find('span').text
-            location = soup.find('div', attrs={'class': 'field-location'})
-            location = location.find('p').text or ''
+            location = event_li.find('p', attrs={'class': 'location'})
+            location = location.text.strip() if location is not None else ''
             description = soup.find('div', attrs={'class': 'field-body'})
             description = description.find(
                 'p').text if description is not None else ''
@@ -249,8 +252,8 @@ def fetch_events_biology(base_url='http://www.bio.upenn.edu'):
             'description': description,
             'starttime': '',
             'endtime': '',
-            'owner': 'Department of Biology',
-            'url': event_url
+            'url': event_url,
+            'owner': 'Department of Biology'
         })
     return events
 
@@ -742,40 +745,6 @@ def fetch_events_cceb(base_url='https://www.cceb.med.upenn.edu/events'):
     return events
 
 
-def fetch_events_cis(base_url="http://www.cis.upenn.edu/about-cis/events/index.php"):
-    """
-    Fetch events from CIS department. Scrape this site is a little tricky
-    """
-    events = []
-    page_soup = BeautifulSoup(requests.get(base_url).content, 'html.parser')
-    title, date, description, speaker = '', '', '', ''
-    for tr in page_soup.find_all('tr'):
-        if tr.find('img') is not None:
-            events.append({
-                'title': title,
-                'speaker': speaker,
-                'date': date,
-                'location': location,
-                'description': description,
-                'url': base_url,
-                'owner': 'CIS',
-                'starttime': '3:00 PM',
-                'endtime': '4:00 PM'
-            })
-            title, date, description = '', '', ''
-        else:
-            if tr.find('div', attrs={'class': 'CollapsiblePanelContent'}) is not None:
-                description = tr.find(
-                    'div', attrs={'class': 'CollapsiblePanelContent'}).text.strip()
-            if tr.find('div', attrs={'class': 'CollapsiblePanelContent'}) is None:
-                event_header = tr.find('td')
-                if event_header is not None:
-                    date = tr.find('strong').text.strip() if tr.find(
-                        'strong') is not None else ''
-                    title = ' '.join(tr.text.replace(date, '').strip().split())
-    return events
-
-
 def fetch_events_dsl(base_url='http://dsl.cis.upenn.edu/seminar/'):
     """
     Scrape events from DSL seminar.
@@ -1174,8 +1143,9 @@ def fetch_events_HIP(base_url='https://www.impact.upenn.edu/'):
 
         description = event_soup.find(
             'div', attrs={'class': 'entry-content clearfix'})
-        starttime = str(description.find('p')).split(
+        event_time = str(description.find('p')).split(
             '<br/>')[-1].replace('</p>', '') if description is not None else ''
+        starttime, endtime = find_startend_time(event_time)
 
         if description is not None:
             description = ' '.join([i.text.strip() for i in description.find(
