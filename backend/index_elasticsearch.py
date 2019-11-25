@@ -4,7 +4,7 @@ from elasticsearch import Elasticsearch, helpers
 from datetime import datetime
 from dateutil.parser import parse
 
-import backend.config as config
+import config as config
 
 es = Elasticsearch([
     {'host': config.ELASTIC_HOST, 'port': config.ELASTIC_PORT},
@@ -33,7 +33,7 @@ def generate_event(events):
         event_add['suggest'] = event['suggest_candidates'] if isinstance(
             event['suggest_candidates'], list) else []
         yield {
-            "_index": "penn-events",
+            "_index": config.ELASTIC_INDEX,
             "_type": "event",
             "_id": event['event_index'],
             "_source": event_add

@@ -2,13 +2,12 @@ import json
 import re
 from datetime import timedelta, datetime
 from urllib.parse import urljoin
-
 import dateutil.parser
 import requests
 from bs4 import BeautifulSoup, NavigableString
 from dateutil import relativedelta
 
-from backend.fetch_events import parse_pdf_abstract, find_startend_time, read_google_ics, fetch_json_events
+from scraper_util import parse_pdf_abstract, find_startend_time, read_google_ics, fetch_json_events
 
 
 def fetch_events_cni(base_url='https://cni.upenn.edu/events'):

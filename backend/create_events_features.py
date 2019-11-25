@@ -10,7 +10,7 @@ from nltk.tokenize import WhitespaceTokenizer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import TruncatedSVD
 
-import backend.config as config
+import config
 
 nlp = spacy.load('en_core_web_sm')
 stemmer = PorterStemmer()

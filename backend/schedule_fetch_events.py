@@ -9,7 +9,7 @@ from datetime import datetime
 from fetch_events import fetch_all_events
 from create_events_features import create_events_features
 from index_elasticsearch import index_events_elasticsearch
-
+import config
 
 home_dir = str(Path.home())
 if not os.path.isdir(os.path.join(home_dir, 'nltk_data')):
@@ -21,7 +21,7 @@ def job():
     print("Start fetching events...")
     subprocess.run(['supervisorctl', 'start', 'supervisor-grobid']) # start GROBID
     time.sleep(30)
-    fetch_all_events() # fetch all events
+    fetch_all_events(config.scrapers) # fetch all events
     subprocess.run(['supervisorctl', 'stop', 'supervisor-grobid']) # stop GROBID
 
     create_events_features() # create events features: event topics, search keywords
