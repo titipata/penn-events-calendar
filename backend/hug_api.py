@@ -126,12 +126,17 @@ def query(search_query: hug.types.text):
     See more query examples at: https://elasticsearch-dsl.readthedocs.io/en/latest/search_dsl.html
     """
     fields = ['title^2', 'owner^2', 'speaker^2', 'location^2', 'description']
-    n_results = 60
+    n_results = 30
     responses = es_search.query(
         "multi_match",
         query=search_query,
         fields=fields
-    )
+    ).filter(
+        'range',
+        timestamp={
+            'from': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+            'to': (datetime.now() + timedelta(weeks=50)).strftime('%Y-%m-%dT%H:%M:%S')
+        })
     search_responses = responses[0:n_results].execute()
     search_responses = search_responses.to_dict()['hits']['hits']
 
