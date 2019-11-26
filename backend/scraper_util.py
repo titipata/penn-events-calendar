@@ -12,8 +12,9 @@ from bs4 import BeautifulSoup
 from ics import Calendar
 from unidecode import unidecode
 
-import config
-
+# GROBID stuff for parsing PDFs
+GROBID_URL = 'http://localhost:8070'
+GROBID_PDF_URL = '{}/api/processFulltextDocument'.format(GROBID_URL)
 
 PATTERNS = [
     r'^[a-zA-Z]+, ([a-zA-Z]+ [0-9]{1,2}, [0-9]{4}).*',
@@ -151,7 +152,7 @@ def parse_pdf_abstract(pdf_url):
     """
     try:
         parsed_article = requests.post(
-            config.GROBID_PDF_URL, files={'input': requests.get(pdf_url).content}).text
+            GROBID_PDF_URL, files={'input': requests.get(pdf_url).content}).text
         pdf_soup = BeautifulSoup(parsed_article, 'lxml')
         title = pdf_soup.find('title')
         title = title.text if title is not None else ''

@@ -15,10 +15,6 @@ PATH_DATA = os.path.join('data', 'events.json')  # path to save events
 PATH_FETCH_DATA = os.path.join('data', 'fetch_record.json')
 PATH_VECTOR = os.path.join('data', 'events_vector.json')
 
-# GROBID stuff for parsing PDFs
-GROBID_URL = 'http://localhost:8070'
-GROBID_PDF_URL = '{}/api/processFulltextDocument'.format(GROBID_URL)
-
 # ElasticSearch configuration
 ELASTIC_HOST = 'localhost'
 ELASTIC_PORT = 9200
