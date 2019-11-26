@@ -53,7 +53,8 @@ Here is an instruction on how to use the web application:
 
 - Titipat Achakulvisut ([titipata](https://github.com/titipata))
 - Tulakan Ruangrong ([bluenex](https://github.com/bluenex))
-- Kittinan Srithaworn ([kittinan](https://github.com/kittinan))
+
+and [contributors](https://github.com/titipata/penn-events-calendar/graphs/contributors)
 
 ## Sponsors
 
