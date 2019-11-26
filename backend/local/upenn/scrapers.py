@@ -285,7 +285,8 @@ def fetch_events_economics(base_url='https://economics.sas.upenn.edu'):
         page = requests.get(all_event_url)
         all_event_soup = BeautifulSoup(page.content, 'html.parser')
         page_events = all_event_soup.find(
-            'ul', attrs={'class': 'list-unstyled row'}).find_all('li')
+            'ul', attrs={'class': 'list-unstyled row'})
+        page_events = page_events.find_all('li') if page_events is not None else []
 
         for event in page_events:
             event_url = urljoin(base_url, event.find('a')['href'])
