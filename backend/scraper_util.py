@@ -49,8 +49,8 @@ def clean_date_format(d):
             for pat in PATS:
                 if pat.match(d):
                     d = pat.sub(r"\1", d)
-                    return dateutil.parser.parse(d, dayfirst=True, fuzzy=True).strftime('%d-%m-%Y')
-            return dateutil.parser.parse(d, dayfirst=True, fuzzy=True).strftime('%d-%m-%Y')
+                    return dateutil.parser.parse(d, dayfirst=False, fuzzy=True).strftime('%d-%m-%Y')
+            return dateutil.parser.parse(d, dayfirst=False, fuzzy=True).strftime('%d-%m-%Y')
         else:
             return ''
 
