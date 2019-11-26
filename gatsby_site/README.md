@@ -24,6 +24,10 @@ To make it run on a remote server, you can do the following:
 npm run gatsby-prod -- -H <host_name>
 ```
 
+## Customize metadata and Google Analytics
+
+`gatsby-config.js` contains a script for site metadata for social media sharing and Google Analytics tracking. You can edit this file before serving the frontend.
+
 ## Gatsby documentation
 
 Full documentation for Gatsby can be found [here](https://www.gatsbyjs.org/).

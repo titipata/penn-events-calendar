@@ -29,6 +29,10 @@ By default, this will concurrently run Gatsby frontend site at port `8000`, hug 
 
 **For production** see [`devops`](https://github.com/titipata/penn-events-calendar/tree/master/devops) folder on how to set up [supervisord](http://supervisord.org).
 
+## Customize for your events
+
+You can customize the site so that it works on your events. Please see `backend` on how to create your own fetch events script and `frontend` on how to customize site's metadata and Google Analytics.
+
 ## Usage
 
 Here is an instruction on how to use the web application:
