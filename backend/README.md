@@ -2,15 +2,23 @@
 
 We use Python as our backend. Backend mainly contains scripts to fetch events from Penn, search and recommendation API using [hug](https://www.hug.rest/), and index fetched events to `Elasticsearch`. For development, the hug backend is set by default to run on port `8888` and `Elasticsearch` is run on port `9200`. See `backend` folder on how to run the backend scripts.
 
-## Fetch events
+## Fetch events and  search
 
-The `fetch_events.py` script contains functions to fetch Penn events. We use GROBID to parse PDF and fetch all event to `data/events.json`. `create_events_features.py` contains a script to transform events to LSA vectors and list of search keywords.
+The `fetch_events.py` script contains functions to fetch Penn events. For a PDF file, we use GROBID to parse a it. After running a fetch script, events will be fetched to `data/events.json`. `create_events_features.py` contains a script to transform events to LSA vectors and list of search candidates.
 
 ```sh
-bash serve_grobid.sh
+bash serve_grobid.sh # serve GROBID to parse PDF (not required)
 python fetch_events.py # scrape data
 python create_events_features.py # create LSA vectors and search candidates
 ```
+
+### Customize to your own events
+
+There are a few places to chage before running your own application
+
+* `config.py`: this file this contains path to the scrapers and custom locations e.g. `local/upenn/scrapers.py` and `local/upenn/locations.py`.
+  * `scrapers.py` contains functions, each returns a list of events. Each event is a dictionary with a key of `title`, `speaker`, `date`, `location`, `description`, `starttime`, `endtime`, `url`, `owner` (see `data/events.json` for the format). You have to edit this file to make it scrapes your universities events instead. Output `date` format should be year first or month first. It might give a parsing error if you put in a date first format.
+  * `locations.py` contains a list specific locations which sometimes do not get recognized by [spacy Named Entity Recognition](https://spacy.io/usage/linguistic-features#named-entities)
 
 ## Serve and index events to `Elasticsearch`
 

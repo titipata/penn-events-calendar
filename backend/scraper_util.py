@@ -44,13 +44,13 @@ def clean_date_format(d):
         d = d.replace('Special time:', '')
         d = d.replace('Wu & Chen Auditorium', '')
         d = re.sub(r'(\d+\:\d+\s?(?:AM|PM|am|pm|A.M.|P.M.|a.m.|p.m.))', '', d)
-        d = d.replace('-', '').strip()
+        d = d.strip()
         if d is not '':
             for pat in PATS:
                 if pat.match(d):
                     d = pat.sub(r"\1", d)
-                    return dateutil.parser.parse(d).strftime('%d-%m-%Y')
-            return dateutil.parser.parse(d).strftime('%d-%m-%Y')
+                    return dateutil.parser.parse(d, dayfirst=True, fuzzy=True).strftime('%d-%m-%Y')
+            return dateutil.parser.parse(d, dayfirst=True, fuzzy=True).strftime('%d-%m-%Y')
         else:
             return ''
 
@@ -141,7 +141,11 @@ def save_json(events_json, file_path):
 
 def parse_pdf_abstract(pdf_url):
     """
-    Parse title and abstract for a given pdf_url to scientific paper
+    Parse title and abstract for a given ``pdf_url`` to scientific paper
+
+    Returns
+    =======
+    title, description: tuple (str, str), title and description parsed from a path or URL to a PDF file
     """
     try:
         parsed_article = requests.post(
@@ -163,7 +167,8 @@ def parse_pdf_abstract(pdf_url):
 
 def read_google_ics(ics_url):
     """
-    Fetch events directly from Google calendar ICS file
+    Fetch events directly from Google calendar ICS file.
+    This will return a list of events, each in dictionary format
     """
     events = []
     try:
