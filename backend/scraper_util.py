@@ -12,6 +12,8 @@ from bs4 import BeautifulSoup
 from ics import Calendar
 from unidecode import unidecode
 
+import config
+
 
 PATTERNS = [
     r'^[a-zA-Z]+, ([a-zA-Z]+ [0-9]{1,2}, [0-9]{4}).*',
