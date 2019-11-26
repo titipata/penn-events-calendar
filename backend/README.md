@@ -46,7 +46,7 @@ To serve hug with `uwsgi`, use the following command
 uwsgi --http 127.0.0.1:8888 --wsgi-file hug_api.py -p 2 --callable __hug_wsgi__
 ```
 
-this will serve `uwsgi` with 2 processes. Before running, make sure that `uwsgi` is installed via `conda install -c conda-forge uwsgi`
+this will serve `uwsgi` with 2 processes. Before running, make sure that `uwsgi` is installed via `conda install -c conda-forge uwsgi`. If it does not work, you might have to check this [Stack Overflow post](https://stackoverflow.com/questions/41775441/chef-installing-uwsgi-libiconv-so-2-no-such-file-or-directory).
 
 ## Requirements
 

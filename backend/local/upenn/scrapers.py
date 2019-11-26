@@ -1304,7 +1304,7 @@ def fetch_events_CEAS(base_url='https://ceas.sas.upenn.edu'):
         details = details.text if details is not None else ''
         events.append({
             'title': title,
-            'speaker'
+            'speaker': '',
             'date': date,
             'location': '',
             'description': details,
