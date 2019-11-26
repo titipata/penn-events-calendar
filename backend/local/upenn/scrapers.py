@@ -151,8 +151,8 @@ def fetch_events_crim(base_url='https://crim.sas.upenn.edu'):
                 find('h1', attrs={'class': 'page-header'}).text
             date = soup.find(
                 'div', attrs={'class': 'field-date'}).find('span').text
-            location = event_li.find('p', attrs={'class': 'location'})
-            location = location.text.strip() if location is not None else ''
+            location = soup.find('div', attrs={'class': 'field-location'})
+            location = location.text.replace('\xa0\n', ', ').strip() if location is not None else ''
             description = soup.find('div', attrs={'class': 'field-body'})
             description = description.find(
                 'p').text if description is not None else ''
@@ -228,30 +228,31 @@ def fetch_events_biology(base_url='http://www.bio.upenn.edu'):
     page = requests.get(urljoin(base_url, '/events'))
     soup = BeautifulSoup(page.content, 'html.parser')
 
-    for event in soup.find('div', attrs={'class': 'events-listing'}).find_all('summary', attrs={'class': 'col-md-11'}):
+    for event in soup.find_all('div', attrs={'class': 'events-listing'}):
         event_url = urljoin(base_url, event.find('a')['href'])
         title = event.find('a')
         title = title.text if title is not None else ''
         event_time = event.find('span', attrs={'class': 'news-date'})
         event_time = event_time.text if event_time is not None else ''
-        event_soup = BeautifulSoup(page.content, 'html.parser')
+        starttime, endtime = find_startend_time(event_time)
+
+        event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
         date = event_soup.find('span', attrs={'class': 'date-display-single'})
         date = date.text if date is not None else ''
         location = event_soup.find(
             'div', attrs={'class': 'field field-type-text field-field-event-location'})
         location = location.find(
             'div', attrs={'class': 'field-item odd'}).text if location is not None else ''
-        description = event_soup.find('div', attrs={'class': 'node-inner'})
-        description = description.find('div', attrs={'class': 'content'}).find(
-            'p').text if description is not None else ''
+        description = event_soup.find('div', attrs={'class': 'events-page'})
+        description = description.get_text().strip() if description is not None else ''
         events.append({
             'title': title,
             'speaker': '',
             'date': date,
             'location': location,
             'description': description,
-            'starttime': '',
-            'endtime': '',
+            'starttime': starttime,
+            'endtime': endtime,
             'url': event_url,
             'owner': 'Department of Biology'
         })
