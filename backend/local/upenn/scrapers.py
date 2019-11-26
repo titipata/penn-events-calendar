@@ -1866,7 +1866,7 @@ def fetch_events_mins(base_url='http://go.activecalendar.com/handlers/query.ashx
     dates = []
     event_date_time = [p.text.strip() for p in event_soup.find_all('p')]
     for e in event_date_time:
-        date = dateutil.parser.parse(e.split(', ')[0]).strftime('%d-%m-%Y')
+        date = dateutil.parser.parse(e.split(', ')[0]).strftime('%m-%d-%Y')
         starttime, endtime = e.split(', ')[1].split('-')
         starttime, endtime = ' '.join(
             starttime.split()), ' '.join(endtime.split())
@@ -1915,7 +1915,7 @@ def _extract_mindcore_event_detail(event):
     title = event.find('h2', attrs={'class': 'event-title'})
     title = title.text.strip() if title is not None else ''
     date = event.find('div', attrs={'class': 'event-meta-item'})
-    date = date.get_text() if date is not None else ''
+    date = date.get_text().strip() if date is not None else ''
     description = event.find('div', attrs={'class': 'row event-inner-content'})
     description = description.text.strip() if description is not None else ''
     event_time = event.find(

@@ -28,12 +28,13 @@ PATS = [re.compile(pattern) for pattern in PATTERNS]
 
 def clean_date_format(d):
     """
-    Clean date in string
+    Clean date in string to string in 'DD-MM-YYYY' format for front-end rendering
     e.g. 'Tuesday, October 30, 2018 - 11:30am', '02/06/2019', '1.3.18'
-    to string in 'DD-MM-YYYY' format
+
+    Not that the default parser will assume to parse month first before date
     """
     try:
-        return dateutil.parser.parse(d).strftime('%d-%m-%Y')
+        return dateutil.parser.parse(d, dayfirst=False, fuzzy=True).strftime('%d-%m-%Y')
     except:
         d = d.replace('*', '')
         d = d.replace('-', '')
@@ -138,17 +139,6 @@ def save_json(events_json, file_path):
         fp.write(s)
 
 
-def stringify_children(node):
-    """
-    Filters and removes possible Nones in texts and tails
-    ref: http://stackoverflow.com/questions/4624062/get-all-text-inside-a-tag-in-lxml
-    """
-    parts = ([node.text] +
-             list(chain(*([c.text, c.tail] for c in node.getchildren()))) +
-             [node.tail])
-    return ''.join(filter(None, parts))
-
-
 def parse_pdf_abstract(pdf_url):
     """
     Parse title and abstract for a given pdf_url to scientific paper
@@ -183,7 +173,7 @@ def read_google_ics(ics_url):
             unidecode(urlopen(ics_url).read().decode('iso-8859-1')))
     for event in calendar.events:
         if event.begin.year >= datetime.today().year:
-            date = event.begin.strftime('%d-%m-%Y')
+            date = event.begin.strftime('%m-%d-%Y')
             starttime = event.begin.strftime("%I:%M %p")
             endtime = event.end.strftime("%I:%M %p")
             description = event.description
@@ -221,7 +211,7 @@ def fetch_json_events(base_url, json_url, owner):
             endtime = end_date.strftime("%I:%M %p")
         else:
             endtime = ''
-        date = start_date.strftime('%d-%m-%Y')
+        date = start_date.strftime('%m-%d-%Y')
         title = event.get('title', '')
         description = event.get('summary', '')
         description = BeautifulSoup(description, 'html.parser').get_text(
