@@ -230,21 +230,28 @@ def fetch_events_biology(base_url='http://www.bio.upenn.edu'):
 
     for event in soup.find_all('div', attrs={'class': 'events-listing'}):
         event_url = urljoin(base_url, event.find('a')['href'])
-        title = event.find('a')
-        title = title.text if title is not None else ''
+        title = event.find('h3', attrs={'class': 'events-title'})
+        title = title.text.strip() if title is not None else ''
+        time_location = event.find('div', attrs={'class': 'metainfo'})
+        time_location = time_location.get_text().strip() if time_location is not None else ''
+        location = time_location.split('|')[-1]
+        location = location if location is not None else ''
+
+        date = event.find('div', attrs={'class': 'event-date'})
+        date = date.get_text().strip() if date is not None else ''
+        if date is not '':
+            date = '{} {}, {}'.format(date[0:3], date[3:5], date[5::])
+
         event_time = event.find('span', attrs={'class': 'news-date'})
-        event_time = event_time.text if event_time is not None else ''
+        event_time = event_time.text.strip() if event_time is not None else ''
         starttime, endtime = find_startend_time(event_time)
 
-        event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
-        date = event_soup.find('span', attrs={'class': 'date-display-single'})
-        date = date.text if date is not None else ''
-        location = event_soup.find(
-            'div', attrs={'class': 'field field-type-text field-field-event-location'})
-        location = location.find(
-            'div', attrs={'class': 'field-item odd'}).text if location is not None else ''
-        description = event_soup.find('div', attrs={'class': 'events-page'})
-        description = description.get_text().strip() if description is not None else ''
+        try:
+            event_soup = BeautifulSoup(requests.get(event_url).content, 'html.parser')
+            description = event_soup.find('div', attrs={'class': 'events-page'})
+            description = description.get_text().strip() if description is not None else ''
+        except:
+            description = ''
         events.append({
             'title': title,
             'speaker': '',
