@@ -134,7 +134,7 @@ def query(search_query: hug.types.text):
     ).filter(
         'range',
         timestamp={
-            'from': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+            'from': (datetime.now() - timedelta(hours=12)).strftime('%Y-%m-%dT%H:%M:%S'),
             'to': (datetime.now() + timedelta(weeks=50)).strftime('%Y-%m-%dT%H:%M:%S')
         })
     search_responses = responses[0:n_results].execute()
