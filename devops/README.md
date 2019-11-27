@@ -1,3 +1,5 @@
+# DevOps
+
 ## Reverse proxy with NGINX
 
 We use [NGINX](https://www.nginx.com) to reverse proxy of our services to the public. Basically, our production servers are:
@@ -21,6 +23,14 @@ sudo cp devops/penn-calendar.nginx.conf /etc/nginx/conf.d/
 
 # restart the service
 sudo service nginx restart
+```
+
+## Setting up timezone
+
+We use `datetime` library to index events to `Elasticsearch`. Setting a correct timezone is crucial to make sure your search result is aligned with your local time. For Ubuntu server, you can set up timezone as follows
+
+```sh
+sudo timedatectl set-timezone EST
 ```
 
 ## Running processes with Supervisor
