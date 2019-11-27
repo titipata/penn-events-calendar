@@ -189,3 +189,29 @@ def suggestion(text: hug.types.text):
             if text.lower() in s.lower():
                 suggest_terms.append(s)
     return list(pd.unique(suggest_terms))
+
+
+@hug.get("/pagination", examples="page=1")
+def pagination(page: hug.types.number=1):
+    """
+    Get pagination of a given page
+
+    example query: http://localhost:8888/api/pagination?page=1
+    """
+
+    search_responses = es_search.filter(
+        'range',
+        timestamp={
+            'from': (datetime.utcnow().date() - timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M:%S'),
+            'to': (datetime.now() + timedelta(weeks=50)).strftime('%Y-%m-%dT%H:%M:%S')
+        }
+    ).sort("timestamp")
+
+    query_events = []
+    for response in search_responses[(page - 1) * 30: (page * 30)].execute().to_dict()['hits']['hits']:
+        event = response['_source']
+        if 'suggest' in event:
+            del event['suggest']
+        query_events.append(event)
+
+    return query_events
