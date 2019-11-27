@@ -190,13 +190,13 @@ def read_google_ics(ics_url):
             title = event.name
             events.append({
                 'title': title,
-                #Speaker set later
+                # 'speaker' set later
                 'date': date,
-                #Location set later
+                # 'location' set later
                 'description': description,
                 'starttime': starttime,
                 'endtime': endtime,
-                #Owner and URL set later
+                # 'owner' and 'url' set later
             })
     return events
 

@@ -84,6 +84,7 @@ def recommendations(body):
 
     The body is then passed as an argument to this function, as a dictionary.
     """
+    n_recommendation = 25
     event_indices = body['payload']
     # in case frond-end sending index out of range
     event_indices = [event_idx for event_idx in event_indices
@@ -99,13 +100,15 @@ def recommendations(body):
     future_event_indices = [e['event_index'] for e in filter(
         lambda r: get_future_event(r['date_dt']), events)]
     # rank indices by cosine distance and get indices
-    relevances = np.array([cosine(pref_vector, np.array(
-        event_vectors_map[idx])) for idx in future_event_indices]).ravel()
+    relevances = np.array([
+        cosine(pref_vector, np.array(event_vectors_map[idx]))
+        for idx in future_event_indices
+    ]).ravel()
     rank_indices = np.argsort(relevances)
     relevances = np.clip(np.sort(relevances)[
-                         ::-1] * 100, 0, 100).astype(int)[0:25]
+                         ::-1] * 100, 0, 100).astype(int)[0:n_recommendation]
     indices_recommendation = [future_event_indices[i]
-                              for i in rank_indices][0:25]
+                              for i in rank_indices][0:n_recommendation]
 
     recommendations = []
     for idx, rel in zip(indices_recommendation, relevances):
@@ -142,15 +145,17 @@ def query(search_query: hug.types.text):
 
     # return future events for a given query
     future_events, relevances = [], []
-    for response in filter(lambda r: get_future_event('{} {}'.format(r['_source']['date_dt'], r['_source']['starttime'])), search_responses):
+    for response in search_responses:
         event = response['_source']
         event['event_index'] = int(response['_id'])
         if 'suggest' in event:
             del event['suggest']
         future_events.append(event)
         relevances.append(response['_score'])
-    relevances = [int(100 * (r / max(relevances)))
-                  for r in relevances]  # normalize by the maximum relevance
+    relevances = [
+        int(100 * (r / max(relevances)))
+        for r in relevances
+    ]  # normalize by the maximum relevance
     query_events = []
     for event, rel in zip(future_events, relevances):
         event['relevance'] = rel

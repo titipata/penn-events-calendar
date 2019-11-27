@@ -17,6 +17,7 @@ stemmer = PorterStemmer()
 w_tokenizer = WhitespaceTokenizer()
 punct_re = re.compile('[{}]'.format(re.escape(string.punctuation)))
 
+
 def save_json(ls, file_path):
     """
     Save list of dictionary to JSON
@@ -52,7 +53,9 @@ def generate_location_candidate(event):
     """
     location = nlp(event['location'])
     location_candidates = [
-        ent.text for ent in location.ents if ent.label_ in ('ORG', 'LOC')]
+        ent.text for ent in location.ents
+        if ent.label_ in ('ORG', 'LOC')
+    ]
     for penn_location in config.locations:
         if penn_location in location.text:
             location_candidates.append(penn_location)
@@ -64,10 +67,13 @@ def generate_description_candidate(event):
     Generate person, organization candidate using speaker, title and description
     from a given row of events dataframe
     """
-    event_text = event['speaker'] + ' ' + \
-        event['title'] + ' ' + event['description']
-    candidates = [ent.text for ent in nlp(
-        event_text).ents if ent.label_ in ('PERSON', 'ORG')]
+    event_text = '{} {} {}'.format(
+        event['speaker'], event['title'], event['description']
+    )
+    candidates = [ent.text
+                  for ent in nlp(event_text).ents
+                  if ent.label_ in ('PERSON', 'ORG')
+                  ]
     return candidates
 
 
@@ -115,10 +121,15 @@ def create_events_features():
 
     # produce search candidate list
     print('Compute list of search candidates...')
-    location_candidates = events_df.apply(generate_location_candidate, axis=1)
+    location_candidates = events_df.apply(
+        generate_location_candidate, axis=1
+    )
     description_candidates = events_df.apply(
-        generate_description_candidate, axis=1)
-    owner_candidates = events_df.apply(generate_owner_candidate, axis=1)
+        generate_description_candidate, axis=1
+    )
+    owner_candidates = events_df.apply(
+        generate_owner_candidate, axis=1
+    )
 
     suggest_candidates = (location_candidates + owner_candidates + description_candidates).\
         map(lambda x: list(pd.unique(

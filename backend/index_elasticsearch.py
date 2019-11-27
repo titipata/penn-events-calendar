@@ -4,7 +4,7 @@ from elasticsearch import Elasticsearch, helpers
 from datetime import datetime
 from dateutil.parser import parse
 
-import config as config
+import config
 
 es = Elasticsearch([
     {'host': config.ELASTIC_HOST, 'port': config.ELASTIC_PORT},
@@ -18,7 +18,9 @@ def generate_event(events):
     for event in events:
         try:
             timestamp = parse(
-                event['date_dt'] + ' ' + event['starttime'], dayfirst=True)
+                event['date_dt'] + ' ' + event['starttime'],
+                dayfirst=True
+            )
         except:
             timestamp = datetime.now()
         event['timestamp'] = timestamp
@@ -115,14 +117,18 @@ def index_events_elasticsearch():
                                 on='event_index', how='left')
     events = events_df.to_dict(orient='records')
 
-    es.indices.delete(index=config.ELASTIC_INDEX, ignore=[
-                      400, 404])  # delete current index
+    es.indices.delete(
+        index=config.ELASTIC_INDEX,
+        ignore=[400, 404]
+    ) # delete current index
     # add settings to es indices client
     # include_type_name is very important!
     # also dont ignore 400, 404 here to know what the error is
-    es.indices.create(index=config.ELASTIC_INDEX,
-                      body=settings,
-                      include_type_name=True)
+    es.indices.create(
+        index=config.ELASTIC_INDEX,
+        body=settings,
+        include_type_name=True
+    )
 
     # insert all events to elasticsearch
     helpers.bulk(es, generate_event(events))
