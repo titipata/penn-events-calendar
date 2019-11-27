@@ -9,6 +9,7 @@ from scipy.spatial.distance import cosine
 
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
+from django.core.paginator import Paginator
 
 # enable CORS
 api = hug.API(__name__)
@@ -198,6 +199,7 @@ def pagination(page: hug.types.number=1):
 
     example query: http://localhost:8888/api/pagination?page=1
     """
+    n_pagination = 30
     if page > 0:
         search_responses = es_search.filter(
             'range',
@@ -207,8 +209,11 @@ def pagination(page: hug.types.number=1):
             }
         ).sort("timestamp")
 
+        p = Paginator(search_responses, n_pagination)
+        n_pages = p.num_pages
+
         query_events = []
-        for response in search_responses[(page - 1) * 30: (page * 30)].execute().to_dict()['hits']['hits']:
+        for response in search_responses[(page - 1) * n_pagination: (page * n_pagination)].execute().to_dict()['hits']['hits']:
             event = response['_source']
             event['event_index'] = int(response['_id'])
             if 'suggest' in event:
@@ -217,4 +222,8 @@ def pagination(page: hug.types.number=1):
     else:
         query_events = []
 
-    return query_events
+    return {
+        'page': page,
+        'total': n_pages,
+        'data': query_events
+    }
