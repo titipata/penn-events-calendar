@@ -46,7 +46,7 @@ def get_future_event(date, days=0, hours=9):
     date: str, date string in '%d-%m-%Y'
     """
     try:
-        if datetime.now() - timedelta(days=days, hours=hours) <= parser.parse(date, dayfirst=True):
+        if datetime.now() - timedelta(days=days, hours=hours) <= parser.parse(date, dayfirst=True, fuzzy=True):
             return True
         else:
             return False

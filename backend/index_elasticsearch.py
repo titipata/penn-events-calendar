@@ -19,7 +19,8 @@ def generate_event(events):
         try:
             timestamp = parse(
                 event['date_dt'] + ' ' + event['starttime'],
-                dayfirst=True
+                dayfirst=True,
+                fuzzy=True
             )
         except:
             timestamp = datetime.now()
