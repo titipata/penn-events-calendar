@@ -198,20 +198,23 @@ def pagination(page: hug.types.number=1):
 
     example query: http://localhost:8888/api/pagination?page=1
     """
+    if page > 0:
+        search_responses = es_search.filter(
+            'range',
+            timestamp={
+                'from': (datetime.utcnow().date() - timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M:%S'),
+                'to': (datetime.now() + timedelta(weeks=50)).strftime('%Y-%m-%dT%H:%M:%S')
+            }
+        ).sort("timestamp")
 
-    search_responses = es_search.filter(
-        'range',
-        timestamp={
-            'from': (datetime.utcnow().date() - timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M:%S'),
-            'to': (datetime.now() + timedelta(weeks=50)).strftime('%Y-%m-%dT%H:%M:%S')
-        }
-    ).sort("timestamp")
-
-    query_events = []
-    for response in search_responses[(page - 1) * 30: (page * 30)].execute().to_dict()['hits']['hits']:
-        event = response['_source']
-        if 'suggest' in event:
-            del event['suggest']
-        query_events.append(event)
+        query_events = []
+        for response in search_responses[(page - 1) * 30: (page * 30)].execute().to_dict()['hits']['hits']:
+            event = response['_source']
+            event['event_index'] = int(response['_id'])
+            if 'suggest' in event:
+                del event['suggest']
+            query_events.append(event)
+    else:
+        query_events = []
 
     return query_events
