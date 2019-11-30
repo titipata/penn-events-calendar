@@ -37,9 +37,20 @@ export default ({ location }) => {
     setSearchQuery(decodeURI(parseQueryString(location.search).search_query));
   }, [location.search]);
 
+  // calculate and get correct events for each page before sending to render
+  const [currentPageEvents, setCurrentPageEvents] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+
   const [searchResults, isLoading] = useFetchEvents(
     `/api/query?search_query=${searchQuery}}`,
   );
+
+  useEffect(() => {
+    const start = 0 + (30 * (currentPage - 1));
+    const end = 30 + (30 * (currentPage - 1));
+
+    setCurrentPageEvents(searchResults.slice(start, end));
+  }, [currentPage, searchResults]);
 
   return (
     <Layout>
@@ -53,8 +64,10 @@ export default ({ location }) => {
       </p>
       <EventsContainer
         isLoading={isLoading}
-        allEvents={searchResults}
+        currentPageEvents={currentPageEvents}
         noEventDefaultText={`Sorry, there are no events matched from your search query "${searchQuery}".`}
+        noOfPages={Math.ceil(searchResults.length / 30)}
+        handlePagination={pageNo => setCurrentPage(pageNo)}
       />
     </Layout>
   );
