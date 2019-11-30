@@ -9,6 +9,7 @@ from scipy.spatial.distance import cosine
 
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
+from django.core.paginator import Paginator
 
 # enable CORS
 api = hug.API(__name__)
@@ -189,3 +190,40 @@ def suggestion(text: hug.types.text):
             if text.lower() in s.lower():
                 suggest_terms.append(s)
     return list(pd.unique(suggest_terms))
+
+
+@hug.get("/pagination", examples="page=1")
+def pagination(page: hug.types.number=1):
+    """
+    Get pagination of a given page
+
+    example query: http://localhost:8888/api/pagination?page=1
+    """
+    n_pagination = 30
+    if page > 0:
+        search_responses = es_search.filter(
+            'range',
+            timestamp={
+                'from': (datetime.utcnow().date() - timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M:%S'),
+                'to': (datetime.now() + timedelta(weeks=50)).strftime('%Y-%m-%dT%H:%M:%S')
+            }
+        ).sort("timestamp")
+
+        p = Paginator(search_responses, n_pagination)
+        n_pages = p.num_pages
+
+        query_events = []
+        for response in search_responses[(page - 1) * n_pagination: (page * n_pagination)].execute().to_dict()['hits']['hits']:
+            event = response['_source']
+            event['event_index'] = int(response['_id'])
+            if 'suggest' in event:
+                del event['suggest']
+            query_events.append(event)
+    else:
+        query_events = []
+
+    return {
+        'page': page,
+        'total': n_pages,
+        'data': query_events
+    }

@@ -2,7 +2,7 @@ import { FontAwesomeIcon as Fa } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
 import Pagination from 'rc-pagination';
 import localeInfo from 'rc-pagination/lib/locale/en_US';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Events as evUtil, Key } from '../../utils';
 import EventList from './EventList';
@@ -48,25 +48,15 @@ const PaginationWrapper = styled.div`
   align-items: center;
 `;
 
-const EventsContainer = ({ allEvents, noEventDefaultText, isLoading }) => {
-  // local state
+const EventsContainer = ({
+  currentPageEvents,
+  noOfPages,
+  noEventDefaultText,
+  isLoading,
+  handlePagination,
+}) => {
+  // also keep track of page in local state
   const [currentPage, setCurrentPage] = useState(1);
-  const [currentPageData, setCurrentPageData] = useState([]);
-  const [paginatedEvents, setPaginatedEvents] = useState([]);
-
-  // ---- manage pagination
-  // set current page data when currentPage and paginatedEvents is changed
-  // as we use globalState to retrieve data from localStorage
-  // we don't get the data right after the component is mounted
-  // thus we also watch for `allEvents`
-  useEffect(() => {
-    setPaginatedEvents(evUtil.getPaginatedEvents(allEvents));
-  }, [allEvents]);
-
-  useEffect(() => {
-    const { data } = paginatedEvents.find(grp => grp.page === currentPage) || [];
-    setCurrentPageData(evUtil.groupByDate(data));
-  }, [currentPage, paginatedEvents]);
 
   // ---- render no data screen
   if (isLoading) {
@@ -77,7 +67,7 @@ const EventsContainer = ({ allEvents, noEventDefaultText, isLoading }) => {
     );
   }
 
-  if (allEvents.length === 0) {
+  if (currentPageEvents.length === 0) {
     return (
       <StyledContainer>
         <p>{noEventDefaultText}</p>
@@ -88,7 +78,7 @@ const EventsContainer = ({ allEvents, noEventDefaultText, isLoading }) => {
   return (
     <>
       {
-        currentPageData.map(grp => (
+        evUtil.groupByDate(currentPageEvents).map(grp => (
           <StyledContainer key={Key.getShortKey()}>
             <StyledSectionText>
               <StyledH2>
@@ -106,11 +96,12 @@ const EventsContainer = ({ allEvents, noEventDefaultText, isLoading }) => {
       <PaginationWrapper>
         <StyledPagination
           onChange={(nextPage) => {
+            handlePagination(nextPage);
             setCurrentPage(nextPage);
             window.scrollTo(0, 0);
           }}
           current={currentPage}
-          total={allEvents.length - 1}
+          total={30 * noOfPages}
           pageSize={30}
           hideOnSinglePage
           locale={localeInfo}
@@ -121,15 +112,19 @@ const EventsContainer = ({ allEvents, noEventDefaultText, isLoading }) => {
 };
 
 EventsContainer.propTypes = {
-  // allEvents is supposed to be preprocessed already
+  // currentPageEvents is supposed to be preprocessed already
   // including filter incomplete data out and sort by date ascendingly
-  allEvents: PropTypes.arrayOf(Object).isRequired,
+  currentPageEvents: PropTypes.arrayOf(Object).isRequired,
+  noOfPages: PropTypes.number,
   noEventDefaultText: PropTypes.string,
   isLoading: PropTypes.bool.isRequired,
+  handlePagination: PropTypes.func,
 };
 
 EventsContainer.defaultProps = {
   noEventDefaultText: null,
+  noOfPages: 0,
+  handlePagination: () => {},
 };
 
 export default EventsContainer;

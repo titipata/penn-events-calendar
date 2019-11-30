@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import EventsContainer from '../components/EventsContainer';
 import Layout from '../components/layout';
 import useGlobal from '../store';
@@ -15,18 +15,31 @@ export default ({ data, location }) => {
   // get selected event indexes from global state
   const { selectedEvents: selectedEventsIndexes } = globalState;
 
+  // calculate and get correct events for each page before sending to render
+  const [currentPageEvents, setCurrentPageEvents] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+
   const [selectedEvents, isLoading] = useFetchEvents(
     '/api/getevents',
     selectedEventsIndexes,
   );
+
+  useEffect(() => {
+    const start = 0 + (30 * (currentPage - 1));
+    const end = 30 + (30 * (currentPage - 1));
+
+    setCurrentPageEvents(selectedEvents.slice(start, end));
+  }, [currentPage, selectedEvents]);
 
   return (
     <Layout>
       <h1>Selected Events</h1>
       <EventsContainer
         isLoading={isLoading}
-        allEvents={selectedEvents}
+        currentPageEvents={currentPageEvents}
         noEventDefaultText="You don't have selected events in your library."
+        noOfPages={Math.ceil(selectedEvents.length / 30)}
+        handlePagination={pageNo => setCurrentPage(pageNo)}
       />
     </Layout>
   );

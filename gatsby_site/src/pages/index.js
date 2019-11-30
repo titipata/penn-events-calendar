@@ -1,5 +1,4 @@
-import { graphql } from 'gatsby';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import EventsContainer from '../components/EventsContainer';
 import Layout from '../components/layout';
@@ -7,7 +6,6 @@ import useLocalStorage from '../hooks/useLocalStorage';
 import useStaticResources from '../hooks/useStaticResources';
 import { Events as evUtil } from '../utils';
 import SearchButton from '../components/BaseComponents/SearchButton';
-import useLoadingAllEvents from '../hooks/useLoadingEvents';
 
 const HeaderWrapper = styled.div`
   display: flex;
@@ -15,19 +13,42 @@ const HeaderWrapper = styled.div`
   align-items: center;
 `;
 
-export default ({ data, location }) => {
+export default () => {
   // use this to retrieve data and rehydrate before globalState is used
   useLocalStorage();
   useStaticResources();
 
-  // use custom hook to check if it is loading
-  const [isLoading] = useLoadingAllEvents(data.allEventsJson.edges);
+  // local state
+  const [isLoading, setIsLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [fetchedData, setFetchedData] = useState({});
+  const [currentPageEvents, setCurrentPageEvents] = useState([]);
 
-  // preprocess events before sending to events list
-  const preprocessedEvents = evUtil.getPreprocessedEvents(
-    data.allEventsJson.edges,
-    true,
-  );
+  useEffect(() => {
+    setIsLoading(true);
+    fetch(`/api/pagination?page=${currentPage}`)
+      .then(res => res.json())
+      .then((resJson) => {
+        setFetchedData(resJson);
+        setIsLoading(false);
+      });
+  }, [currentPage]);
+
+  useEffect(() => {
+    if (fetchedData.data) {
+      // preprocess events before sending to events list
+      const preprocessedEvents = evUtil.getPreprocessedEvents(
+        fetchedData.data
+          // TODO: this filter step is supposed to be done on backend
+          .filter(x => x.title)
+          .map(x => ({ node: x })),
+        true,
+      );
+
+      // set to local state
+      setCurrentPageEvents(preprocessedEvents);
+    }
+  }, [fetchedData.data]);
 
   return (
     <Layout>
@@ -37,29 +58,11 @@ export default ({ data, location }) => {
       </HeaderWrapper>
       <EventsContainer
         isLoading={isLoading}
-        allEvents={preprocessedEvents}
+        allEvents={currentPageEvents}
+        handlePagination={pageNo => setCurrentPage(pageNo)}
+        noOfPages={fetchedData.total}
+        currentPageEvents={currentPageEvents}
       />
     </Layout>
   );
 };
-
-export const pageQuery = graphql`
-  query {
-    allEventsJson {
-      edges {
-        node {
-          date_dt
-          description
-          endtime
-          event_index
-          location
-          owner
-          speaker
-          starttime
-          title
-          url
-        }
-      }
-    }
-  }
-`;
