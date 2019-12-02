@@ -1,7 +1,7 @@
 import json
 import pandas as pd
 from elasticsearch import Elasticsearch, helpers
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil.parser import parse
 
 import config
@@ -23,7 +23,7 @@ def generate_event(events):
                 fuzzy=True
             )
         except:
-            timestamp = datetime.now()
+            timestamp = datetime.now() - timedelta(days=1)
         event['timestamp'] = timestamp
         event['date'] = timestamp.strftime("%B %d %Y")
         event_add = {
