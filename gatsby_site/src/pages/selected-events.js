@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import EventsContainer from '../components/EventsContainer';
 import Layout from '../components/layout';
-import useGlobal from '../store';
-import useLocalStorage from '../hooks/useLocalStorage';
-import useStaticResources from '../hooks/useStaticResources';
 import useFetchEvents from '../hooks/useFetchEvents';
+import useLocalStorage from '../hooks/useLocalStorage';
+import usePagination from '../hooks/usePagination';
+import useStaticResources from '../hooks/useStaticResources';
+import useGlobal from '../store';
 
-export default ({ data, location }) => {
+export default () => {
   // use this to retrieve data and rehydrate before globalState is used
   useLocalStorage();
   useStaticResources();
@@ -15,21 +16,14 @@ export default ({ data, location }) => {
   // get selected event indexes from global state
   const { selectedEvents: selectedEventsIndexes } = globalState;
 
-  // calculate and get correct events for each page before sending to render
-  const [currentPageEvents, setCurrentPageEvents] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-
+  // fetch selected events from saved indexes
   const [selectedEvents, isLoading] = useFetchEvents(
     '/api/getevents',
     selectedEventsIndexes,
   );
 
-  useEffect(() => {
-    const start = 0 + (30 * (currentPage - 1));
-    const end = 30 + (30 * (currentPage - 1));
-
-    setCurrentPageEvents(selectedEvents.slice(start, end));
-  }, [currentPage, selectedEvents]);
+  // use a custom hook to get data
+  const [currentPageEvents, totalPage, setCurrentPage] = usePagination(selectedEvents);
 
   return (
     <Layout>
@@ -38,7 +32,7 @@ export default ({ data, location }) => {
         isLoading={isLoading}
         currentPageEvents={currentPageEvents}
         noEventDefaultText="You don't have selected events in your library."
-        noOfPages={Math.ceil(selectedEvents.length / 30)}
+        noOfPages={totalPage}
         handlePagination={pageNo => setCurrentPage(pageNo)}
       />
     </Layout>
