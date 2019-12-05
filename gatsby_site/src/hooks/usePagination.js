@@ -18,6 +18,7 @@ function usePagination(eventsArray = null) {
       return;
     }
 
+    setIsLoading(true);
     fetch(`/api/pagination?page=${currentPage}`)
       .then(res => res.json())
       .then((resJson) => {
