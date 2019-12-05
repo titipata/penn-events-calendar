@@ -6,6 +6,7 @@ import Layout from '../components/layout';
 import useFetchEvents from '../hooks/useFetchEvents';
 import useLocalStorage from '../hooks/useLocalStorage';
 import useStaticResources from '../hooks/useStaticResources';
+import usePagination from '../hooks/usePagination';
 
 const HeaderWrapper = styled.div`
   display: flex;
@@ -37,20 +38,13 @@ export default ({ location }) => {
     setSearchQuery(decodeURI(parseQueryString(location.search).search_query));
   }, [location.search]);
 
-  // calculate and get correct events for each page before sending to render
-  const [currentPageEvents, setCurrentPageEvents] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-
+  // fetch events from search query
   const [searchResults, isLoading] = useFetchEvents(
     `/api/query?search_query=${searchQuery}}`,
   );
 
-  useEffect(() => {
-    const start = 0 + (30 * (currentPage - 1));
-    const end = 30 + (30 * (currentPage - 1));
-
-    setCurrentPageEvents(searchResults.slice(start, end));
-  }, [currentPage, searchResults]);
+  // use a custom hook to get data
+  const [currentPageEvents, totalPage, setCurrentPage] = usePagination(searchResults);
 
   return (
     <Layout>
@@ -66,7 +60,7 @@ export default ({ location }) => {
         isLoading={isLoading}
         currentPageEvents={currentPageEvents}
         noEventDefaultText={`Sorry, there are no events matched from your search query "${searchQuery}".`}
-        noOfPages={Math.ceil(searchResults.length / 30)}
+        noOfPages={totalPage}
         handlePagination={pageNo => setCurrentPage(pageNo)}
       />
     </Layout>

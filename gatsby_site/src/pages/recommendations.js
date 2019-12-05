@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import EventsContainer from '../components/EventsContainer';
 import Layout from '../components/layout';
-import useGlobal from '../store';
-import useLocalStorage from '../hooks/useLocalStorage';
-import useStaticResources from '../hooks/useStaticResources';
 import useFetchEvents from '../hooks/useFetchEvents';
+import useLocalStorage from '../hooks/useLocalStorage';
+import usePagination from '../hooks/usePagination';
+import useStaticResources from '../hooks/useStaticResources';
+import useGlobal from '../store';
 
 export default () => {
   // use this to retrieve data and rehydrate before globalState is used
@@ -15,21 +16,14 @@ export default () => {
   // get selected event indexes from global state
   const { selectedEvents: selectedEventsIndexes } = globalState;
 
-  // calculate and get correct events for each page before sending to render
-  const [currentPageEvents, setCurrentPageEvents] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-
+  // fetch recommended events from saved indexes
   const [recommendedEvents, isLoading] = useFetchEvents(
     '/api/recommendations',
     selectedEventsIndexes,
   );
 
-  useEffect(() => {
-    const start = 0 + (30 * (currentPage - 1));
-    const end = 30 + (30 * (currentPage - 1));
-
-    setCurrentPageEvents(recommendedEvents.slice(start, end));
-  }, [currentPage, recommendedEvents]);
+  // use a custom hook to get data
+  const [currentPageEvents, totalPage, setCurrentPage] = usePagination(recommendedEvents);
 
   return (
     <Layout>
@@ -38,7 +32,7 @@ export default () => {
         isLoading={isLoading}
         currentPageEvents={currentPageEvents}
         noEventDefaultText="Add some events to your library to see your recommendations."
-        noOfPages={Math.ceil(recommendedEvents.length / 30)}
+        noOfPages={totalPage}
         handlePagination={pageNo => setCurrentPage(pageNo)}
       />
     </Layout>
