@@ -89,7 +89,7 @@ DetailBox.propTypes = {
   owner: PropTypes.string,
   url: PropTypes.string,
   description: PropTypes.string,
-  isDescriptionExpanded: PropTypes.bool.isRequired,
+  isDescriptionExpanded: PropTypes.bool,
   saveToCalendarUrl: PropTypes.string.isRequired,
 };
 
@@ -99,6 +99,7 @@ DetailBox.defaultProps = {
   owner: null,
   url: null,
   description: null,
+  isDescriptionExpanded: false,
 };
 
 export default DetailBox;

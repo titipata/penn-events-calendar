@@ -67,13 +67,14 @@ CategoryLabel.propTypes = {
   //   description: PropTypes.string.isRequired,
   //   school: PropTypes.string.isRequired,
   // }).isRequired,
-  isDescriptionExpanded: PropTypes.bool.isRequired,
+  isDescriptionExpanded: PropTypes.bool,
   // onCollapseClick: PropTypes.func.isRequired,
 };
 
 CategoryLabel.defaultProps = {
   owner: null,
   description: null,
+  isDescriptionExpanded: false,
 };
 
 export default CategoryLabel;

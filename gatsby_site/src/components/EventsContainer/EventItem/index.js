@@ -34,10 +34,11 @@ const EventItem = ({ eventData }) => {
   const saveToCalendarUrl = evUtil.getUrlToAddEventToCalendar(eventData);
 
   // define local hook
+  // null on first load helps in render animation correctly
   const [
     descriptionVisible,
     setDescriptionVisible,
-  ] = useState(false);
+  ] = useState(null);
 
   // destructuring variables to use
   const {
@@ -84,12 +85,13 @@ const EventItem = ({ eventData }) => {
         />
       </StyledContentWrapper>
       {
-        descriptionVisible && description
+        description
           ? (
             <DescriptionBox
               // when expanded
               description={description}
               speaker={speaker}
+              shouldVisible={descriptionVisible}
             />
           )
           : null

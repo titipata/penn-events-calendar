@@ -1,14 +1,57 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
+
+const animateCss = {
+  visible: css`
+    height: 100%;
+    padding: 15px;
+    margin: 15px;
+    opacity: 1;
+    visibility: visible;
+  `,
+  invisible: css`
+    height: 0;
+    padding: 0 15px;
+    margin: 0 15px;
+    opacity: 0;
+    visibility: hidden;
+  `,
+};
+
+const showAnimation = keyframes`
+  0% {
+    ${animateCss.invisible}
+  }
+  100% {
+    ${animateCss.visible}
+  }
+`;
+
+const hideAnimation = keyframes`
+  0% {
+    ${animateCss.visible}
+  }
+  100% {
+    ${animateCss.invisible}
+  }
+`;
 
 const StyledDescriptionBox = styled.div`
   flex: 1;
-  margin: 15px;
   margin-bottom: 5px;
-  padding: 15px;
   border: 1px solid #eee;
   border-radius: 5px;
+
+  ${(props) => (props.visible === null
+    ? animateCss.invisible
+    : props.visible
+      ? css`
+        animation: 0.45s ${showAnimation} forwards;
+      `
+      : css`
+        animation: 0.22s ${hideAnimation} forwards;
+      `)}
 `;
 
 const StyledHeader = styled.div`
@@ -25,8 +68,10 @@ const StyledContent = styled.div`
   margin-bottom: 5px;
 `;
 
-const DescriptionBox = ({ description, speaker }) => (
-  <StyledDescriptionBox>
+const DescriptionBox = ({ description, speaker, shouldVisible }) => (
+  <StyledDescriptionBox
+    visible={shouldVisible}
+  >
     {
       speaker
         ? (
@@ -53,11 +98,13 @@ const DescriptionBox = ({ description, speaker }) => (
 DescriptionBox.propTypes = {
   description: PropTypes.string,
   speaker: PropTypes.string,
+  shouldVisible: PropTypes.bool,
 };
 
 DescriptionBox.defaultProps = {
   description: null,
   speaker: null,
+  shouldVisible: null,
 };
 
 export default DescriptionBox;
