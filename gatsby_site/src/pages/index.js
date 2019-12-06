@@ -30,7 +30,7 @@ export default () => {
       <EventsContainer
         isLoading={isLoading}
         allEvents={currentPageEvents}
-        handlePagination={pageNo => setCurrentPage(pageNo)}
+        handlePagination={(pageNo) => setCurrentPage(pageNo)}
         noOfPages={totalPage}
         currentPageEvents={currentPageEvents}
       />

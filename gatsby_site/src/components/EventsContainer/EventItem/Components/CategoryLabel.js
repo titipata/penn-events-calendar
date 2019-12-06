@@ -15,8 +15,8 @@ const StyledCat = styled.div`
   font-size: 0.9rem;
   /* margin-top: 10px; */
   padding: 5px;
-  border: 1px solid ${props => props.color};
-  background-color: ${props => `${props.color}1A`};
+  border: 1px solid ${(props) => props.color};
+  background-color: ${(props) => `${props.color}1A`};
   border-radius: 5px;
   width: fit-content;
   margin-right: 5px;
@@ -24,7 +24,7 @@ const StyledCat = styled.div`
 
 const StyledSpan = styled.span`
   cursor: pointer;
-  color: ${props => `${props.color}A6`};
+  color: ${(props) => `${props.color}A6`};
 `;
 
 const StyledGroup = styled.div`

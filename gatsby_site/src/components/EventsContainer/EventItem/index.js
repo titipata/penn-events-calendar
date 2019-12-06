@@ -10,9 +10,9 @@ const StyledListItem = styled.li`
   margin-bottom: 5px;
   padding: 10px 0;
   border: 1px solid #eee;
-  border-left: 5px solid ${props => props.color};
+  border-left: 5px solid ${(props) => props.color};
   border-radius: 5px;
-  cursor: ${props => (props.cursorPointer ? 'pointer' : 'default')};
+  cursor: ${(props) => (props.cursorPointer ? 'pointer' : 'default')};
 
   /* remove blue highlight when being clicked (Chrome only) */
   /* https://stackoverflow.com/a/21003770/4010864 */
@@ -56,7 +56,7 @@ const EventItem = ({ eventData }) => {
   // handle functions
   const _handleCardClick = () => {
     // set local state to control description visibility
-    setDescriptionVisible(prev => !prev);
+    setDescriptionVisible((prev) => !prev);
   };
 
   return (

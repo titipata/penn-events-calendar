@@ -20,7 +20,7 @@ function usePagination(eventsArray = null) {
 
     setIsLoading(true);
     fetch(`/api/pagination?page=${currentPage}`)
-      .then(res => res.json())
+      .then((res) => res.json())
       .then((resJson) => {
         const { total, data } = resJson;
 
@@ -32,7 +32,7 @@ function usePagination(eventsArray = null) {
           data
             // filter should have been done
             // .filter(x => x.title)
-            .map(x => ({ node: x })),
+            .map((x) => ({ node: x })),
           true,
         );
 

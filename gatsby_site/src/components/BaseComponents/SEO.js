@@ -23,7 +23,7 @@ const SEO = () => (
       } = seo;
 
       return (
-        <React.Fragment>
+        <>
           <Helmet>
             {/* General tags */}
             <title>{title}</title>
@@ -44,7 +44,7 @@ const SEO = () => (
             <meta name="twitter:description" content={description} />
             <meta name="twitter:image" content={image} />
           </Helmet>
-        </React.Fragment>
+        </>
       );
     }}
   />

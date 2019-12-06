@@ -61,7 +61,7 @@ export default ({ location }) => {
         currentPageEvents={currentPageEvents}
         noEventDefaultText={`Sorry, there are no events matched from your search query "${searchQuery}".`}
         noOfPages={totalPage}
-        handlePagination={pageNo => setCurrentPage(pageNo)}
+        handlePagination={(pageNo) => setCurrentPage(pageNo)}
       />
     </Layout>
   );

@@ -67,7 +67,7 @@ const StyledInput = styled.input`
   border-bottom: 2px solid #333;
   padding: 0 5px;
 
-  ${props => (props.active
+  ${(props) => (props.active
     ? css`
       animation: 0.45s ${slideInAnimation} ease-out forwards;
     `
@@ -103,7 +103,7 @@ const SuggestionList = styled.ul`
   ::-webkit-scrollbar-thumb:hover {
     background: #333;
   }
-  ${props => props.hidden && css`
+  ${(props) => props.hidden && css`
     display: none;
   `}
 `;
@@ -165,7 +165,7 @@ const FillerIcon = styled(StyledFa).attrs(() => ({
 const getSuggestions = (suggestionUrl, callback) => {
   if (!suggestionUrl) return;
   fetch(suggestionUrl)
-    .then(res => res.json())
+    .then((res) => res.json())
     .then((resJson) => {
       callback(resJson);
     });
@@ -240,7 +240,7 @@ const SearchButton = () => {
           || !active
         }
       >
-        {suggestionList.slice(0, 10).map(item => (
+        {suggestionList.slice(0, 10).map((item) => (
           <SuggestionItem
             key={Key.getShortKey()}
           >

@@ -33,7 +33,7 @@ export default () => {
         currentPageEvents={currentPageEvents}
         noEventDefaultText="Add some events to your library to see your recommendations."
         noOfPages={totalPage}
-        handlePagination={pageNo => setCurrentPage(pageNo)}
+        handlePagination={(pageNo) => setCurrentPage(pageNo)}
       />
     </Layout>
   );
