@@ -24,7 +24,7 @@ function useStaticResources() {
   }, [icons]);
 
   // return a function to add icon
-  return icon => setIcons([...icons, icon]);
+  return (icon) => setIcons([...icons, icon]);
 }
 
 export default useStaticResources;

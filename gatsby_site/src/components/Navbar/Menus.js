@@ -58,7 +58,7 @@ const NavList = styled.ul`
       background-color: #eee;
     }
 
-    ${props => (props.hidden
+    ${(props) => (props.hidden
     ? css`
       animation: ${props.hideDuration || 0}s ${props.animateHide} forwards;
     ` : css`
@@ -108,7 +108,7 @@ const Menus = ({ items, hidden }) => {
       ref={navListRef}
     >
       {
-        items.map(item => (
+        items.map((item) => (
           <NavItem key={Key.getShortKey()}>
             {item}
           </NavItem>

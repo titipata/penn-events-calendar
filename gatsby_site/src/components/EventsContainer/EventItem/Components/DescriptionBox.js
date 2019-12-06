@@ -30,14 +30,14 @@ const DescriptionBox = ({ description, speaker }) => (
     {
       speaker
         ? (
-          <React.Fragment>
+          <>
             <StyledHeader>
               Speaker:
             </StyledHeader>
             <StyledContent>
               {speaker}
             </StyledContent>
-          </React.Fragment>
+          </>
         )
         : null
     }

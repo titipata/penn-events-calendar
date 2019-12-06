@@ -40,10 +40,10 @@ const StyledFavIcon = styled(Fa).attrs(() => ({
   icon: 'star',
 }))`
   cursor: pointer;
-  color: ${props => (props.checked ? starColor.selected : starColor.normal)};
+  color: ${(props) => (props.checked ? starColor.selected : starColor.normal)};
   font-size: 1.75rem;
   /* refer to the id of svg  */
-  ${props => props.relevance && !props.checked && css`
+  ${(props) => props.relevance && !props.checked && css`
     path {
       fill: url(#${`lgrad-${props.relevance}`});
     }
@@ -73,14 +73,14 @@ const TimeBox = ({
       {
         !singleTime
           ? (
-            <React.Fragment>
+            <>
               <StyledTime>
                 {dtutil.getTime(starttime)}
               </StyledTime>
               <StyledTime>
                 {endtime ? dtutil.getTime(endtime) : null}
               </StyledTime>
-            </React.Fragment>
+            </>
           )
           : <StyledTime>{singleTime}</StyledTime>
       }

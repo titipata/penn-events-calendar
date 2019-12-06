@@ -3,7 +3,7 @@ const toggleSelectedEvent = (store, selectedEventId) => {
 
   store.setState({
     selectedEvents: selectedEvents.includes(selectedEventId)
-      ? selectedEvents.filter(x => x !== selectedEventId)
+      ? selectedEvents.filter((x) => x !== selectedEventId)
       : [...selectedEvents, selectedEventId],
   });
 };

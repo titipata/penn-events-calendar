@@ -28,7 +28,7 @@ function useFetchEvents(endpoint, payload) {
     if (!fetchOption) return;
 
     fetch(endpoint, fetchOption)
-      .then(res => res.json())
+      .then((res) => res.json())
       .then((resJson) => {
         // stop here if there is no data
         if (!resJson || resJson.length === 0) {
@@ -40,7 +40,7 @@ function useFetchEvents(endpoint, payload) {
 
         // need to add event data into node here
         const filteredData = evUtil.getPreprocessedEvents(
-          resJson.map(x => ({ node: x })),
+          resJson.map((x) => ({ node: x })),
         );
 
         // add to global state

@@ -13,7 +13,7 @@ const StyledEventsList = styled.ul`
 const EventsList = ({ groupedEvents }) => (
   <StyledEventsList>
     {
-      groupedEvents.map(ev => (
+      groupedEvents.map((ev) => (
         <EventItem
           key={Key.getShortKey()}
           eventData={ev}

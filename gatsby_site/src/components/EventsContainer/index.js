@@ -78,7 +78,7 @@ const EventsContainer = ({
   return (
     <>
       {
-        evUtil.groupByDate(currentPageEvents).map(grp => (
+        evUtil.groupByDate(currentPageEvents).map((grp) => (
           <StyledContainer key={Key.getShortKey()}>
             <StyledSectionText>
               <StyledH2>
