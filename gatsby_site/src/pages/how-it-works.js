@@ -7,6 +7,11 @@ const HeaderWrapper = styled.div`
   align-items: center;
 `;
 
+const InlineEmphasize = styled.span`
+  font-weight: bold;
+  font-size: 105%;
+`;
+
 const StyledImg = styled.img`
   border-radius: 5px;
   border: 1px solid #ddd;
@@ -23,6 +28,13 @@ export default () => (
     <HeaderWrapper>
       <h1>How it works</h1>
     </HeaderWrapper>
+    <p>
+      <InlineEmphasize>Report missing events:&nbsp;</InlineEmphasize>
+      If you notice any missing departments or events,
+      please report missing events via Github issue
+      <a href="https://github.com/titipata/penn-events-calendar/issues">&nbsp;here</a>
+      .
+    </p>
     <p>
       This web application collects all events happening at the University of Pennsylvania with
       built-in search and recommendation engine. Here is an instruction on how to use the web
