@@ -30,7 +30,7 @@ const Footer = () => (
       &nbsp;at University of Pennsylvania
       <br />
       Help us make it better at&nbsp;
-      <StyledLink href="https://github.com/titipata/penn-events-calendar/issues/">titipata/penn-events-calendar</StyledLink>
+      <StyledLink href="https://github.com/titipata/penn-events-calendar">titipata/penn-events-calendar</StyledLink>
     </StyledFooterText>
   </StyledFooter>
 );
