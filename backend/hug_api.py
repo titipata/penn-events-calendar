@@ -204,7 +204,7 @@ def pagination(page: hug.types.number=1):
         search_responses = es_search.filter(
             'range',
             timestamp={
-                'from': (datetime.utcnow().date() - timedelta(hours=1)).strftime('%Y-%m-%dT%H:%M:%S'),
+                'from': (datetime.today().date()).strftime('%Y-%m-%dT%H:%M:%S'),
                 'to': (datetime.now() + timedelta(weeks=50)).strftime('%Y-%m-%dT%H:%M:%S')
             }
         ).sort("timestamp")
